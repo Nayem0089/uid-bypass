@@ -21,12 +21,14 @@ try:
     mongo_client.server_info()
     db = mongo_client["sensix_panel"]
     subadmins_col = db["subadmins"]
+    uid_ownership_col = db["uid_ownership"]  # tracks which reseller added which UID
     print("MongoDB connected OK")
 except Exception as e:
     print(f"MongoDB FAILED: {e}")
     mongo_client = None
     db = None
     subadmins_col = None
+    uid_ownership_col = None
 
 SENSIX_HEADERS = {
     "X-AUTH-KEY": SENSIX_APIKEY,
@@ -60,7 +62,7 @@ def admin_verify():
     return jsonify({"status": "success", "role": "main_admin"}), 200
 
 
-# LICENSES
+# LICENSES - MAIN ADMIN
 @app.route('/admin/list', methods=['GET'])
 def admin_list():
     if request.args.get("admin_key") != ADMIN_KEY:
@@ -100,6 +102,9 @@ def admin_revoke():
         return jsonify({"status": "error", "message": "uid required"}), 400
     data, code = sensix("POST", "/api/v1/uids/remove", json={"uid": uid})
     if code == 200 and data.get("success"):
+        # Remove ownership record too
+        if uid_ownership_col is not None:
+            uid_ownership_col.delete_one({"uid": uid})
         return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
@@ -119,26 +124,21 @@ def admin_update():
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
 
-# SUB-ADMIN MANAGEMENT - MongoDB
+# SUB-ADMIN MANAGEMENT
 @app.route('/admin/create-subadmin', methods=['POST'])
 def create_subadmin():
     body = request.json or {}
     if body.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
-
     if subadmins_col is None:
         return jsonify({"status": "error", "message": "Database not connected. Check MONGO_URI in environment variables."}), 500
-
     username = body.get("username", "").strip()
     password = body.get("password", "").strip()
     note     = body.get("note", "").strip()
-
     if not username or not password:
         return jsonify({"status": "error", "message": "username and password required"}), 400
-
     if subadmins_col.find_one({"username": username}):
         return jsonify({"status": "error", "message": "Username already exists"}), 409
-
     subadmins_col.insert_one({
         "username": username,
         "password": password,
@@ -152,10 +152,8 @@ def create_subadmin():
 def list_subadmins():
     if request.args.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
-
     if subadmins_col is None:
         return jsonify({"status": "error", "message": "Database not connected"}), 500
-
     result = [
         {"username": sa["username"], "note": sa.get("note", ""), "active": True}
         for sa in subadmins_col.find({}, {"_id": 0, "password": 0})
@@ -168,10 +166,8 @@ def delete_subadmin():
     body = request.json or {}
     if body.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
-
     if subadmins_col is None:
         return jsonify({"status": "error", "message": "Database not connected"}), 500
-
     username = body.get("username", "").strip()
     result = subadmins_col.delete_one({"username": username})
     if result.deleted_count == 0:
@@ -197,21 +193,36 @@ def subadmin_login():
 
 @app.route('/subadmin/list', methods=['GET'])
 def subadmin_list():
+    """Reseller শুধু নিজের add করা UIDs দেখবে"""
     username = request.args.get("username", "")
     password = request.args.get("password", "")
     if not verify_subadmin(username, password):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    # Get all UIDs from Sensix
     data, code = sensix("GET", "/api/v1/uids/list")
     if code != 200:
         return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
-    uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
-    return jsonify({"status": "success", "total": len(uids), "licenses": uids}), 200
+    all_uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
+
+    # Filter only UIDs owned by this reseller
+    if uid_ownership_col is not None:
+        owned = set(
+            doc["uid"] for doc in uid_ownership_col.find({"owner": username}, {"uid": 1})
+        )
+        my_uids = [u for u in all_uids if (u.get("uid") or u.get("id") or "") in owned]
+    else:
+        my_uids = all_uids  # fallback: show all if DB not available
+
+    return jsonify({"status": "success", "total": len(my_uids), "licenses": my_uids}), 200
 
 
 @app.route('/subadmin/create', methods=['POST'])
 def subadmin_create():
     body = request.json or {}
-    if not verify_subadmin(body.get("username", ""), body.get("password", "")):
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_subadmin(username, password):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
     payload = {
         "uid":  body.get("uid", "").strip(),
@@ -222,6 +233,13 @@ def subadmin_create():
         return jsonify({"status": "error", "message": "uid required"}), 400
     data, code = sensix("POST", "/api/v1/uids/add", json=payload)
     if code in (200, 201):
+        # Save ownership in MongoDB
+        if uid_ownership_col is not None:
+            uid_ownership_col.update_one(
+                {"uid": payload["uid"]},
+                {"$set": {"uid": payload["uid"], "owner": username, "added_at": datetime.utcnow()}},
+                upsert=True
+            )
         return jsonify({"status": "success", "message": "UID added", "data": data}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
@@ -229,13 +247,24 @@ def subadmin_create():
 @app.route('/subadmin/revoke', methods=['POST'])
 def subadmin_revoke():
     body = request.json or {}
-    if not verify_subadmin(body.get("username", ""), body.get("password", "")):
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_subadmin(username, password):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
     uid = body.get("uid", "").strip()
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
+
+    # Check ownership — reseller can only remove their own UIDs
+    if uid_ownership_col is not None:
+        ownership = uid_ownership_col.find_one({"uid": uid})
+        if ownership and ownership.get("owner") != username:
+            return jsonify({"status": "error", "message": "You can only remove UIDs you added"}), 403
+
     data, code = sensix("POST", "/api/v1/uids/remove", json={"uid": uid})
     if code == 200 and data.get("success"):
+        if uid_ownership_col is not None:
+            uid_ownership_col.delete_one({"uid": uid})
         return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
@@ -243,7 +272,9 @@ def subadmin_revoke():
 @app.route('/subadmin/update', methods=['POST'])
 def subadmin_update():
     body = request.json or {}
-    if not verify_subadmin(body.get("username", ""), body.get("password", "")):
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_subadmin(username, password):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
     uid  = body.get("uid", "").strip()
     days = int(body.get("days", 30))
@@ -255,7 +286,7 @@ def subadmin_update():
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
 
-# DB STATUS CHECK (debug endpoint)
+# DB STATUS CHECK
 @app.route('/admin/db-status', methods=['GET'])
 def db_status():
     if request.args.get("admin_key") != ADMIN_KEY:
