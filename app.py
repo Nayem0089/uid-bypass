@@ -1,113 +1,263 @@
-from flask import Flask, render_template, request, jsonify
-from datetime import datetime, timedelta
 import os
+import requests
+from flask import Flask, request, jsonify, render_template
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
-# ─── In-memory storage (no database needed) ───────────────────────────────────
-users = {}  # uid -> {uid, name, expiry_date, status, created_at}
+# ─── CONFIG ───────────────────────────────────────────────
+SENSIX_BASE   = os.environ.get("SENSIX_BASE", "https://new.sensix.shop:2005")
+SENSIX_APIKEY = os.environ.get("SENSIX_APIKEY", "SENSIX-6E1D04F888A3CC09C952D58EE63971C919D777C43EB90B5E")
+ADMIN_KEY     = os.environ.get("ADMIN_KEY", "changeme_admin_key")
 
-# Pre-loaded demo users
-_demo = [
-    ('10700059566', 'STREAM',  '2027-01-10'),
-    ('11023982681', 'STREAM2', '2027-01-12'),
-]
-for _uid, _name, _exp in _demo:
-    users[_uid] = {
-        'uid': _uid, 'name': _name, 'expiry_date': _exp,
-        'status': 'ACTIVE',
-        'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
+# Sub-admins stored in memory (resets on restart — no DB)
+# Format: { "username": { "password": "...", "note": "..." } }
+SUBADMINS = {}
 
-# ─── Helper ───────────────────────────────────────────────────────────────────
-def calc_expiry(duration, custom_date=''):
-    today = datetime.now().date()
-    if duration == 'custom' and custom_date:
-        return datetime.strptime(custom_date, '%Y-%m-%d').date()
-    elif duration == '1_month':
-        return today + timedelta(days=30)
-    elif duration == '3_month':
-        return today + timedelta(days=90)
-    elif duration == 'lifetime':
-        return today + timedelta(days=365 * 10)
-    return None
+SENSIX_HEADERS = {
+    "X-AUTH-KEY": SENSIX_APIKEY,
+    "Content-Type": "application/json"
+}
 
-def enrich(user):
-    """Auto-set status based on expiry date."""
-    u = dict(user)
-    today = datetime.now().date()
-    expiry = datetime.strptime(u['expiry_date'], '%Y-%m-%d').date()
-    u['status'] = 'EXPIRED' if expiry < today else 'ACTIVE'
-    return u
+def sensix(method, path, **kwargs):
+    """Helper — call Sensix API and return (response_dict, status_code)."""
+    url = f"{SENSIX_BASE}{path}"
+    try:
+        r = requests.request(method, url, headers=SENSIX_HEADERS, timeout=20, **kwargs)
+        try:
+            return r.json(), r.status_code
+        except Exception:
+            return {"error": r.text}, r.status_code
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}, 503
 
-# ─── Routes ───────────────────────────────────────────────────────────────────
+
+# ─── FRONTEND ─────────────────────────────────────────────
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/api/users', methods=['GET'])
-def get_users():
-    search = request.args.get('search', '').strip().lower()
-    result = []
-    for u in users.values():
-        if search and search not in u['uid'].lower() and search not in u['name'].lower():
-            continue
-        result.append(enrich(u))
 
-    result.sort(key=lambda x: x['uid'], reverse=True)
-    active   = sum(1 for u in result if u['status'] == 'ACTIVE')
-    expired  = sum(1 for u in result if u['status'] == 'EXPIRED')
-    return jsonify({'users': result, 'stats': {'total': len(result), 'active': active, 'expired': expired}})
-
-@app.route('/api/users', methods=['POST'])
-def add_user():
+# ══════════════════════════════════════════════════════════
+#  MAIN ADMIN AUTH
+# ══════════════════════════════════════════════════════════
+@app.route('/admin/verify', methods=['POST'])
+def admin_verify():
     data = request.json or {}
-    uid  = data.get('uid', '').strip()
-    name = data.get('name', '').strip()
-    if not uid or not name:
-        return jsonify({'error': 'UID and Name are required'}), 400
-    if uid in users:
-        return jsonify({'error': 'UID already exists'}), 400
+    if data.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    return jsonify({"status": "success", "role": "main_admin"}), 200
 
-    try:
-        expiry = calc_expiry(data.get('duration'), data.get('custom_date', ''))
-    except ValueError:
-        return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
 
-    if expiry is None:
-        return jsonify({'error': 'Invalid duration selected'}), 400
+# ══════════════════════════════════════════════════════════
+#  LICENSES — proxy to Sensix API
+# ══════════════════════════════════════════════════════════
 
-    users[uid] = {
-        'uid': uid, 'name': name,
-        'expiry_date': expiry.strftime('%Y-%m-%d'),
-        'status': 'ACTIVE',
-        'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+@app.route('/admin/list', methods=['GET'])
+def admin_list():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+
+    data, code = sensix("GET", "/api/v1/uids/list")
+    if code != 200:
+        return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
+
+    uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
+    return jsonify({"status": "success", "total": len(uids), "licenses": uids}), 200
+
+
+@app.route('/admin/create', methods=['POST'])
+def admin_create():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+
+    payload = {
+        "uid":  body.get("uid", "").strip(),
+        "days": int(body.get("days", 30)),
+        "name": body.get("name", "Player").strip()
     }
-    return jsonify({'success': True, 'message': 'User added successfully'})
+    if not payload["uid"]:
+        return jsonify({"status": "error", "message": "uid required"}), 400
 
-@app.route('/api/users/<uid>', methods=['DELETE'])
-def remove_user(uid):
-    if uid not in users:
-        return jsonify({'error': 'User not found'}), 404
-    del users[uid]
-    return jsonify({'success': True, 'message': 'User removed successfully'})
+    data, code = sensix("POST", "/api/v1/uids/add", json=payload)
+    if code in (200, 201):
+        return jsonify({"status": "success", "message": "UID added", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
-@app.route('/api/users/<uid>/update', methods=['PUT'])
-def update_user(uid):
-    if uid not in users:
-        return jsonify({'error': 'User not found'}), 404
-    data = request.json or {}
-    try:
-        expiry = calc_expiry(data.get('duration'), data.get('custom_date', ''))
-    except ValueError:
-        return jsonify({'error': 'Invalid date format'}), 400
-    if expiry is None:
-        return jsonify({'error': 'Invalid duration'}), 400
 
-    users[uid]['expiry_date'] = expiry.strftime('%Y-%m-%d')
-    users[uid]['status'] = 'ACTIVE'
-    return jsonify({'success': True, 'message': 'User updated successfully'})
+@app.route('/admin/revoke', methods=['POST'])
+def admin_revoke():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
 
+    uid = body.get("uid", "").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+
+    data, code = sensix("DELETE", f"/api/v1/uids/{uid}")
+    if code in (200, 204):
+        return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+@app.route('/admin/update', methods=['POST'])
+def admin_update():
+    """Extend / renew a UID's days."""
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+
+    uid  = body.get("uid", "").strip()
+    days = int(body.get("days", 30))
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+
+    data, code = sensix("POST", f"/api/v1/uids/{uid}/renew", json={"days": days})
+    if code in (200, 201):
+        return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+# ══════════════════════════════════════════════════════════
+#  SUB-ADMIN MANAGEMENT (in-memory, Main Admin only)
+# ══════════════════════════════════════════════════════════
+
+@app.route('/admin/create-subadmin', methods=['POST'])
+def create_subadmin():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+    note     = body.get("note", "").strip()
+
+    if not username or not password:
+        return jsonify({"status": "error", "message": "username and password required"}), 400
+    if username in SUBADMINS:
+        return jsonify({"status": "error", "message": "Username already exists"}), 409
+
+    SUBADMINS[username] = {"password": password, "note": note}
+    return jsonify({"status": "success", "message": f"Sub-admin '{username}' created"}), 200
+
+
+@app.route('/admin/list-subadmins', methods=['GET'])
+def list_subadmins():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+
+    result = [
+        {"username": u, "note": v["note"], "active": True}
+        for u, v in SUBADMINS.items()
+    ]
+    return jsonify({"status": "success", "subadmins": result}), 200
+
+
+@app.route('/admin/delete-subadmin', methods=['POST'])
+def delete_subadmin():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+
+    username = body.get("username", "").strip()
+    if username not in SUBADMINS:
+        return jsonify({"status": "error", "message": "Sub-admin not found"}), 404
+
+    del SUBADMINS[username]
+    return jsonify({"status": "success", "message": f"Sub-admin '{username}' deleted"}), 200
+
+
+# ══════════════════════════════════════════════════════════
+#  SUB-ADMIN — login + their own UID actions
+#  Sub-admins can ADD / REMOVE / RENEW UIDs via Sensix API
+# ══════════════════════════════════════════════════════════
+
+def verify_subadmin(username, password):
+    sa = SUBADMINS.get(username)
+    return sa and sa["password"] == password
+
+
+@app.route('/subadmin/login', methods=['POST'])
+def subadmin_login():
+    body = request.json or {}
+    if verify_subadmin(body.get("username", ""), body.get("password", "")):
+        return jsonify({"status": "success", "role": "sub_admin", "username": body["username"]}), 200
+    return jsonify({"status": "error", "message": "Invalid credentials"}), 403
+
+
+@app.route('/subadmin/list', methods=['GET'])
+def subadmin_list():
+    username = request.args.get("username", "")
+    password = request.args.get("password", "")
+    if not verify_subadmin(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    data, code = sensix("GET", "/api/v1/uids/list")
+    if code != 200:
+        return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
+
+    uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
+    return jsonify({"status": "success", "total": len(uids), "licenses": uids}), 200
+
+
+@app.route('/subadmin/create', methods=['POST'])
+def subadmin_create():
+    body = request.json or {}
+    if not verify_subadmin(body.get("username", ""), body.get("password", "")):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    payload = {
+        "uid":  body.get("uid", "").strip(),
+        "days": int(body.get("days", 30)),
+        "name": body.get("name", "Player").strip()
+    }
+    if not payload["uid"]:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+
+    data, code = sensix("POST", "/api/v1/uids/add", json=payload)
+    if code in (200, 201):
+        return jsonify({"status": "success", "message": "UID added", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+@app.route('/subadmin/revoke', methods=['POST'])
+def subadmin_revoke():
+    body = request.json or {}
+    if not verify_subadmin(body.get("username", ""), body.get("password", "")):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    uid = body.get("uid", "").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+
+    data, code = sensix("DELETE", f"/api/v1/uids/{uid}")
+    if code in (200, 204):
+        return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+@app.route('/subadmin/update', methods=['POST'])
+def subadmin_update():
+    body = request.json or {}
+    if not verify_subadmin(body.get("username", ""), body.get("password", "")):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    uid  = body.get("uid", "").strip()
+    days = int(body.get("days", 30))
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+
+    data, code = sensix("POST", f"/api/v1/uids/{uid}/renew", json={"days": days})
+    if code in (200, 201):
+        return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+# ══════════════════════════════════════════════════════════
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get('PORT', 8002))
+    app.run(host='0.0.0.0', port=port, debug=False)
