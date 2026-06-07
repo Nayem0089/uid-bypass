@@ -103,8 +103,8 @@ def admin_revoke():
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
 
-    data, code = sensix("DELETE", f"/api/v1/uids/{uid}")
-    if code in (200, 204):
+    data, code = sensix("POST", "/api/v1/uids/remove", json={"uid": uid})
+    if code == 200 and data.get("success"):
         return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
@@ -244,8 +244,8 @@ def subadmin_revoke():
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
 
-    data, code = sensix("DELETE", f"/api/v1/uids/{uid}")
-    if code in (200, 204):
+    data, code = sensix("POST", "/api/v1/uids/remove", json={"uid": uid})
+    if code == 200 and data.get("success"):
         return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
