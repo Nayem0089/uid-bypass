@@ -1,6 +1,13 @@
 services:
   - type: web
-    name: user-management-app
-    env: python
+    name: reseller-panel
+    runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --workers 2 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SENSIX_BASE
+        value: https://new.sensix.shop:2005
+      - key: SENSIX_APIKEY
+        sync: false
+      - key: ADMIN_KEY
+        sync: false
