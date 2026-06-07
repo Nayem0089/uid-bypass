@@ -71,6 +71,7 @@ def admin_list():
     if code != 200:
         return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
     uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
+    uids = [u for u in uids if u.get("status", "active") != "removed"]
     return jsonify({"status": "success", "total": len(uids), "licenses": uids}), 200
 
 
@@ -203,6 +204,9 @@ def subadmin_list():
     if code != 200:
         return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
     all_uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
+
+    # Filter out removed UIDs
+    all_uids = [u for u in all_uids if u.get("status", "active") != "removed"]
 
     # Filter only UIDs owned by this reseller
     if uid_ownership_col is not None:
