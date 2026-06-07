@@ -1,279 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stream Corporation UID Bypass</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body { 
-            background: radial-gradient(circle at 50% 0%, #16192b 0%, #090a10 100%); 
-            color: #f3f4f6; 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-        }
-        /* Premium Cyber Glassmorphism */
-        .glass-card { 
-            background: rgba(17, 20, 34, 0.65); 
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.04); 
-            border-radius: 16px; 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-card:hover {
-            border-color: rgba(6, 182, 212, 0.15);
-            box-shadow: 0 12px 40px 0 rgba(6, 182, 212, 0.05);
-        }
-        /* Custom Glowing & Text Effects */
-        .gradient-text { 
-            background: linear-gradient(135deg, #38bdf8 0%, #a78bfa 100%); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-        }
-        .btn-gradient { 
-            background: linear-gradient(135deg, #06b6d4 0%, #7c3aed 100%); 
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25);
-            transition: all 0.2s ease; 
-        }
-        .btn-gradient:hover { 
-            opacity: 0.95;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-        }
-        /* Input Premium Styling */
-        .input-dark { 
-            background: rgba(10, 12, 22, 0.8); 
-            border: 1px solid rgba(255, 255, 255, 0.07); 
-            border-radius: 10px; 
-            padding: 12px 18px; 
-            width: 100%; 
-            color: white; 
-            outline: none; 
-            transition: all 0.2s ease;
-        }
-        .input-dark:focus { 
-            border-color: #06b6d4; 
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
-            background: rgba(14, 17, 30, 0.9);
-        }
-        /* Status Badges with Glow */
-        .status-badge { padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;}
-        .status-active { background: rgba(34, 197, 94, 0.12); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); box-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
-        .status-expired { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); box-shadow: 0 0 10px rgba(239, 68, 68, 0.1); }
-        
-        /* Neon Number Counter Glows */
-        .glow-cyan { text-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
-        .glow-green { text-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
-        .glow-red { text-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
-        
-        /* Custom Scrollbar for Premium Feel */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #090a10; }
-        ::-webkit-scrollbar-thumb { background: #2d334a; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Management</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 20px; color: #38bdf8; }
+    .stats { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat { background: #1e293b; border-radius: 10px; padding: 16px 28px; text-align: center; }
+    .stat .num { font-size: 2rem; font-weight: bold; color: #38bdf8; }
+    .stat .label { font-size: 0.85rem; color: #94a3b8; }
+    .card { background: #1e293b; border-radius: 12px; padding: 20px; max-width: 900px; margin: 0 auto 20px; }
+    input, select { background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; padding: 10px 14px; width: 100%; margin-bottom: 10px; font-size: 14px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .row input, .row select { flex: 1; min-width: 140px; }
+    button { background: #38bdf8; color: #0f172a; border: none; border-radius: 8px; padding: 10px 20px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #0ea5e9; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { background: #0f172a; color: #94a3b8; padding: 10px; text-align: left; font-size: 13px; }
+    td { padding: 10px; border-bottom: 1px solid #1e293b; font-size: 14px; }
+    tr:hover td { background: #1e293b; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+    .ACTIVE { background: #14532d; color: #4ade80; }
+    .EXPIRED { background: #450a0a; color: #f87171; }
+    .actions button { background: none; border: 1px solid #334155; color: #e2e8f0; padding: 5px 12px; margin-right: 4px; border-radius: 6px; font-size: 12px; }
+    .actions button:hover { background: #334155; }
+    #msg { text-align: center; padding: 8px; border-radius: 8px; display: none; margin-top: 10px; }
+    .success { background: #14532d; color: #4ade80; }
+    .error { background: #450a0a; color: #f87171; }
+    #customDate { display: none; }
+  </style>
 </head>
-<body class="p-6 md:p-12 lg:px-24">
+<body>
+  <h1>👤 User Management</h1>
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 pb-6 border-b border-white/[0.03]">
-        <div>
-            <h1 class="text-3xl md:text-4xl font-black gradient-text uppercase tracking-wider mb-1">Stream Corporation UID Bypass</h1>
-            <p class="text-gray-400 text-sm font-medium tracking-wide">Sensix API Integrated — <span class="text-gray-500">User Identity Database Management</span></p>
-        </div>
-        <div class="flex items-center space-x-4 bg-white/[0.02] p-2.5 rounded-xl border border-white/[0.04]">
-            <div class="flex items-center text-xs font-semibold text-gray-400 tracking-wider uppercase pl-2">
-                <span class="w-2.5 h-2.5 bg-red-500 rounded-full mr-2.5 animate-pulse shadow-[0_0_10px_#ef4444]"></span>
-                Checking API...
-            </div>
-            <button class="bg-[#ea580c] hover:bg-[#d97706] text-white text-xs px-4 py-2 rounded-lg font-bold uppercase tracking-wider transition-colors shadow-lg shadow-orange-600/10">Test API</button>
-        </div>
+  <div class="stats" id="stats">
+    <div class="stat"><div class="num" id="s-total">—</div><div class="label">Total</div></div>
+    <div class="stat"><div class="num" id="s-active">—</div><div class="label">Active</div></div>
+    <div class="stat"><div class="num" id="s-expired">—</div><div class="label">Expired</div></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:14px;color:#38bdf8">➕ Add User</h3>
+    <div class="row">
+      <input id="uid" placeholder="UID" />
+      <input id="name" placeholder="Name" />
+      <select id="duration" onchange="toggleCustom()">
+        <option value="1_month">1 Month</option>
+        <option value="3_month">3 Months</option>
+        <option value="lifetime">Lifetime</option>
+        <option value="custom">Custom Date</option>
+      </select>
+      <input type="date" id="customDate" />
     </div>
+    <button onclick="addUser()">Add User</button>
+    <div id="msg"></div>
+  </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div class="glass-card p-6 bg-gradient-to-br from-white/[0.01] to-transparent">
-            <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Database</h3>
-            <p id="total-users" class="text-5xl font-extrabold text-cyan-400 font-mono glow-cyan">0</p>
-        </div>
-        <div class="glass-card p-6 bg-gradient-to-br from-white/[0.01] to-transparent">
-            <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Active</h3>
-            <p id="active-users" class="text-5xl font-extrabold text-green-400 font-mono glow-green">0</p>
-        </div>
-        <div class="glass-card p-6 bg-gradient-to-br from-white/[0.01] to-transparent">
-            <h3 class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Expired</h3>
-            <p id="expired-users" class="text-5xl font-extrabold text-red-400 font-mono glow-red">0</p>
-        </div>
+  <div class="card">
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <input id="search" placeholder="🔍 Search by UID or Name…" oninput="loadUsers()" style="margin:0" />
     </div>
+    <table>
+      <thead><tr><th>#</th><th>UID</th><th>Name</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
 
-    <div class="glass-card p-4 flex flex-col sm:flex-row gap-3 mb-10 items-center">
-        <div class="relative w-full flex-grow">
-            <i class="fas fa-search absolute left-4 top-4 text-gray-500 text-sm"></i>
-            <input type="text" id="search-input" placeholder="Search UID or Name..." class="input-dark pl-11">
-        </div>
-        <div class="flex gap-3 w-full sm:w-auto shrink-0">
-            <button onclick="fetchUsers()" class="btn-gradient w-full sm:w-auto px-6 py-3 rounded-xl font-bold flex items-center justify-center text-sm tracking-wide text-white">
-                <i class="fas fa-search mr-2 text-xs opacity-80"></i> SEARCH
-            </button>
-            <button class="btn-gradient w-full sm:w-auto px-6 py-3 rounded-xl font-bold flex items-center justify-center text-sm tracking-wide text-white">
-                <i class="fas fa-sync-alt mr-2 text-xs opacity-80"></i> SYNC ALL
-            </button>
-        </div>
-    </div>
+  <script>
+    async function loadUsers() {
+      const q = document.getElementById('search').value;
+      const res = await fetch('/api/users?search=' + encodeURIComponent(q));
+      const data = await res.json();
+      document.getElementById('s-total').textContent = data.stats.total;
+      document.getElementById('s-active').textContent = data.stats.active;
+      document.getElementById('s-expired').textContent = data.stats.expired;
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = data.users.map((u, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${u.uid}</td>
+          <td>${u.name}</td>
+          <td>${u.expiry_date}</td>
+          <td><span class="badge ${u.status}">${u.status}</span></td>
+          <td class="actions">
+            <button onclick="updateUser('${u.uid}')">🔄 Renew</button>
+            <button onclick="deleteUser('${u.uid}')" style="color:#f87171;border-color:#7f1d1d">🗑 Delete</button>
+          </td>
+        </tr>`).join('');
+    }
 
-    <div class="glass-card p-6 md:p-8 mb-10 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-32 h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
-        <h2 class="text-cyan-400 font-bold text-sm uppercase tracking-widest mb-6 flex items-center">
-            <i class="fas fa-plus-circle mr-2.5 text-base"></i> ADD / UPDATE USER
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">User UID</label>
-                <input type="text" id="uid" placeholder="Enter UID" class="input-dark font-mono text-cyan-400">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">User Name</label>
-                <input type="text" id="name" placeholder="Enter Name" class="input-dark">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Expiry Date</label>
-                <input type="date" id="custom_date" class="input-dark text-gray-300">
-            </div>
-        </div>
+    function toggleCustom() {
+      const v = document.getElementById('duration').value;
+      document.getElementById('customDate').style.display = v === 'custom' ? 'block' : 'none';
+    }
 
-        <div class="flex flex-wrap gap-2.5 mb-6">
-            <button onclick="setDuration('1_month')" class="bg-white/[0.02] hover:bg-white/[0.06] text-gray-300 px-5 py-2.5 rounded-xl border border-white/[0.05] hover:border-cyan-500/40 transition duration-200 text-xs font-bold tracking-wider uppercase">1 MONTH</button>
-            <button onclick="setDuration('3_month')" class="bg-white/[0.02] hover:bg-white/[0.06] text-gray-300 px-5 py-2.5 rounded-xl border border-white/[0.05] hover:border-cyan-500/40 transition duration-200 text-xs font-bold tracking-wider uppercase">3 MONTH</button>
-            <button onclick="setDuration('lifetime')" class="bg-white/[0.02] hover:bg-white/[0.06] text-gray-300 px-5 py-2.5 rounded-xl border border-white/[0.05] hover:border-cyan-500/40 transition duration-200 text-xs font-bold tracking-wider uppercase">LIFETIME</button>
-            <button onclick="setDuration('custom')" class="btn-gradient px-5 py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase text-white">CUSTOM DATE</button>
-        </div>
+    function showMsg(text, type) {
+      const el = document.getElementById('msg');
+      el.textContent = text; el.className = type; el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 3000);
+    }
 
-        <div class="flex items-center mb-8 bg-white/[0.01] p-3 rounded-lg inline-flex border border-white/[0.03]">
-            <input type="checkbox" id="sync-api" class="w-4 h-4 rounded text-cyan-500 bg-black border-white/10 accent-cyan-500 focus:ring-0 cursor-pointer" checked>
-            <label for="sync-api" class="text-xs text-gray-300 font-semibold tracking-wide pl-2.5 cursor-pointer select-none">Sync with Sensix API</label>
-        </div>
+    async function addUser() {
+      const uid = document.getElementById('uid').value;
+      const name = document.getElementById('name').value;
+      const duration = document.getElementById('duration').value;
+      const custom_date = document.getElementById('customDate').value;
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({uid, name, duration, custom_date})
+      });
+      const data = await res.json();
+      if (data.success) { showMsg('✅ ' + data.message, 'success'); loadUsers(); document.getElementById('uid').value=''; document.getElementById('name').value=''; }
+      else showMsg('❌ ' + data.error, 'error');
+    }
 
-        <button onclick="saveUser()" class="bg-[#10b981] hover:bg-[#059669] text-[#060814] font-black px-8 py-3.5 rounded-xl flex items-center text-sm tracking-wider uppercase transition-all shadow-lg shadow-green-500/10 hover:shadow-green-500/20 hover:translate-y-[-1px]">
-            <i class="fas fa-save mr-2 text-base"></i> SAVE CUSTOM
-        </button>
-    </div>
+    async function deleteUser(uid) {
+      if (!confirm('Delete user ' + uid + '?')) return;
+      const res = await fetch('/api/users/' + uid, {method:'DELETE'});
+      const data = await res.json();
+      if (data.success) loadUsers();
+    }
 
-    <div class="glass-card overflow-hidden shadow-2xl">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-white/[0.02] border-b border-white/[0.04] text-gray-400 text-xs font-bold uppercase tracking-widest">
-                    <tr>
-                        <th class="p-5">UID</th>
-                        <th class="p-5">Name</th>
-                        <th class="p-5">Expiry Date</th>
-                        <th class="p-5">Status</th>
-                        <th class="p-5 text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="user-table-body" class="divide-y divide-white/[0.02]">
-                    <tr class="hover:bg-white/[0.01] transition duration-150">
-                        <td class="p-5 font-mono text-sm text-cyan-400 tracking-wide">10700059566</td>
-                        <td class="p-5 font-semibold text-sm text-gray-200">NXR</td>
-                        <td class="p-5 text-sm text-gray-400 font-medium">2027-01-10</td>
-                        <td class="p-5"><span class="status-badge status-active">Active</span></td>
-                        <td class="p-5 text-right">
-                            <button class="text-gray-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-500/10 transition-colors">
-                                <i class="fas fa-trash-alt text-sm"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    async function updateUser(uid) {
+      const duration = prompt('Enter duration: 1_month / 3_month / lifetime / custom\nFor custom enter YYYY-MM-DD after comma', '1_month');
+      if (!duration) return;
+      let d = duration.trim(), custom_date = '';
+      if (d.includes(',')) { [d, custom_date] = d.split(',').map(s => s.trim()); d = 'custom'; }
+      const res = await fetch('/api/users/' + uid + '/update', {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({duration: d, custom_date})
+      });
+      const data = await res.json();
+      if (data.success) loadUsers();
+    }
 
-    <script>
-        let selectedDuration = 'custom';
-
-        function setDuration(val) {
-            selectedDuration = val;
-        }
-
-        async function fetchUsers() {
-            const search = document.getElementById('search-input').value;
-            const res = await fetch(`/api/users?search=${search}`);
-            const data = await res.json();
-            
-            document.getElementById('total-users').innerText = data.stats.total;
-            document.getElementById('active-users').innerText = data.stats.active;
-            document.getElementById('expired-users').innerText = data.stats.expired;
-
-            const tableBody = document.getElementById('user-table-body');
-            tableBody.innerHTML = '';
-
-            data.users.forEach(user => {
-                const statusClass = user.status === 'ACTIVE' ? 'status-active' : 'status-expired';
-                tableBody.innerHTML += `
-                    <tr class="hover:bg-white/[0.01] transition duration-150">
-                        <td class="p-5 font-mono text-sm text-cyan-400 tracking-wide">${user.uid}</td>
-                        <td class="p-5 font-semibold text-sm text-gray-200">${user.name}</td>
-                        <td class="p-5 text-sm text-gray-400 font-medium">${user.expiry_date}</td>
-                        <td class="p-5">
-                            <span class="status-badge ${statusClass}">${user.status}</span>
-                        </td>
-                        <td class="p-5 text-right">
-                            <button onclick="deleteUser('${user.uid}')" class="text-gray-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-500/10 transition-colors">
-                                <i class="fas fa-trash-alt text-sm"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        async function saveUser() {
-            const payload = {
-                uid: document.getElementById('uid').value,
-                name: document.getElementById('name').value,
-                duration: selectedDuration,
-                custom_date: document.getElementById('custom_date').value
-            };
-
-            const res = await fetch('/api/users', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await res.json();
-            if (result.success) {
-                fetchUsers();
-            } else {
-                if (result.error === "UID already exists") {
-                    updateUser(payload);
-                } else {
-                    alert(result.error);
-                }
-            }
-        }
-
-        async function updateUser(payload) {
-            const res = await fetch(`/api/users/${payload.uid}/update`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            fetchUsers();
-        }
-
-        async function deleteUser(uid) {
-            if(confirm('Are you sure you want to delete this user?')) {
-                await fetch(`/api/users/${uid}`, { method: 'DELETE' });
-                fetchUsers();
-            }
-        }
-
-        // Initial Load
-        fetchUsers();
-    </script>
+    loadUsers();
+  </script>
 </body>
 </html>
