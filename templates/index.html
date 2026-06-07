@@ -520,8 +520,9 @@ async function confirmDelete(){
     res=await fetch('/subadmin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid})});
   }
   data=await res.json();
-  if(res.ok){showToast('UID '+uid+' removed');pendingIsMain?mainLoadUIDs():subLoadUIDs();}
-  else showToast(data.message,'error');
+  if(res.ok&&data.status==='success'){showToast('UID '+uid+' removed!');}
+  else{showToast(data.message||'Remove failed','error');}
+  pendingIsMain?mainLoadUIDs():subLoadUIDs();
 }
 document.getElementById('modal-del').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
