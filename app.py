@@ -9,17 +9,24 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# ─── CONFIG ───────────────────────────────────────────────
-# HTTP instead of HTTPS fix — port 2005 uses plain HTTP
+# CONFIG
 SENSIX_BASE   = os.environ.get("SENSIX_BASE", "http://new.sensix.shop:2005")
 SENSIX_APIKEY = os.environ.get("SENSIX_APIKEY", "SENSIX-6E1D04F888A3CC09C952D58EE63971C919D777C43EB90B5E")
 ADMIN_KEY     = os.environ.get("ADMIN_KEY", "changeme_admin_key")
 
-# ─── MONGODB SETUP ────────────────────────────────────────
+# MONGODB SETUP
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://NAYEM:1122@cluster0.ywmyozb.mongodb.net/?appName=Cluster0")
-mongo_client = MongoClient(MONGO_URI)
-db = mongo_client["sensix_panel"]
-subadmins_col = db["subadmins"]
+try:
+    mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000, tls=True, tlsAllowInvalidCertificates=True)
+    mongo_client.server_info()
+    db = mongo_client["sensix_panel"]
+    subadmins_col = db["subadmins"]
+    print("MongoDB connected OK")
+except Exception as e:
+    print(f"MongoDB FAILED: {e}")
+    mongo_client = None
+    db = None
+    subadmins_col = None
 
 SENSIX_HEADERS = {
     "X-AUTH-KEY": SENSIX_APIKEY,
@@ -27,7 +34,6 @@ SENSIX_HEADERS = {
 }
 
 def sensix(method, path, **kwargs):
-    """Helper — call Sensix API and return (response_dict, status_code)."""
     url = f"{SENSIX_BASE}{path}"
     try:
         r = requests.request(method, url, headers=SENSIX_HEADERS, timeout=20, **kwargs)
@@ -39,15 +45,13 @@ def sensix(method, path, **kwargs):
         return {"error": str(e)}, 503
 
 
-# ─── FRONTEND ─────────────────────────────────────────────
+# FRONTEND
 @app.route('/')
 def index():
     return render_template('index.html')
 
 
-# ══════════════════════════════════════════════════════════
-#  MAIN ADMIN AUTH
-# ══════════════════════════════════════════════════════════
+# MAIN ADMIN AUTH
 @app.route('/admin/verify', methods=['POST'])
 def admin_verify():
     data = request.json or {}
@@ -56,19 +60,14 @@ def admin_verify():
     return jsonify({"status": "success", "role": "main_admin"}), 200
 
 
-# ══════════════════════════════════════════════════════════
-#  LICENSES — proxy to Sensix API
-# ══════════════════════════════════════════════════════════
-
+# LICENSES
 @app.route('/admin/list', methods=['GET'])
 def admin_list():
     if request.args.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
-
     data, code = sensix("GET", "/api/v1/uids/list")
     if code != 200:
         return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
-
     uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
     return jsonify({"status": "success", "total": len(uids), "licenses": uids}), 200
 
@@ -78,7 +77,6 @@ def admin_create():
     body = request.json or {}
     if body.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
-
     payload = {
         "uid":  body.get("uid", "").strip(),
         "days": int(body.get("days", 30)),
@@ -86,7 +84,6 @@ def admin_create():
     }
     if not payload["uid"]:
         return jsonify({"status": "error", "message": "uid required"}), 400
-
     data, code = sensix("POST", "/api/v1/uids/add", json=payload)
     if code in (200, 201):
         return jsonify({"status": "success", "message": "UID added", "data": data}), 200
@@ -98,11 +95,9 @@ def admin_revoke():
     body = request.json or {}
     if body.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
-
     uid = body.get("uid", "").strip()
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
-
     data, code = sensix("POST", "/api/v1/uids/remove", json={"uid": uid})
     if code == 200 and data.get("success"):
         return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
@@ -114,27 +109,25 @@ def admin_update():
     body = request.json or {}
     if body.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
-
     uid  = body.get("uid", "").strip()
     days = int(body.get("days", 30))
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
-
     data, code = sensix("POST", f"/api/v1/uids/{uid}/renew", json={"days": days})
     if code in (200, 201):
         return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
 
-# ══════════════════════════════════════════════════════════
-#  SUB-ADMIN MANAGEMENT — MongoDB (persistent!)
-# ══════════════════════════════════════════════════════════
-
+# SUB-ADMIN MANAGEMENT - MongoDB
 @app.route('/admin/create-subadmin', methods=['POST'])
 def create_subadmin():
     body = request.json or {}
     if body.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+
+    if subadmins_col is None:
+        return jsonify({"status": "error", "message": "Database not connected. Check MONGO_URI in environment variables."}), 500
 
     username = body.get("username", "").strip()
     password = body.get("password", "").strip()
@@ -143,7 +136,6 @@ def create_subadmin():
     if not username or not password:
         return jsonify({"status": "error", "message": "username and password required"}), 400
 
-    # Check if already exists in MongoDB
     if subadmins_col.find_one({"username": username}):
         return jsonify({"status": "error", "message": "Username already exists"}), 409
 
@@ -161,6 +153,9 @@ def list_subadmins():
     if request.args.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
 
+    if subadmins_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
     result = [
         {"username": sa["username"], "note": sa.get("note", ""), "active": True}
         for sa in subadmins_col.find({}, {"_id": 0, "password": 0})
@@ -174,19 +169,20 @@ def delete_subadmin():
     if body.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
 
+    if subadmins_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
     username = body.get("username", "").strip()
     result = subadmins_col.delete_one({"username": username})
     if result.deleted_count == 0:
         return jsonify({"status": "error", "message": "Sub-admin not found"}), 404
-
     return jsonify({"status": "success", "message": f"Sub-admin '{username}' deleted"}), 200
 
 
-# ══════════════════════════════════════════════════════════
-#  SUB-ADMIN — login + their own UID actions
-# ══════════════════════════════════════════════════════════
-
+# SUB-ADMIN LOGIN + UID ACTIONS
 def verify_subadmin(username, password):
+    if subadmins_col is None:
+        return False
     sa = subadmins_col.find_one({"username": username, "password": password})
     return sa is not None
 
@@ -205,11 +201,9 @@ def subadmin_list():
     password = request.args.get("password", "")
     if not verify_subadmin(username, password):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
-
     data, code = sensix("GET", "/api/v1/uids/list")
     if code != 200:
         return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
-
     uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
     return jsonify({"status": "success", "total": len(uids), "licenses": uids}), 200
 
@@ -219,7 +213,6 @@ def subadmin_create():
     body = request.json or {}
     if not verify_subadmin(body.get("username", ""), body.get("password", "")):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
-
     payload = {
         "uid":  body.get("uid", "").strip(),
         "days": int(body.get("days", 30)),
@@ -227,7 +220,6 @@ def subadmin_create():
     }
     if not payload["uid"]:
         return jsonify({"status": "error", "message": "uid required"}), 400
-
     data, code = sensix("POST", "/api/v1/uids/add", json=payload)
     if code in (200, 201):
         return jsonify({"status": "success", "message": "UID added", "data": data}), 200
@@ -239,11 +231,9 @@ def subadmin_revoke():
     body = request.json or {}
     if not verify_subadmin(body.get("username", ""), body.get("password", "")):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
-
     uid = body.get("uid", "").strip()
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
-
     data, code = sensix("POST", "/api/v1/uids/remove", json={"uid": uid})
     if code == 200 and data.get("success"):
         return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
@@ -255,19 +245,26 @@ def subadmin_update():
     body = request.json or {}
     if not verify_subadmin(body.get("username", ""), body.get("password", "")):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
-
     uid  = body.get("uid", "").strip()
     days = int(body.get("days", 30))
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
-
     data, code = sensix("POST", f"/api/v1/uids/{uid}/renew", json={"days": days})
     if code in (200, 201):
         return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
 
 
-# ══════════════════════════════════════════════════════════
+# DB STATUS CHECK (debug endpoint)
+@app.route('/admin/db-status', methods=['GET'])
+def db_status():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if subadmins_col is None:
+        return jsonify({"status": "error", "message": "MongoDB NOT connected"}), 500
+    return jsonify({"status": "success", "message": "MongoDB connected OK"}), 200
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8002))
     app.run(host='0.0.0.0', port=port, debug=False)
