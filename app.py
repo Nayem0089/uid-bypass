@@ -2,19 +2,24 @@ import os
 import requests
 from flask import Flask, request, jsonify, render_template
 from dotenv import load_dotenv
+from pymongo import MongoClient
+from datetime import datetime
 
 load_dotenv()
 
 app = Flask(__name__)
 
 # ─── CONFIG ───────────────────────────────────────────────
-SENSIX_BASE   = os.environ.get("SENSIX_BASE", "https://new.sensix.shop:2005")
+# HTTP instead of HTTPS fix — port 2005 uses plain HTTP
+SENSIX_BASE   = os.environ.get("SENSIX_BASE", "http://new.sensix.shop:2005")
 SENSIX_APIKEY = os.environ.get("SENSIX_APIKEY", "SENSIX-6E1D04F888A3CC09C952D58EE63971C919D777C43EB90B5E")
 ADMIN_KEY     = os.environ.get("ADMIN_KEY", "changeme_admin_key")
 
-# Sub-admins stored in memory (resets on restart — no DB)
-# Format: { "username": { "password": "...", "note": "..." } }
-SUBADMINS = {}
+# ─── MONGODB SETUP ────────────────────────────────────────
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://NAYEM:1122@cluster0.ywmyozb.mongodb.net/?appName=Cluster0")
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client["sensix_panel"]
+subadmins_col = db["subadmins"]
 
 SENSIX_HEADERS = {
     "X-AUTH-KEY": SENSIX_APIKEY,
@@ -106,7 +111,6 @@ def admin_revoke():
 
 @app.route('/admin/update', methods=['POST'])
 def admin_update():
-    """Extend / renew a UID's days."""
     body = request.json or {}
     if body.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
@@ -123,7 +127,7 @@ def admin_update():
 
 
 # ══════════════════════════════════════════════════════════
-#  SUB-ADMIN MANAGEMENT (in-memory, Main Admin only)
+#  SUB-ADMIN MANAGEMENT — MongoDB (persistent!)
 # ══════════════════════════════════════════════════════════
 
 @app.route('/admin/create-subadmin', methods=['POST'])
@@ -138,10 +142,17 @@ def create_subadmin():
 
     if not username or not password:
         return jsonify({"status": "error", "message": "username and password required"}), 400
-    if username in SUBADMINS:
+
+    # Check if already exists in MongoDB
+    if subadmins_col.find_one({"username": username}):
         return jsonify({"status": "error", "message": "Username already exists"}), 409
 
-    SUBADMINS[username] = {"password": password, "note": note}
+    subadmins_col.insert_one({
+        "username": username,
+        "password": password,
+        "note": note,
+        "created_at": datetime.utcnow()
+    })
     return jsonify({"status": "success", "message": f"Sub-admin '{username}' created"}), 200
 
 
@@ -151,8 +162,8 @@ def list_subadmins():
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
 
     result = [
-        {"username": u, "note": v["note"], "active": True}
-        for u, v in SUBADMINS.items()
+        {"username": sa["username"], "note": sa.get("note", ""), "active": True}
+        for sa in subadmins_col.find({}, {"_id": 0, "password": 0})
     ]
     return jsonify({"status": "success", "subadmins": result}), 200
 
@@ -164,21 +175,20 @@ def delete_subadmin():
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
 
     username = body.get("username", "").strip()
-    if username not in SUBADMINS:
+    result = subadmins_col.delete_one({"username": username})
+    if result.deleted_count == 0:
         return jsonify({"status": "error", "message": "Sub-admin not found"}), 404
 
-    del SUBADMINS[username]
     return jsonify({"status": "success", "message": f"Sub-admin '{username}' deleted"}), 200
 
 
 # ══════════════════════════════════════════════════════════
 #  SUB-ADMIN — login + their own UID actions
-#  Sub-admins can ADD / REMOVE / RENEW UIDs via Sensix API
 # ══════════════════════════════════════════════════════════
 
 def verify_subadmin(username, password):
-    sa = SUBADMINS.get(username)
-    return sa and sa["password"] == password
+    sa = subadmins_col.find_one({"username": username, "password": password})
+    return sa is not None
 
 
 @app.route('/subadmin/login', methods=['POST'])
