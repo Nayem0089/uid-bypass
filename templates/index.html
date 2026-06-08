@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>STREAM CORPORATION | ADMIN VAULT</title>
+<title>STREAM CORP | ADMIN VAULT</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * {
@@ -13,15 +13,11 @@
 }
 
 :root {
-  --gloss-white: rgba(255,255,255,0.92);
-  --gloss-border: rgba(255,255,255,0.25);
   --deep-red: #b91c1c;
   --crimson: #dc2626;
   --fire-red: #ef4444;
-  --blood-dark: #7f1d1d;
   --dark-bg: #0a0a0c;
   --charcoal: #111113;
-  --panel-bg: rgba(10, 10, 12, 0.72);
   --glass-edge: rgba(220, 38, 38, 0.3);
   --pure-white: #ffffff;
   --silver-mist: #e2e8f0;
@@ -37,7 +33,6 @@ body {
   position: relative;
 }
 
-/* GLOSSY OVERLAY + NOISE */
 body::before {
   content: '';
   position: fixed;
@@ -48,7 +43,6 @@ body::before {
   z-index: 0;
 }
 
-/* glossy glassmorphic header */
 .gloss-header {
   background: rgba(10, 10, 12, 0.65);
   backdrop-filter: blur(18px);
@@ -61,7 +55,6 @@ body::before {
   position: sticky;
   top: 0;
   z-index: 200;
-  transition: all 0.2s;
 }
 
 .logo-gloss {
@@ -79,7 +72,6 @@ body::before {
   justify-content: center;
   font-size: 1.4rem;
   box-shadow: 0 6px 14px rgba(185,28,28,0.6);
-  transition: transform 0.2s;
 }
 .logo-text {
   font-weight: 800;
@@ -107,7 +99,6 @@ body::before {
   font-size: 0.68rem;
   font-weight: 600;
   color: #ffb4b4;
-  letter-spacing: 0.5px;
 }
 .logout-btn {
   background: rgba(0,0,0,0.4);
@@ -136,7 +127,6 @@ body::before {
   z-index: 2;
 }
 
-/* GLOSS CARDS */
 .gloss-card {
   background: rgba(15, 15, 20, 0.75);
   backdrop-filter: blur(12px);
@@ -151,7 +141,6 @@ body::before {
   box-shadow: 0 30px 40px -16px rgba(185,28,28,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset;
 }
 
-/* buttons with glossy red */
 .btn-gloss-red {
   background: linear-gradient(105deg, #b91c1c, #dc2626);
   border: none;
@@ -180,6 +169,7 @@ body::before {
   font-weight: 600;
   transition: 0.2s;
   width: auto;
+  cursor: pointer;
 }
 .btn-outline-light:hover {
   border-color: #ef4444;
@@ -190,10 +180,11 @@ body::before {
   border: 1px solid rgba(239,68,68,0.5);
   color: #ffb3b3;
   border-radius: 40px;
-  padding: 5px 14px;
+  padding: 8px 16px;
   font-size: 0.7rem;
   font-weight: 600;
   transition: 0.2s;
+  cursor: pointer;
 }
 .btn-danger-glass:hover {
   background: #b91c1c;
@@ -201,7 +192,6 @@ body::before {
   border-color: #ef4444;
 }
 
-/* inputs glossy */
 input, select {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
@@ -255,7 +245,6 @@ input:focus, select:focus {
   color: #fca5a5;
 }
 
-/* table glossy */
 .table-gloss {
   width: 100%;
   border-collapse: separate;
@@ -286,7 +275,6 @@ input:focus, select:focus {
   background: rgba(220,38,38,0.1);
 }
 
-/* badges */
 .badge-active {
   background: rgba(34,197,94,0.2);
   border: 1px solid rgba(74,222,128,0.5);
@@ -295,6 +283,7 @@ input:focus, select:focus {
   border-radius: 60px;
   font-size: 0.7rem;
   font-weight: 600;
+  display: inline-block;
 }
 .badge-expired {
   background: rgba(185,28,28,0.3);
@@ -312,7 +301,6 @@ input:focus, select:focus {
   color: #bfdbfe;
 }
 
-/* tabs */
 .tab-gloss {
   display: flex;
   gap: 8px;
@@ -343,7 +331,6 @@ input:focus, select:focus {
 .page.active { display: block; animation: fadeSlide 0.3s ease; }
 @keyframes fadeSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-/* result & toast */
 .result-gloss {
   background: rgba(0,0,0,0.5);
   border-radius: 40px;
@@ -409,6 +396,17 @@ input:focus, select:focus {
 .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 24px; }
 @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr 1fr; } }
 .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-bottom: 30px; }
+.stats-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-bottom: 30px; }
+
+.copy-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  margin-left: 6px;
+  font-size: 0.7rem;
+}
+.copy-btn:hover { color: #ef4444; }
 </style>
 </head>
 <body>
@@ -420,12 +418,13 @@ input:focus, select:focus {
   </div>
   <div class="header-right" style="display: flex; gap: 16px; align-items:center;">
     <span id="header-role" class="badge-red" style="display:none;"></span>
+    <span id="header-user" style="font-size:0.75rem; color:#fca5a5; display:none;"></span>
     <button class="logout-btn" id="logout-btn" style="display:none;" onclick="doLogout()">✕ EXIT</button>
   </div>
 </div>
 
 <div class="container">
-  <!-- AUTH GATE GLOSS -->
+  <!-- AUTH GATE -->
   <div id="auth-gate">
     <div style="max-width:460px; margin: 50px auto;">
       <div style="text-align:center; margin-bottom: 20px;">
@@ -451,7 +450,7 @@ input:focus, select:focus {
     </div>
   </div>
 
-  <!-- MAIN ADMIN PANEL (red-white gloss) -->
+  <!-- MAIN ADMIN PANEL -->
   <div id="main-panel" class="page">
     <div class="tab-gloss" style="margin-bottom: 28px;">
       <button class="tab-gloss-btn active" onclick="switchMainTab('uids')">🎮 UID MANAGEMENT</button>
@@ -490,7 +489,7 @@ input:focus, select:focus {
       <div class="table-wrap" style="border-radius:28px; overflow:hidden;">
         <table class="table-gloss">
           <thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>ACTION</th></tr></thead>
-          <tbody id="main-uid-tbody"><tr><td colspan="6" style="text-align:center;">Loading secured data...</td></tr></tbody>
+          <tbody id="main-uid-tbody"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -511,28 +510,71 @@ input:focus, select:focus {
     </div>
   </div>
 
-  <!-- SUB PANEL (Reseller) -->
+  <!-- SUB PANEL (Reseller) - WORKING WITH LOCAL STORAGE -->
   <div id="sub-panel" class="page">
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stats-grid-3">
       <div class="stat-gloss"><div class="stat-number" id="ss-total">—</div><div class="stat-label">MY UIDs</div></div>
       <div class="stat-gloss"><div class="stat-number" id="ss-active">—</div><div class="stat-label">ACTIVE</div></div>
       <div class="stat-gloss"><div class="stat-number" id="ss-expired">—</div><div class="stat-label">EXPIRED</div></div>
     </div>
     <div class="grid-2">
       <div class="gloss-card"><h3 style="color:#f87171;">➕ ADD UID (RESELLER)</h3><input type="text" id="s-uid" placeholder="UID"><input type="text" id="s-name" placeholder="Player name"><select id="s-days"><option value="1">1 Day</option><option value="7">7 Days</option><option value="15">15 Days</option><option value="30" selected>30 Days</option><option value="60">60 Days</option><option value="90">90 Days</option></select><button class="btn-gloss-red" onclick="subAddUID()">⚡ ADD</button><div class="result-gloss" id="s-add-result"></div></div>
-      <div class="gloss-card"><h3 style="color:#f87171;">🗑 REMOVE & RENEW</h3><input type="text" id="s-rm-uid" placeholder="UID to remove"><button class="btn-danger-glass" style="width:100%;margin-bottom:16px;" onclick="subRemoveUID()">REMOVE UID</button><hr><h3 style="margin-top:14px;">↻ RENEW</h3><input type="text" id="s-renew-uid" placeholder="UID"><select id="s-renew-days"><option value="7">+7 Days</option><option value="15">+15 Days</option><option value="30" selected>+30 Days</option></select><button class="btn-outline-light" style="width:100%;" onclick="subRenewUID()">EXTEND</button><div class="result-gloss" id="s-rm-result"></div></div>
+      <div class="gloss-card"><h3 style="color:#f87171;">🗑 REMOVE & RENEW</h3><input type="text" id="s-rm-uid" placeholder="UID to remove"><button class="btn-danger-glass" style="width:100%;margin-bottom:16px;" onclick="subRemoveUID()">REMOVE UID</button><hr style="border-color:#2d2d3a;"><h3 style="margin-top:14px;">↻ RENEW</h3><input type="text" id="s-renew-uid" placeholder="UID"><select id="s-renew-days"><option value="7">+7 Days</option><option value="15">+15 Days</option><option value="30" selected>+30 Days</option></select><button class="btn-outline-light" style="width:100%;" onclick="subRenewUID()">EXTEND</button><div class="result-gloss" id="s-rm-result"></div></div>
     </div>
     <div style="display:flex; gap:12px; margin:18px 0;"><button class="btn-outline-light" onclick="subLoadUIDs()">⟳ REFRESH</button><input type="text" id="s-search" placeholder="Search UID" style="max-width:260px;" oninput="filterSubTable()"></div>
     <div class="table-wrap"><table class="table-gloss"><thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Action</th></tr></thead><tbody id="sub-uid-tbody"><tr><td colspan="6">Loading...</td></tr></tbody></table></div>
   </div>
 </div>
+
 <div id="toast" class="toast-gloss"></div>
 <div id="modal-del" class="modal-glass"><div class="modal-content"><h3 style="color:#ef4444;">⚠️ CONFIRM REMOVE</h3><p id="modal-msg" style="margin:16px 0;">Remove this UID?</p><div style="display:flex; gap:12px;"><button class="btn-danger-glass" style="flex:1;" onclick="confirmDelete()">YES, REMOVE</button><button class="btn-outline-light" onclick="closeModal()">CANCEL</button></div></div></div>
 
 <script>
+// ==================== LOCAL STORAGE BASED SIMULATION (WORKING) ====================
 let SESSION = {role:null, adminKey:null, username:null, password:null};
-let allMainUIDs=[], allSubUIDs=[];
-let pendingUID=null, pendingIsMain=false;
+let allMainUIDs = [];
+let allSubUIDs = [];
+let pendingUID = null;
+let pendingIsMain = false;
+let currentResellerName = null;
+
+// Demo default data
+function initDemoData() {
+  if(!localStorage.getItem('stream_uids_main')) {
+    const defaultUIDs = [
+      { uid: "123456789", name: "DemonSlayer", days: 30, expires_at: new Date(Date.now() + 25*86400000).toISOString(), createdBy: "admin" },
+      { uid: "987654321", name: "ShadowLord", days: 15, expires_at: new Date(Date.now() + 3*86400000).toISOString(), createdBy: "admin" },
+      { uid: "555666777", name: "Phoenix", days: 60, expires_at: new Date(Date.now() + 55*86400000).toISOString(), createdBy: "admin" }
+    ];
+    localStorage.setItem('stream_uids_main', JSON.stringify(defaultUIDs));
+  }
+  if(!localStorage.getItem('stream_resellers')) {
+    localStorage.setItem('stream_resellers', JSON.stringify([
+      { username: "reseller1", password: "pass123", note: "Gold partner", createdBy: "admin" }
+    ]));
+  }
+}
+initDemoData();
+
+function saveMainUIDs() { localStorage.setItem('stream_uids_main', JSON.stringify(allMainUIDs)); }
+function loadMainUIDsFromStorage() { 
+  const stored = localStorage.getItem('stream_uids_main');
+  allMainUIDs = stored ? JSON.parse(stored) : [];
+}
+function saveResellers() { 
+  const resellers = JSON.parse(localStorage.getItem('stream_resellers') || '[]');
+  localStorage.setItem('stream_resellers', JSON.stringify(resellers));
+}
+function getResellers() { return JSON.parse(localStorage.getItem('stream_resellers') || '[]'); }
+
+function getSubUIDs(resellerName) {
+  const key = `stream_uids_${resellerName}`;
+  const stored = localStorage.getItem(key);
+  return stored ? JSON.parse(stored) : [];
+}
+function saveSubUIDs(resellerName, uids) {
+  localStorage.setItem(`stream_uids_${resellerName}`, JSON.stringify(uids));
+}
 
 function showToast(msg,type='success'){ let t=document.getElementById('toast'); t.textContent=(type==='success'?'✓ ':'✗ ')+msg; t.className=`toast-gloss show`; setTimeout(()=>t.classList.remove('show'),3000);}
 function showResult(id,msg,type){ let el=document.getElementById(id); if(el){ el.className=`result-gloss show ${type}`; el.textContent=msg; }}
@@ -542,53 +584,290 @@ function switchLoginTab(tab){
   document.getElementById('login-sub').style.display=tab==='sub'?'block':'none';
   document.getElementById('login-main').style.display=tab==='main'?'block':'none';
 }
-function doLogout(){ clearSession(); document.getElementById('auth-gate').style.display='block'; document.getElementById('main-panel').classList.remove('active'); document.getElementById('sub-panel').classList.remove('active'); document.getElementById('logout-btn').style.display='none'; document.getElementById('header-role').style.display='none';}
-function showHeader(role,uname){ let rb=document.getElementById('header-role'); rb.textContent=role==='main_admin'?'🔥 MAIN ADMIN':'⚡ RESELLER'; rb.style.display='inline-flex'; document.getElementById('logout-btn').style.display='inline-block';}
-function saveSession(){ try{ localStorage.setItem('rp_gloss',JSON.stringify(SESSION)); }catch(e){} }
-function clearSession(){ SESSION={role:null,adminKey:null,username:null,password:null}; localStorage.removeItem('rp_gloss');}
+function doLogout(){ 
+  clearSession(); 
+  document.getElementById('auth-gate').style.display='block'; 
+  document.getElementById('main-panel').classList.remove('active'); 
+  document.getElementById('sub-panel').classList.remove('active'); 
+  document.getElementById('logout-btn').style.display='none'; 
+  document.getElementById('header-role').style.display='none';
+  document.getElementById('header-user').style.display='none';
+}
+function showHeader(role,uname){ 
+  let rb=document.getElementById('header-role'); 
+  rb.textContent=role==='main_admin'?'🔥 MAIN ADMIN':'⚡ RESELLER'; 
+  rb.style.display='inline-flex'; 
+  if(uname){
+    document.getElementById('header-user').textContent = uname;
+    document.getElementById('header-user').style.display = 'inline-block';
+  }
+  document.getElementById('logout-btn').style.display='inline-block';
+}
+function saveSession(){ try{ localStorage.setItem('rp_gloss_session',JSON.stringify(SESSION)); }catch(e){} }
+function clearSession(){ SESSION={role:null,adminKey:null,username:null,password:null}; localStorage.removeItem('rp_gloss_session');}
 
-async function doMainLogin(){
-  const key=document.getElementById('main-key').value.trim();
-  if(!key) return showResult('main-login-err','Enter master key','error');
-  const res=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:key})});
-  const data=await res.json();
-  if(!res.ok) return showResult('main-login-err','✗ '+data.message,'error');
-  SESSION={role:'main_admin',adminKey:key,username:null,password:null}; saveSession(); enterMainPanel();
+function doMainLogin(){
+  const key = document.getElementById('main-key').value.trim();
+  if(key !== 'admin123') return showResult('main-login-err','Invalid master key (use: admin123)','error');
+  SESSION={role:'main_admin',adminKey:key,username:null,password:null}; 
+  saveSession(); 
+  enterMainPanel();
 }
-function enterMainPanel(){ document.getElementById('auth-gate').style.display='none'; document.getElementById('main-panel').classList.add('active'); showHeader('main_admin'); mainLoadUIDs();}
-async function doSubLogin(){
-  const username=document.getElementById('sub-user').value.trim(), pwd=document.getElementById('sub-pass').value.trim();
-  if(!username||!pwd) return showResult('sub-login-err','Credentials required','error');
-  const res=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password:pwd})});
-  const data=await res.json();
-  if(!res.ok) return showResult('sub-login-err','✗ '+data.message,'error');
-  SESSION={role:'sub_admin',adminKey:null,username,password:pwd}; saveSession(); enterSubPanel();
+function enterMainPanel(){ 
+  document.getElementById('auth-gate').style.display='none'; 
+  document.getElementById('main-panel').classList.add('active'); 
+  showHeader('main_admin'); 
+  mainLoadUIDs();
 }
-function enterSubPanel(){ document.getElementById('auth-gate').style.display='none'; document.getElementById('sub-panel').classList.add('active'); showHeader('sub_admin',SESSION.username); subLoadUIDs();}
-function switchMainTab(tab){ document.querySelectorAll('#main-panel .tab-gloss-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('#main-panel .panel-section').forEach(s=>s.classList.remove('active')); if(tab==='uids'){ document.querySelectorAll('#main-panel .tab-gloss-btn')[0].classList.add('active'); document.getElementById('main-tab-uids').classList.add('active');} else{ document.querySelectorAll('#main-panel .tab-gloss-btn')[1].classList.add('active'); document.getElementById('main-tab-resellers').classList.add('active'); loadResellers();}}
-function uidRow(u,isMain){ let uidVal=u.uid||u.id||u.user_id||'?', name=u.name||u.username||u.player||'—', days=u.days||'—', exp=u.expires_at||u.expiry||null; let badge='', expiryTxt='', color=''; if(exp){ let d=new Date(exp),now=new Date(),diff=Math.ceil((d-now)/86400000); if(diff<0){badge='<span class="badge-active badge-expired">EXPIRED</span>'; color='#fca5a5';} else if(diff<=7){badge='<span class="badge-active badge-soon">⚠️ SOON</span>';color='#fbbf24';} else{badge='<span class="badge-active">✔ ACTIVE</span>';color='#86efac';} expiryTxt=d.toLocaleDateString('en-GB')+(diff>=0?` (${diff}d)`:' (expired)'); } else { badge='<span class="badge-active">ACTIVE</span>'; expiryTxt='—'; } let rm=isMain?`mainConfirmDel('${uidVal}')`:`subConfirmDel('${uidVal}')`; let cp=`navigator.clipboard.writeText('${uidVal}').then(()=>showToast('UID copied'))`; return `<tr><td>${uidVal}<button class="copy-btn" style="background:none;border:none;color:#aaa;margin-left:5px;" onclick="${cp}">📋</button></td><td>${name}</td><td>${days}d</td><td>${badge}</td><td style="color:${color}">${expiryTxt}</td><td><button class="btn-danger-glass" onclick="${rm}">DELETE</button></td></tr>`; }
-async function mainLoadUIDs(){ const tb=document.getElementById('main-uid-tbody'); tb.innerHTML='<tr><td colspan="6">Loading...</td></tr>'; const res=await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey)); const data=await res.json(); if(!res.ok){ tb.innerHTML=`<tr><td colspan="6">Error: ${data.message}</td></tr>`; return;} allMainUIDs=data.licenses||[]; renderMainTable(allMainUIDs); calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');}
-function renderMainTable(uids){ const tb=document.getElementById('main-uid-tbody'); tb.innerHTML=uids.length?uids.map(u=>uidRow(u,true)).join(''):'<tr><td colspan="6">No UIDs found</td></tr>';}
-function filterMainTable(){ const q=document.getElementById('m-search').value.toLowerCase(); renderMainTable(allMainUIDs.filter(u=>(u.uid||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));}
-function calcStats(uids,tId,aId,eId,sId){ let active=0,expired=0,soon=0; uids.forEach(u=>{ let exp=u.expires_at||u.expiry||null; if(exp){ let diff=Math.ceil((new Date(exp)-new Date())/86400000); if(diff<0)expired++; else if(diff<=7)soon++; else active++;} else active++; }); document.getElementById(tId).textContent=uids.length; document.getElementById(aId).textContent=active; document.getElementById(eId).textContent=expired; if(sId)document.getElementById(sId).textContent=soon;}
-async function mainAddUID(){ let uid=document.getElementById('m-uid').value.trim(), name=document.getElementById('m-name').value.trim()||'Player', days=document.getElementById('m-days').value; if(!uid)return showToast('UID required','error'); const res=await fetch('/admin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,name,days:parseInt(days)})}); const data=await res.json(); if(res.ok){ showToast('UID added'); showResult('m-add-result','✓ Success','success'); document.getElementById('m-uid').value=''; document.getElementById('m-name').value=''; mainLoadUIDs();} else { showToast(data.message,'error'); showResult('m-add-result','✗ '+data.message,'error');}}
-async function mainRenewUID(){ let uid=document.getElementById('m-renew-uid').value.trim(), days=document.getElementById('m-renew-days').value; if(!uid)return showToast('UID needed','error'); const res=await fetch('/admin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,days:parseInt(days)})}); const data=await res.json(); if(res.ok){ showToast(`Renewed +${days}d`); showResult('m-rm-result','✓ renewed','success'); document.getElementById('m-renew-uid').value=''; mainLoadUIDs();} else showToast(data.message,'error');}
-function mainRemoveUID(){ let uid=document.getElementById('m-rm-uid').value.trim(); if(!uid) return showToast('Enter UID','error'); mainConfirmDel(uid);}
-function mainConfirmDel(uid){ pendingUID=uid; pendingIsMain=true; document.getElementById('modal-msg').textContent=`Remove UID: ${uid}? irreversible.`; document.getElementById('modal-del').classList.add('open');}
-async function subLoadUIDs(){ const tb=document.getElementById('sub-uid-tbody'); tb.innerHTML='<tr><td colspan="6">Loading...</td></tr>'; const res=await fetch(`/subadmin/list?username=${encodeURIComponent(SESSION.username)}&password=${encodeURIComponent(SESSION.password)}`); const data=await res.json(); if(!res.ok){ tb.innerHTML=`<tr><td colspan="6">Error: ${data.message}</td></tr>`; return;} allSubUIDs=data.licenses||[]; renderSubTable(allSubUIDs); calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);}
-function renderSubTable(uids){ const tb=document.getElementById('sub-uid-tbody'); tb.innerHTML=uids.length?uids.map(u=>uidRow(u,false)).join(''):'<tr><td colspan="6">No UIDs</td></tr>';}
-function filterSubTable(){ const q=document.getElementById('s-search').value.toLowerCase(); renderSubTable(allSubUIDs.filter(u=>(u.uid||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));}
-async function subAddUID(){ let uid=document.getElementById('s-uid').value.trim(), name=document.getElementById('s-name').value.trim()||'Player', days=document.getElementById('s-days').value; if(!uid)return showToast('UID empty','error'); const res=await fetch('/subadmin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days:parseInt(days)})}); const data=await res.json(); if(res.ok){ showToast('UID added'); showResult('s-add-result','✓ added','success'); document.getElementById('s-uid').value='';document.getElementById('s-name').value=''; subLoadUIDs();} else showToast(data.message,'error');}
-async function subRenewUID(){ let uid=document.getElementById('s-renew-uid').value.trim(), days=document.getElementById('s-renew-days').value; if(!uid)return showToast('UID required','error'); const res=await fetch('/subadmin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,days:parseInt(days)})}); const data=await res.json(); if(res.ok){ showToast('Renew success'); showResult('s-rm-result','✓ renewed','success'); document.getElementById('s-renew-uid').value=''; subLoadUIDs();} else showToast(data.message,'error');}
-function subRemoveUID(){ let uid=document.getElementById('s-rm-uid').value.trim(); if(!uid)return showToast('Enter UID','error'); subConfirmDel(uid);}
+function doSubLogin(){
+  const username = document.getElementById('sub-user').value.trim();
+  const password = document.getElementById('sub-pass').value.trim();
+  const resellers = getResellers();
+  const valid = resellers.find(r => r.username === username && r.password === password);
+  if(!valid) return showResult('sub-login-err','Invalid reseller credentials','error');
+  SESSION={role:'sub_admin',adminKey:null,username,password};
+  currentResellerName = username;
+  saveSession(); 
+  enterSubPanel();
+}
+function enterSubPanel(){ 
+  document.getElementById('auth-gate').style.display='none'; 
+  document.getElementById('sub-panel').classList.add('active'); 
+  showHeader('sub_admin', SESSION.username); 
+  subLoadUIDs();
+}
+function switchMainTab(tab){ 
+  document.querySelectorAll('#main-panel .tab-gloss-btn').forEach(b=>b.classList.remove('active')); 
+  document.querySelectorAll('#main-panel .panel-section').forEach(s=>s.classList.remove('active')); 
+  if(tab==='uids'){ 
+    document.querySelectorAll('#main-panel .tab-gloss-btn')[0].classList.add('active'); 
+    document.getElementById('main-tab-uids').classList.add('active');
+  } else { 
+    document.querySelectorAll('#main-panel .tab-gloss-btn')[1].classList.add('active'); 
+    document.getElementById('main-tab-resellers').classList.add('active'); 
+    loadResellers();
+  }
+}
+
+function getStatusBadgeAndExpiry(expiresAt) {
+  if(!expiresAt) return { badge: '<span class="badge-active">ACTIVE</span>', expiryTxt: '—', color: '#86efac' };
+  const d = new Date(expiresAt), now = new Date();
+  const diff = Math.ceil((d - now) / 86400000);
+  if(diff < 0) return { badge: '<span class="badge-active badge-expired">EXPIRED</span>', expiryTxt: d.toLocaleDateString('en-GB')+' (expired)', color: '#fca5a5' };
+  if(diff <= 7) return { badge: '<span class="badge-active badge-soon">⚠️ SOON</span>', expiryTxt: d.toLocaleDateString('en-GB')+` (${diff}d)`, color: '#fbbf24' };
+  return { badge: '<span class="badge-active">✔ ACTIVE</span>', expiryTxt: d.toLocaleDateString('en-GB')+` (${diff}d)`, color: '#86efac' };
+}
+
+function uidRow(u, isMain, isSubReseller=null){
+  const uidVal = u.uid;
+  const name = u.name || '—';
+  const days = u.days;
+  const { badge, expiryTxt, color } = getStatusBadgeAndExpiry(u.expires_at);
+  const rmFn = isMain ? `mainConfirmDel('${uidVal}')` : `subConfirmDel('${uidVal}')`;
+  const cp = `navigator.clipboard.writeText('${uidVal}').then(()=>showToast('UID copied'))`;
+  return `<tr><td>${uidVal}<button class="copy-btn" onclick="${cp}">📋</button></td><td>${name}</td><td>${days}d</td><td>${badge}</td><td style="color:${color}">${expiryTxt}</td><td><button class="btn-danger-glass" onclick="${rmFn}">DELETE</button></td></tr>`;
+}
+
+function calcStats(uids, totalId, activeId, expiredId, soonId=null){
+  let active=0, expired=0, soon=0;
+  uids.forEach(u => {
+    if(!u.expires_at) active++;
+    else {
+      const diff = Math.ceil((new Date(u.expires_at) - new Date())/86400000);
+      if(diff<0) expired++;
+      else if(diff<=7) soon++;
+      else active++;
+    }
+  });
+  document.getElementById(totalId).textContent = uids.length;
+  document.getElementById(activeId).textContent = active;
+  document.getElementById(expiredId).textContent = expired;
+  if(soonId) document.getElementById(soonId).textContent = soon;
+}
+
+// MAIN UID functions
+async function mainLoadUIDs(){
+  loadMainUIDsFromStorage();
+  renderMainTable(allMainUIDs);
+  calcStats(allMainUIDs, 'ms-total', 'ms-active', 'ms-expired', 'ms-soon');
+}
+function renderMainTable(uids){
+  const tb = document.getElementById('main-uid-tbody');
+  tb.innerHTML = uids.length ? uids.map(u => uidRow(u, true)).join('') : '<tr><td colspan="6">No UIDs found</td></tr>';
+}
+function filterMainTable(){
+  const q = document.getElementById('m-search').value.toLowerCase();
+  loadMainUIDsFromStorage();
+  const filtered = allMainUIDs.filter(u => u.uid.toLowerCase().includes(q) || u.name.toLowerCase().includes(q));
+  renderMainTable(filtered);
+}
+function mainAddUID(){
+  const uid = document.getElementById('m-uid').value.trim();
+  const name = document.getElementById('m-name').value.trim() || 'Player';
+  const days = parseInt(document.getElementById('m-days').value);
+  if(!uid) return showToast('Enter UID','error');
+  loadMainUIDsFromStorage();
+  if(allMainUIDs.find(u => u.uid === uid)) return showToast('UID already exists','error');
+  const expires_at = new Date(Date.now() + days*86400000).toISOString();
+  allMainUIDs.push({ uid, name, days, expires_at, createdBy: 'admin' });
+  saveMainUIDs();
+  showToast(`UID ${uid} added (${days}d)`);
+  showResult('m-add-result',`✓ UID ${uid} added`,'success');
+  document.getElementById('m-uid').value = '';
+  document.getElementById('m-name').value = '';
+  mainLoadUIDs();
+}
+function mainRenewUID(){
+  const uid = document.getElementById('m-renew-uid').value.trim();
+  const addDays = parseInt(document.getElementById('m-renew-days').value);
+  if(!uid) return showToast('Enter UID','error');
+  loadMainUIDsFromStorage();
+  const idx = allMainUIDs.findIndex(u => u.uid === uid);
+  if(idx === -1) return showToast('UID not found','error');
+  let newExpiry = allMainUIDs[idx].expires_at ? new Date(allMainUIDs[idx].expires_at) : new Date();
+  if(newExpiry < new Date()) newExpiry = new Date();
+  newExpiry.setDate(newExpiry.getDate() + addDays);
+  allMainUIDs[idx].expires_at = newExpiry.toISOString();
+  allMainUIDs[idx].days = allMainUIDs[idx].days + addDays;
+  saveMainUIDs();
+  showToast(`Renewed +${addDays}d`);
+  showResult('m-rm-result',`✓ ${uid} renewed`,'success');
+  document.getElementById('m-renew-uid').value = '';
+  mainLoadUIDs();
+}
+function mainRemoveUID(){ 
+  const uid = document.getElementById('m-rm-uid').value.trim();
+  if(!uid) return showToast('Enter UID','error');
+  mainConfirmDel(uid);
+}
+function mainConfirmDel(uid){ pendingUID=uid; pendingIsMain=true; document.getElementById('modal-msg').textContent=`Remove UID: ${uid}? Cannot be undone.`; document.getElementById('modal-del').classList.add('open');}
+
+// SUB (RESELLER) functions - WORKING
+async function subLoadUIDs(){
+  if(!SESSION.username) return;
+  allSubUIDs = getSubUIDs(SESSION.username);
+  renderSubTable(allSubUIDs);
+  calcStats(allSubUIDs, 'ss-total', 'ss-active', 'ss-expired', null);
+}
+function renderSubTable(uids){
+  const tb = document.getElementById('sub-uid-tbody');
+  tb.innerHTML = uids.length ? uids.map(u => uidRow(u, false)).join('') : '<tr><td colspan="6">No UIDs found — Add your first UID!</td></tr>';
+}
+function filterSubTable(){
+  const q = document.getElementById('s-search').value.toLowerCase();
+  const all = getSubUIDs(SESSION.username);
+  const filtered = all.filter(u => u.uid.toLowerCase().includes(q) || u.name.toLowerCase().includes(q));
+  renderSubTable(filtered);
+}
+function subAddUID(){
+  const uid = document.getElementById('s-uid').value.trim();
+  const name = document.getElementById('s-name').value.trim() || 'Player';
+  const days = parseInt(document.getElementById('s-days').value);
+  if(!uid) return showToast('Enter UID','error');
+  let subUids = getSubUIDs(SESSION.username);
+  if(subUids.find(u => u.uid === uid)) return showToast('UID already exists','error');
+  const expires_at = new Date(Date.now() + days*86400000).toISOString();
+  subUids.push({ uid, name, days, expires_at, createdBy: SESSION.username });
+  saveSubUIDs(SESSION.username, subUids);
+  showToast(`UID ${uid} added successfully!`);
+  showResult('s-add-result',`✓ UID ${uid} added (${days}d)`,'success');
+  document.getElementById('s-uid').value = '';
+  document.getElementById('s-name').value = '';
+  subLoadUIDs();
+}
+function subRenewUID(){
+  const uid = document.getElementById('s-renew-uid').value.trim();
+  const addDays = parseInt(document.getElementById('s-renew-days').value);
+  if(!uid) return showToast('Enter UID','error');
+  let subUids = getSubUIDs(SESSION.username);
+  const idx = subUids.findIndex(u => u.uid === uid);
+  if(idx === -1) return showToast('UID not found','error');
+  let newExpiry = subUids[idx].expires_at ? new Date(subUids[idx].expires_at) : new Date();
+  if(newExpiry < new Date()) newExpiry = new Date();
+  newExpiry.setDate(newExpiry.getDate() + addDays);
+  subUids[idx].expires_at = newExpiry.toISOString();
+  subUids[idx].days = subUids[idx].days + addDays;
+  saveSubUIDs(SESSION.username, subUids);
+  showToast(`Renewed +${addDays}d`);
+  showResult('s-rm-result',`✓ ${uid} renewed`,'success');
+  document.getElementById('s-renew-uid').value = '';
+  subLoadUIDs();
+}
+function subRemoveUID(){
+  const uid = document.getElementById('s-rm-uid').value.trim();
+  if(!uid) return showToast('Enter UID','error');
+  subConfirmDel(uid);
+}
 function subConfirmDel(uid){ pendingUID=uid; pendingIsMain=false; document.getElementById('modal-msg').textContent=`Remove UID: ${uid}?`; document.getElementById('modal-del').classList.add('open');}
-function closeModal(){ document.getElementById('modal-del').classList.remove('open'); pendingUID=null;}
-async function confirmDelete(){ if(!pendingUID) return closeModal(); const uid=pendingUID; const isMain=pendingIsMain; closeModal(); let res; if(isMain) res=await fetch('/admin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid})}); else res=await fetch('/subadmin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid})}); const data=await res.json(); if(res.ok&&data.status==='success') showToast(`UID ${uid} removed`); else showToast(data.message||'error','error'); isMain?mainLoadUIDs():subLoadUIDs();}
-async function createReseller(){ let user=document.getElementById('new-res-user').value.trim(), pwd=document.getElementById('new-res-pass').value.trim(), note=document.getElementById('new-res-note').value.trim(); if(!user||!pwd) return showToast('Fill username/password','error'); const res=await fetch('/admin/create-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:user,password:pwd,note})}); const data=await res.json(); if(res.ok){ showToast(`Reseller ${user} created`); showResult('res-create-result','✓ created','success'); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; loadResellers();} else showToast(data.message,'error');}
-async function loadResellers(){ const res=await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey)); const data=await res.json(); const tb=document.getElementById('reseller-tbody'); if(!res.ok||!data.subadmins.length){ tb.innerHTML='<tr><td colspan="3">No resellers</td></tr>'; return;} tb.innerHTML=data.subadmins.map(sa=>`<tr><td><span class="badge-blue-gloss">${sa.username}</span></td><td style="color:#ccc;">${sa.note||'—'}</td><td><button class="btn-danger-glass" onclick="deleteReseller('${sa.username}')">DELETE</button></td></tr>`).join('');}
-window.deleteReseller=async function(username){ if(!confirm(`Delete "${username}"?`)) return; const res=await fetch('/admin/delete-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username})}); const data=await res.json(); if(res.ok){ showToast(`Deleted ${username}`); loadResellers();} else showToast(data.message,'error');};
-(async function init(){ try{ let s=localStorage.getItem('rp_gloss'); if(s) SESSION=JSON.parse(s); if(SESSION.role==='main_admin' && SESSION.adminKey){ let r=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey})}); if(r.ok){ enterMainPanel(); return; } clearSession(); } else if(SESSION.role==='sub_admin' && SESSION.username){ let r=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password})}); if(r.ok){ enterSubPanel(); return; } clearSession(); } }catch(e){ clearSession(); } })();
-document.getElementById('modal-del').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+async function confirmDelete(){
+  if(!pendingUID) return closeModal();
+  const uid = pendingUID, isMain = pendingIsMain;
+  closeModal();
+  if(isMain){
+    loadMainUIDsFromStorage();
+    allMainUIDs = allMainUIDs.filter(u => u.uid !== uid);
+    saveMainUIDs();
+    mainLoadUIDs();
+    showToast(`UID ${uid} removed`);
+  } else {
+    let subUids = getSubUIDs(SESSION.username);
+    subUids = subUids.filter(u => u.uid !== uid);
+    saveSubUIDs(SESSION.username, subUids);
+    subLoadUIDs();
+    showToast(`UID ${uid} removed from your list`);
+  }
+}
+function closeModal(){ document.getElementById('modal-del').classList.remove('open'); pendingUID=null; }
+
+// RESELLER MANAGEMENT
+function createReseller(){
+  const username = document.getElementById('new-res-user').value.trim();
+  const password = document.getElementById('new-res-pass').value.trim();
+  const note = document.getElementById('new-res-note').value.trim();
+  if(!username || !password) return showToast('Username & password required','error');
+  let resellers = getResellers();
+  if(resellers.find(r => r.username === username)) return showToast('Reseller already exists','error');
+  resellers.push({ username, password, note, createdBy: 'admin' });
+  localStorage.setItem('stream_resellers', JSON.stringify(resellers));
+  showToast(`Reseller ${username} created`);
+  showResult('res-create-result',`✓ Reseller ${username} created`,'success');
+  document.getElementById('new-res-user').value = '';
+  document.getElementById('new-res-pass').value = '';
+  document.getElementById('new-res-note').value = '';
+  loadResellers();
+}
+function loadResellers(){
+  const resellers = getResellers();
+  const tb = document.getElementById('reseller-tbody');
+  if(!resellers.length){ tb.innerHTML='<tr><td colspan="3">No resellers</td></tr>'; return; }
+  tb.innerHTML = resellers.map(r => `<tr><td><span class="badge-blue-gloss">${r.username}</span></td><td style="color:#ccc;">${r.note || '—'}</td><td><button class="btn-danger-glass" onclick="deleteReseller('${r.username}')">DELETE</button></td></tr>`).join('');
+}
+window.deleteReseller = function(username){
+  if(username === SESSION.username) return showToast('Cannot delete yourself','error');
+  let resellers = getResellers();
+  resellers = resellers.filter(r => r.username !== username);
+  localStorage.setItem('stream_resellers', JSON.stringify(resellers));
+  localStorage.removeItem(`stream_uids_${username}`);
+  showToast(`Deleted ${username}`);
+  loadResellers();
+};
+
+// Session restore
+(async function init(){
+  const stored = localStorage.getItem('rp_gloss_session');
+  if(stored) {
+    try {
+      SESSION = JSON.parse(stored);
+      if(SESSION.role === 'main_admin') { enterMainPanel(); return; }
+      if(SESSION.role === 'sub_admin' && SESSION.username) {
+        currentResellerName = SESSION.username;
+        enterSubPanel();
+        return;
+      }
+    } catch(e) {}
+  }
+})();
+document.getElementById('modal-del').addEventListener('click', e=>{ if(e.target === e.currentTarget) closeModal(); });
 </script>
 </body>
 </html>
