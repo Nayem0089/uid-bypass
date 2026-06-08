@@ -3,294 +3,573 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STREAM CORPORATION • ADMIN</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
+<title>STREAM CORPORATION ADMIN PANEL</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0a0a0a;
-  --glass: rgba(20, 20, 25, 0.75);
-  --glass-border: rgba(255,255,255,0.12);
-  --red:#ef4444;
-  --red2:#dc2626;
-  --white:#ffffff;
-  --light:#f1f5f9;
-  --muted:#a3b4d0;
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--light);
-  font-family: 'Syne', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-}
-
-/* Background */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(239,68,68,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(239,68,68,0.05) 1px, transparent 1px);
-  background-size: 70px 70px;
-  pointer-events: none;
-  z-index: 0;
-}
-body::after {
-  content: '';
-  position: fixed;
-  top: -400px; left: -400px;
-  width: 1000px; height: 1000px;
-  background: radial-gradient(circle, rgba(239,68,68,0.25) 0%, transparent 65%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Header */
-.header {
-  border-bottom: 1px solid rgba(239,68,68,0.4);
-  padding: 20px 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(10,10,10,0.9);
-  backdrop-filter: blur(24px);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-}
-.logo {
-  font-size: 2.1rem;
-  font-weight: 800;
-  letter-spacing: -2.2px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  color: var(--white);
-  text-shadow: 0 0 25px var(--red);
-}
-.logo-icon {
-  width: 56px; height: 56px;
-  background: linear-gradient(135deg, var(--red), #b91c1c);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.9rem;
-  box-shadow: 0 0 45px rgba(239,68,68,0.6);
-  border: 2px solid rgba(255,255,255,0.3);
-}
-
-/* Glass Cards */
-.card {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  border-radius: 22px;
-  padding: 32px;
-  margin-bottom: 26px;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 15px 45px rgba(0,0,0,0.5);
-  transition: all 0.4s ease;
-}
-.card:hover {
-  border-color: var(--red);
-  transform: translateY(-8px);
-  box-shadow: 0 25px 60px rgba(239,68,68,0.3);
-}
-
-/* Auth Section */
-#auth-gate {
-  max-width: 490px;
-  margin: 110px auto;
-  text-align: center;
-}
-.auth-logo-big {
-  width: 100px; height: 100px;
-  background: linear-gradient(135deg, var(--red), #b91c1c);
-  border-radius: 26px;
-  margin: 0 auto 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  box-shadow: 0 25px 70px rgba(239,68,68,0.5);
-  border: 3px solid rgba(255,255,255,0.2);
-}
-#auth-gate h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -2.5px;
-  background: linear-gradient(90deg, var(--white), #ff9999, var(--red));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 10px;
-}
-#auth-gate p {
-  color: var(--muted);
-  font-size: 1.25rem;
-}
-
-/* Tabs */
-.tab-switcher {
-  display: flex;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  padding: 6px;
-  margin-bottom: 28px;
-}
-.tab-btn {
-  flex: 1;
-  padding: 14px;
-  border: none;
-  background: transparent;
-  color: var(--white);
-  font-weight: 700;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.tab-btn.active {
-  background: var(--red);
-  color: var(--white);
-  box-shadow: 0 5px 20px rgba(239,68,68,0.5);
-}
-
-/* Inputs & Buttons */
-input, select {
-  width: 100%;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 14px;
-  padding: 16px 18px;
-  color: var(--white);
-  font-family: 'Space Mono', monospace;
-  margin-bottom: 16px;
-  font-size: 1rem;
-}
-input:focus, select:focus {
-  border-color: var(--red);
-  box-shadow: 0 0 0 4px rgba(239,68,68,0.3);
-  background: rgba(239,68,68,0.1);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--red), var(--red2));
-  color: white;
-  padding: 16px;
-  width: 100%;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border-radius: 14px;
-  box-shadow: 0 10px 35px rgba(239,68,68,0.4);
-}
-.btn-primary:hover { transform: translateY(-4px); box-shadow: 0 18px 45px rgba(239,68,68,0.55); }
-
-.btn-blue {
-  background: linear-gradient(135deg, #3b82f6, #1e40af);
-  color: white;
-}
-
-/* Stats, Table, Toast, Modal - Same glassy style with high visibility */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin-bottom: 32px; }
-.stat-box {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  padding: 28px;
-  text-align: center;
-  backdrop-filter: blur(16px);
-}
-.stat-num { font-size: 3rem; font-weight: 800; }
-.s-red .stat-num { color: var(--red); }
-.s-green .stat-num { color: #4ade80; }
-
-.table-wrap {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  overflow: hidden;
-  backdrop-filter: blur(16px);
-}
-th { background: rgba(239,68,68,0.15); color: var(--red); padding: 18px 22px; text-transform: uppercase; font-size: 0.75rem; }
-td { padding: 18px 22px; border-top: 1px solid rgba(255,255,255,0.08); color: var(--light); }
-tr:hover td { background: rgba(239,68,68,0.12); }
-
-.toast, .modal {
-  background: var(--glass);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--red);
-  color: var(--white);
-}
+:root{--bg:#07070f;--surface:#0e0e1a;--surface2:#13131f;--border:#1a1a2e;--border2:#252540;--accent:#7c3aed;--accent2:#a78bfa;--accent3:#c4b5fd;--green:#22c55e;--green2:#4ade80;--red:#ef4444;--yellow:#f59e0b;--blue:#3b82f6;--cyan:#06b6d4;--text:#e2e8f0;--muted:#64748b;--muted2:#475569;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+.header{border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;background:rgba(7,7,15,0.92);backdrop-filter:blur(16px);}
+.logo{font-size:1.2rem;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 18px rgba(124,58,237,0.45);}
+.logo span{color:var(--accent2);}
+.header-right{display:flex;align-items:center;gap:12px;}
+.role-badge{font-family:'Space Mono',monospace;font-size:0.68rem;padding:4px 12px;border-radius:20px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);color:var(--accent2);display:none;}
+.logout-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 16px;border-radius:8px;font-family:'Space Mono',monospace;font-size:0.7rem;cursor:pointer;transition:all 0.2s;display:none;width:auto;}
+.logout-btn:hover{border-color:var(--red);color:var(--red);background:rgba(239,68,68,0.05);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green2);animation:pulse 2.5s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px var(--green2)}50%{box-shadow:0 0 22px var(--green2),0 0 40px rgba(74,222,128,0.2)}}
+.container{max-width:1200px;margin:0 auto;padding:32px 24px;position:relative;z-index:1;}
+/* AUTH */
+#auth-gate{max-width:420px;margin:70px auto;text-align:center;}
+.auth-logo-big{width:62px;height:62px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 22px;box-shadow:0 8px 32px rgba(124,58,237,0.38);}
+#auth-gate h2{font-size:1.9rem;font-weight:800;margin-bottom:6px;letter-spacing:-0.5px;}
+#auth-gate p{color:var(--muted);margin-bottom:28px;font-family:'Space Mono',monospace;font-size:0.75rem;}
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:18px;transition:border-color 0.2s;}
+.card:hover{border-color:var(--border2);}
+.card h3{font-size:0.68rem;font-weight:700;margin-bottom:16px;color:var(--accent2);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;display:flex;align-items:center;gap:8px;}
+.card h3::before{content:'//';color:var(--muted2);}
+/* INPUTS */
+input,select{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border2);border-radius:9px;padding:11px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.82rem;margin-bottom:10px;transition:all 0.2s;outline:none;}
+input:focus,select:focus{border-color:var(--accent);background:rgba(124,58,237,0.05);box-shadow:0 0 0 3px rgba(124,58,237,0.08);}
+input::placeholder{color:var(--muted2);}
+select option{background:var(--surface2);}
+/* BUTTONS */
+button{width:100%;padding:11px 18px;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.87rem;cursor:pointer;transition:all 0.2s;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#6d28d9);color:white;box-shadow:0 4px 15px rgba(124,58,237,0.25);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,58,237,0.4);}
+.btn-blue{background:linear-gradient(135deg,var(--blue),#2563eb);color:white;box-shadow:0 4px 15px rgba(59,130,246,0.2);}
+.btn-blue:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(59,130,246,0.35);}
+.btn-danger{background:transparent;border:1px solid rgba(239,68,68,0.4);color:var(--red);width:auto;padding:4px 12px;font-size:0.7rem;border-radius:7px;}
+.btn-danger:hover{background:rgba(239,68,68,0.1);border-color:var(--red);transform:none;}
+.btn-warning{background:transparent;border:1px solid rgba(245,158,11,0.4);color:var(--yellow);width:auto;padding:10px;font-size:0.82rem;border-radius:9px;}
+.btn-warning:hover{background:rgba(245,158,11,0.1);border-color:var(--yellow);transform:none;}
+button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
+/* TAB */
+.tab-switcher{display:flex;background:var(--surface);border:1px solid var(--border2);border-radius:11px;padding:4px;margin-bottom:18px;}
+.tab-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;font-size:0.84rem;border-radius:8px;cursor:pointer;transition:all 0.2s;width:auto;}
+.tab-btn.active{background:var(--accent);color:white;box-shadow:0 2px 10px rgba(124,58,237,0.3);}
+.panel-nav{display:flex;gap:2px;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.pnav-btn{background:transparent;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;font-size:0.86rem;padding:10px 22px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;width:auto;transition:all 0.2s;}
+.pnav-btn:hover{color:var(--text);}
+.pnav-btn.active{color:var(--accent2);border-bottom-color:var(--accent);}
+.panel-section{display:none;}
+.panel-section.active{display:block;animation:fadeUp 0.2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.page{display:none;}
+.page.active{display:block;}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.stats-4{grid-template-columns:repeat(4,1fr);}
+@media(max-width:640px){.stats,.stats-4{grid-template-columns:repeat(2,1fr);}.grid-2{grid-template-columns:1fr!important;}}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;text-align:center;transition:all 0.2s;position:relative;overflow:hidden;}
+.stat-box::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,0.04),transparent);pointer-events:none;}
+.stat-box:hover{border-color:var(--border2);transform:translateY(-2px);}
+.stat-num{font-size:2.1rem;font-weight:800;line-height:1;}
+.stat-label{font-size:0.61rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:5px;text-transform:uppercase;letter-spacing:1px;}
+.s-purple .stat-num{color:var(--accent2);}
+.s-green .stat-num{color:var(--green2);}
+.s-red .stat-num{color:var(--red);}
+.s-yellow .stat-num{color:var(--yellow);}
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:0.77rem;}
+th{text-align:left;padding:11px 14px;color:var(--muted2);font-family:'Space Mono',monospace;font-size:0.63rem;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:1px;background:rgba(255,255,255,0.01);}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);font-family:'Space Mono',monospace;font-size:0.72rem;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(124,58,237,0.04);}
+.empty-row td{text-align:center;color:var(--muted);padding:40px!important;font-size:0.78rem;}
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:0.63rem;font-weight:700;letter-spacing:0.5px;font-family:'Space Mono',monospace;}
+.b-active{background:rgba(34,197,94,0.1);color:var(--green2);border:1px solid rgba(34,197,94,0.25);}
+.b-expired{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.25);}
+.b-soon{background:rgba(245,158,11,0.1);color:var(--yellow);border:1px solid rgba(245,158,11,0.25);}
+.b-blue{background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.25);}
+/* RESULT */
+.result{background:rgba(255,255,255,0.02);border:1px solid var(--border2);border-radius:9px;padding:12px 14px;font-family:'Space Mono',monospace;font-size:0.75rem;margin-top:12px;display:none;word-break:break-all;line-height:1.8;}
+.result.show{display:block;}
+.result.success{border-color:rgba(34,197,94,0.4);color:var(--green);background:rgba(34,197,94,0.04);}
+.result.error{border-color:rgba(239,68,68,0.4);color:var(--red);background:rgba(239,68,68,0.04);}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:12px 20px;font-family:'Space Mono',monospace;font-size:0.77rem;z-index:9999;transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-color:rgba(34,197,94,0.4);color:var(--green2);}
+.toast.error{border-color:rgba(239,68,68,0.4);color:var(--red);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.refresh-btn{width:auto;background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-size:0.73rem;border-radius:8px;margin-bottom:14px;transition:all 0.2s;}
+.refresh-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+.copy-btn{background:none;border:none;color:var(--muted2);cursor:pointer;padding:2px 6px;width:auto;font-size:0.7rem;border-radius:4px;transition:all 0.15s;vertical-align:middle;}
+.copy-btn:hover{color:var(--accent2);background:rgba(167,139,250,0.1);}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;width:90%;max-width:420px;}
+.modal h3{font-size:1.1rem;font-weight:800;margin-bottom:8px;}
+.modal p{color:var(--muted);font-size:0.82rem;margin-bottom:22px;font-family:'Space Mono',monospace;line-height:1.6;}
+.modal-actions{display:flex;gap:10px;}
+.modal-actions button{flex:1;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">
-    <div class="logo-icon">⚡</div>
-    STREAM CORPORATION
+  <div class="logo"><div class="logo-icon">⚡</div>STREAM CORPORATION <span>ADMIN PANEL</span></div>
+  <div class="header-right">
+    <span class="status-dot"></span>
+    <span id="header-role" class="role-badge"></span>
+    <span id="header-user" style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);display:none;"></span>
+    <button class="logout-btn" id="logout-btn" onclick="doLogout()">✕ Logout</button>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- AUTH GATE -->
-  <div id="auth-gate">
-    <div class="auth-logo-big">🔐</div>
-    <h1>ADMIN PANEL</h1>
-    <p>STREAM CORPORATION CONTROL CENTER</p>
+<!-- ══════════ AUTH GATE ══════════ -->
+<div id="auth-gate">
+  <div class="auth-logo-big">🔐</div>
+  <h2>Admin <span style="color:var(--accent2)">Login</span></h2>
+  <p>// STREAM CORPORATION ADMIN PANEL</p>
+  <div class="tab-switcher">
+    <button class="tab-btn active" onclick="switchLoginTab('sub')">STREAM CORPORATION RESELLER</button>
+    <button class="tab-btn" onclick="switchLoginTab('main')">DEV / Main Admin</button>
+  </div>
+  <div id="login-sub" class="card">
+    <input type="text" id="sub-user" placeholder="Username" autocomplete="off"/>
+    <input type="password" id="sub-pass" placeholder="Password"/>
+    <button class="btn-blue" onclick="doSubLogin()">Login as STREAM CORPORATION RESELLER →</button>
+    <div class="result" id="sub-login-err"></div>
+  </div>
+  <div id="login-main" class="card" style="display:none;">
+    <input type="password" id="main-key" placeholder="Admin Secret Key"/>
+    <button class="btn-primary" onclick="doMainLogin()">Access Main Panel →</button>
+    <div class="result" id="main-login-err"></div>
+  </div>
+</div>
 
-    <div class="card">
-      <div class="tab-switcher">
-        <button onclick="switchLoginTab(0)" class="tab-btn active">RESELLER</button>
-        <button onclick="switchLoginTab(1)" class="tab-btn">MAIN ADMIN</button>
-      </div>
+<!-- ══════════ MAIN ADMIN PANEL ══════════ -->
+<div id="main-panel" class="page">
+  <div class="panel-nav">
+    <button class="pnav-btn active" onclick="switchMainTab('uids')">🎮 UIDs</button>
+    <button class="pnav-btn" onclick="switchMainTab('resellers')">👥 Resellers</button>
+  </div>
 
-      <div id="login-sub">
-        <input type="text" id="sub-user" placeholder="Username">
-        <input type="password" id="sub-pass" placeholder="Password">
-        <button class="btn-blue" onclick="doSubLogin()">LOGIN AS RESELLER</button>
-      </div>
+  <!-- UIDs TAB -->
+  <div id="main-tab-uids" class="panel-section active">
+    <div class="stats stats-4">
+      <div class="stat-box s-purple"><div class="stat-num" id="ms-total">—</div><div class="stat-label">Total UIDs</div></div>
+      <div class="stat-box s-green"><div class="stat-num" id="ms-active">—</div><div class="stat-label">Active</div></div>
+      <div class="stat-box s-red"><div class="stat-num" id="ms-expired">—</div><div class="stat-label">Expired</div></div>
+      <div class="stat-box s-yellow"><div class="stat-num" id="ms-soon">—</div><div class="stat-label">Expiring Soon</div></div>
+    </div>
 
-      <div id="login-main" style="display:none;">
-        <input type="password" id="main-key" placeholder="Secret Admin Key">
-        <button class="btn-primary" onclick="doMainLogin()">ACCESS MAIN PANEL</button>
+    <div class="grid-2" style="margin-bottom:18px;">
+      <div class="card">
+        <h3>Add UID</h3>
+        <input type="text" id="m-uid" placeholder="UID  (e.g. 123456789)"/>
+        <input type="text" id="m-name" placeholder="Player Name"/>
+        <select id="m-days">
+          <option value="1">1 Day</option><option value="7">7 Days</option>
+          <option value="15">15 Days</option><option value="30" selected>30 Days</option>
+          <option value="60">60 Days</option><option value="90">90 Days</option><option value="365">1 Year</option>
+        </select>
+        <button class="btn-primary" onclick="mainAddUID()">⚡ Add UID</button>
+        <div class="result" id="m-add-result"></div>
       </div>
+      <div class="card">
+        <h3>Remove UID</h3>
+        <input type="text" id="m-rm-uid" placeholder="UID to remove"/>
+        <button class="btn-danger" style="width:100%;padding:11px;margin-bottom:16px;" onclick="mainRemoveUID()">🗑 Remove UID</button>
+        <div style="border-top:1px solid var(--border);padding-top:16px;">
+          <h3 style="margin-bottom:12px;">Renew / Extend UID</h3>
+          <input type="text" id="m-renew-uid" placeholder="UID to renew"/>
+          <select id="m-renew-days">
+            <option value="7">+7 Days</option><option value="15">+15 Days</option>
+            <option value="30" selected>+30 Days</option><option value="60">+60 Days</option><option value="90">+90 Days</option>
+          </select>
+          <button class="btn-warning" style="width:100%;" onclick="mainRenewUID()">↻ Renew UID</button>
+        </div>
+        <div class="result" id="m-rm-result"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+      <button class="refresh-btn" onclick="mainLoadUIDs()" style="margin:0;">↻ Refresh</button>
+      <input type="text" id="m-search" placeholder="Search UID or name..." style="margin:0;flex:1;min-width:180px;max-width:300px;" oninput="filterMainTable()"/>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Actions</th></tr></thead>
+        <tbody id="main-uid-tbody"><tr class="empty-row"><td colspan="6">Loading UIDs...</td></tr></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- MAIN PANEL & SUB PANEL will go here when you expand -->
-
+  <!-- RESELLERS TAB -->
+  <div id="main-tab-resellers" class="panel-section">
+    <div class="grid-2">
+      <div class="card">
+        <h3>Create Reseller</h3>
+        <input type="text" id="new-res-user" placeholder="Username" autocomplete="off"/>
+        <input type="password" id="new-res-pass" placeholder="Password"/>
+        <input type="text" id="new-res-note" placeholder="Note (optional)"/>
+        <button class="btn-primary" onclick="createReseller()">+ Create Reseller</button>
+        <div class="result" id="res-create-result"></div>
+      </div>
+      <div class="card">
+        <h3>Active Resellers</h3>
+        <button class="refresh-btn" onclick="loadResellers()">↻ Refresh</button>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Username</th><th>Note</th><th>Action</th></tr></thead>
+            <tbody id="reseller-tbody"><tr class="empty-row"><td colspan="3">No resellers yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- ══════════ SUB (RESELLER) PANEL ══════════ -->
+<div id="sub-panel" class="page">
+  <div class="stats">
+    <div class="stat-box s-purple"><div class="stat-num" id="ss-total">—</div><div class="stat-label">Total UIDs</div></div>
+    <div class="stat-box s-green"><div class="stat-num" id="ss-active">—</div><div class="stat-label">Active</div></div>
+    <div class="stat-box s-red"><div class="stat-num" id="ss-expired">—</div><div class="stat-label">Expired</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px;">
+    <div class="card">
+      <h3>Add UID</h3>
+      <input type="text" id="s-uid" placeholder="UID  (e.g. 123456789)"/>
+      <input type="text" id="s-name" placeholder="Player Name"/>
+      <select id="s-days">
+        <option value="1">1 Day</option><option value="7">7 Days</option>
+        <option value="15">15 Days</option><option value="30" selected>30 Days</option>
+        <option value="60">60 Days</option><option value="90">90 Days</option>
+      </select>
+      <button class="btn-blue" onclick="subAddUID()">⚡ Add UID</button>
+      <div class="result" id="s-add-result"></div>
+    </div>
+    <div class="card">
+      <h3>Remove UID</h3>
+      <input type="text" id="s-rm-uid" placeholder="UID to remove"/>
+      <button class="btn-danger" style="width:100%;padding:11px;margin-bottom:16px;" onclick="subRemoveUID()">🗑 Remove UID</button>
+      <div style="border-top:1px solid var(--border);padding-top:16px;">
+        <h3 style="margin-bottom:12px;">Renew / Extend UID</h3>
+        <input type="text" id="s-renew-uid" placeholder="UID to renew"/>
+        <select id="s-renew-days">
+          <option value="7">+7 Days</option><option value="15">+15 Days</option>
+          <option value="30" selected>+30 Days</option><option value="60">+60 Days</option>
+        </select>
+        <button class="btn-warning" style="width:100%;" onclick="subRenewUID()">↻ Renew UID</button>
+      </div>
+      <div class="result" id="s-rm-result"></div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+    <button class="refresh-btn" onclick="subLoadUIDs()" style="margin:0;">↻ Refresh</button>
+    <input type="text" id="s-search" placeholder="Search UID or name..." style="margin:0;flex:1;min-width:180px;max-width:300px;" oninput="filterSubTable()"/>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Actions</th></tr></thead>
+      <tbody id="sub-uid-tbody"><tr class="empty-row"><td colspan="6">Loading UIDs...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /container -->
 
 <div class="toast" id="toast"></div>
 
+<div class="modal-backdrop" id="modal-del">
+  <div class="modal">
+    <h3>⚠️ Confirm Remove</h3>
+    <p id="modal-msg">Remove this UID? Cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-danger" style="width:auto;flex:1;padding:11px;" onclick="confirmDelete()">Yes, Remove</button>
+      <button onclick="closeModal()" style="flex:1;background:transparent;border:1px solid var(--border2);color:var(--muted);">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div style="position:fixed;bottom:-150px;right:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(6,182,212,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+
 <script>
-// ==================== YOUR ORIGINAL FULL JAVASCRIPT ====================
 let SESSION = {role:null,adminKey:null,username:null,password:null};
 let allMainUIDs=[], allSubUIDs=[];
 let pendingUID=null, pendingIsMain=false;
 
-// ... (Paste all your original script functions here: doMainLogin, doSubLogin, loadUIDs, tables, etc.)
+function saveSession(){try{localStorage.setItem('rp_s',JSON.stringify(SESSION));}catch(e){}}
+function loadSession(){try{const s=localStorage.getItem('rp_s');if(s)SESSION=JSON.parse(s);}catch(e){}}
+function clearSession(){SESSION={role:null,adminKey:null,username:null,password:null};try{localStorage.removeItem('rp_s');}catch(e){}}
 
-function switchLoginTab(n) {
-  document.getElementById('login-sub').style.display = n === 0 ? 'block' : 'none';
-  document.getElementById('login-main').style.display = n === 1 ? 'block' : 'none';
-  
-  const tabs = document.querySelectorAll('.tab-btn');
-  tabs.forEach((tab, i) => tab.classList.toggle('active', i === n));
+let toastTimer;
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=(type==='success'?'✓ ':'✗ ')+msg;
+  t.className=`toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+function showResult(id,msg,type){const el=document.getElementById(id);if(!el)return;el.className=`result show ${type}`;el.textContent=msg;}
+
+function switchLoginTab(tab){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(tab==='sub'&&i===0)||(tab==='main'&&i===1)));
+  document.getElementById('login-sub').style.display=tab==='sub'?'block':'none';
+  document.getElementById('login-main').style.display=tab==='main'?'block':'none';
 }
 
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = type === 'success' ? '✓ ' + msg : '✗ ' + msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3200);
+function doLogout(){
+  clearSession();
+  ['main-panel','sub-panel'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('auth-gate').style.display='block';
+  document.getElementById('logout-btn').style.display='none';
+  document.getElementById('header-role').style.display='none';
+  document.getElementById('header-user').style.display='none';
 }
+
+function showHeader(role,uname){
+  const rb=document.getElementById('header-role');
+  rb.textContent=role==='main_admin'?'👑 MAIN ADMIN':'🔑 RESELLER';
+  rb.style.display='inline-flex';
+  if(uname){document.getElementById('header-user').textContent=uname;document.getElementById('header-user').style.display='inline';}
+  document.getElementById('logout-btn').style.display='inline-block';
+}
+
+// ── MAIN LOGIN ──
+async function doMainLogin(){
+  const key=document.getElementById('main-key').value.trim();
+  if(!key)return showResult('main-login-err','Enter admin key','error');
+  const res=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:key})});
+  const data=await res.json();
+  if(!res.ok)return showResult('main-login-err','✗ '+data.message,'error');
+  SESSION={role:'main_admin',adminKey:key,username:null,password:null};
+  saveSession(); enterMainPanel();
+}
+function enterMainPanel(){
+  document.getElementById('auth-gate').style.display='none';
+  document.getElementById('main-panel').classList.add('active');
+  showHeader('main_admin',null); mainLoadUIDs();
+}
+
+// ── SUB LOGIN ──
+async function doSubLogin(){
+  const username=document.getElementById('sub-user').value.trim();
+  const password=document.getElementById('sub-pass').value.trim();
+  if(!username||!password)return showResult('sub-login-err','Enter username and password','error');
+  const res=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+  const data=await res.json();
+  if(!res.ok)return showResult('sub-login-err','✗ '+data.message,'error');
+  SESSION={role:'sub_admin',adminKey:null,username,password};
+  saveSession(); enterSubPanel();
+}
+function enterSubPanel(){
+  document.getElementById('auth-gate').style.display='none';
+  document.getElementById('sub-panel').classList.add('active');
+  showHeader('sub_admin',SESSION.username); subLoadUIDs();
+}
+
+// ── MAIN TABS ──
+function switchMainTab(tab){
+  document.querySelectorAll('#main-panel .pnav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#main-panel .panel-section').forEach(s=>s.classList.remove('active'));
+  const idx=['uids','resellers'].indexOf(tab);
+  if(idx>=0)document.querySelectorAll('#main-panel .pnav-btn')[idx].classList.add('active');
+  const el=document.getElementById('main-tab-'+tab);if(el)el.classList.add('active');
+  if(tab==='resellers')loadResellers();
+}
+
+// ── UID ROW ──
+function uidRow(u,isMain){
+  const uidVal=u.uid||u.id||u.user_id||'?';
+  const name=u.name||u.username||u.player||'—';
+  const days=u.days!==undefined?u.days:'—';
+  const exp=u.expires_at||u.expiry||u.expire||u.expired_at||null;
+  let badge,expiryTxt,expiryColor='var(--muted)';
+  if(exp){
+    const d=new Date(exp),now=new Date(),diff=Math.ceil((d-now)/86400000);
+    if(diff<0){badge='<span class="badge b-expired">✗ Expired</span>';expiryColor='var(--red)';}
+    else if(diff<=7){badge='<span class="badge b-soon">⚠ Soon</span>';expiryColor='var(--yellow)';}
+    else{badge='<span class="badge b-active">✓ Active</span>';expiryColor='var(--green2)';}
+    expiryTxt=d.toLocaleDateString('en-GB')+(diff>=0?' ('+diff+'d)':' (expired)');
+  } else {
+    badge=u.active!==false?'<span class="badge b-active">✓ Active</span>':'<span class="badge b-soon">— Pending</span>';
+    expiryTxt='—';
+  }
+  const rm=isMain?`mainConfirmDel('${uidVal}')`:`subConfirmDel('${uidVal}')`;
+  const cp=`navigator.clipboard.writeText('${uidVal}').then(()=>showToast('UID copied!'))`;
+  return `<tr><td><span style="font-size:0.69rem;">${uidVal}</span><button class="copy-btn" onclick="${cp}">⎘</button></td><td>${name}</td><td>${days}d</td><td>${badge}</td><td style="color:${expiryColor};font-size:0.69rem;">${expiryTxt}</td><td><button class="btn-danger" onclick="${rm}">🗑</button></td></tr>`;
+}
+
+// ── MAIN UIDs ──
+async function mainLoadUIDs(){
+  const tb=document.getElementById('main-uid-tbody');
+  tb.innerHTML='<tr class="empty-row"><td colspan="6">Loading...</td></tr>';
+  const res=await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey));
+  const data=await res.json();
+  if(!res.ok){tb.innerHTML=`<tr class="empty-row"><td colspan="6">Error: ${data.message}</td></tr>`;return;}
+  allMainUIDs=data.licenses||[];
+  renderMainTable(allMainUIDs);
+  calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
+}
+function renderMainTable(uids){
+  const tb=document.getElementById('main-uid-tbody');
+  tb.innerHTML=uids.length?uids.map(u=>uidRow(u,true)).join(''):'<tr class="empty-row"><td colspan="6">No UIDs found</td></tr>';
+}
+function filterMainTable(){
+  const q=document.getElementById('m-search').value.toLowerCase();
+  renderMainTable(allMainUIDs.filter(u=>(u.uid||u.id||'').toLowerCase().includes(q)||(u.name||u.username||'').toLowerCase().includes(q)));
+}
+function calcStats(uids,tId,aId,eId,sId){
+  let active=0,expired=0,soon=0;
+  uids.forEach(u=>{
+    const exp=u.expires_at||u.expiry||u.expire||null;
+    if(exp){const diff=Math.ceil((new Date(exp)-new Date())/86400000);if(diff<0)expired++;else if(diff<=7)soon++;else active++;}
+    else if(u.active!==false)active++;
+  });
+  document.getElementById(tId).textContent=uids.length;
+  document.getElementById(aId).textContent=active;
+  document.getElementById(eId).textContent=expired;
+  if(sId)document.getElementById(sId).textContent=soon;
+}
+
+async function mainAddUID(){
+  const uid=document.getElementById('m-uid').value.trim();
+  const name=document.getElementById('m-name').value.trim()||'Player';
+  const days=document.getElementById('m-days').value;
+  if(!uid)return showToast('Enter a UID','error');
+  const res=await fetch('/admin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,name,days:parseInt(days)})});
+  const data=await res.json();
+  if(res.ok){showToast('UID added!');showResult('m-add-result','✓ UID '+uid+' added ('+days+' days)','success');document.getElementById('m-uid').value='';document.getElementById('m-name').value='';mainLoadUIDs();}
+  else{showToast(data.message,'error');showResult('m-add-result','✗ '+data.message,'error');}
+}
+async function mainRenewUID(){
+  const uid=document.getElementById('m-renew-uid').value.trim();
+  const days=document.getElementById('m-renew-days').value;
+  if(!uid)return showToast('Enter UID to renew','error');
+  const res=await fetch('/admin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,days:parseInt(days)})});
+  const data=await res.json();
+  if(res.ok){showToast('Renewed +'+days+'d!');showResult('m-rm-result','✓ '+uid+' renewed +'+days+' days','success');document.getElementById('m-renew-uid').value='';mainLoadUIDs();}
+  else{showToast(data.message,'error');showResult('m-rm-result','✗ '+data.message,'error');}
+}
+function mainRemoveUID(){
+  const uid=document.getElementById('m-rm-uid').value.trim();
+  if(!uid)return showToast('Enter UID','error');
+  mainConfirmDel(uid);
+}
+function mainConfirmDel(uid){pendingUID=uid;pendingIsMain=true;document.getElementById('modal-msg').textContent='Remove UID: '+uid+'? This cannot be undone.';document.getElementById('modal-del').classList.add('open');}
+
+// ── SUB UIDs ──
+async function subLoadUIDs(){
+  const tb=document.getElementById('sub-uid-tbody');
+  tb.innerHTML='<tr class="empty-row"><td colspan="6">Loading...</td></tr>';
+  const res=await fetch('/subadmin/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
+  const data=await res.json();
+  if(!res.ok){tb.innerHTML=`<tr class="empty-row"><td colspan="6">Error: ${data.message}</td></tr>`;return;}
+  allSubUIDs=data.licenses||[];
+  renderSubTable(allSubUIDs);
+  calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
+}
+function renderSubTable(uids){
+  const tb=document.getElementById('sub-uid-tbody');
+  tb.innerHTML=uids.length?uids.map(u=>uidRow(u,false)).join(''):'<tr class="empty-row"><td colspan="6">No UIDs found</td></tr>';
+}
+function filterSubTable(){
+  const q=document.getElementById('s-search').value.toLowerCase();
+  renderSubTable(allSubUIDs.filter(u=>(u.uid||u.id||'').toLowerCase().includes(q)||(u.name||u.username||'').toLowerCase().includes(q)));
+}
+async function subAddUID(){
+  const uid=document.getElementById('s-uid').value.trim();
+  const name=document.getElementById('s-name').value.trim()||'Player';
+  const days=document.getElementById('s-days').value;
+  if(!uid)return showToast('Enter a UID','error');
+  const res=await fetch('/subadmin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days:parseInt(days)})});
+  const data=await res.json();
+  if(res.ok){showToast('UID added!');showResult('s-add-result','✓ UID '+uid+' added ('+days+' days)','success');document.getElementById('s-uid').value='';document.getElementById('s-name').value='';subLoadUIDs();}
+  else{showToast(data.message,'error');showResult('s-add-result','✗ '+data.message,'error');}
+}
+async function subRenewUID(){
+  const uid=document.getElementById('s-renew-uid').value.trim();
+  const days=document.getElementById('s-renew-days').value;
+  if(!uid)return showToast('Enter UID to renew','error');
+  const res=await fetch('/subadmin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,days:parseInt(days)})});
+  const data=await res.json();
+  if(res.ok){showToast('Renewed +'+days+'d!');showResult('s-rm-result','✓ '+uid+' renewed +'+days+' days','success');document.getElementById('s-renew-uid').value='';subLoadUIDs();}
+  else{showToast(data.message,'error');showResult('s-rm-result','✗ '+data.message,'error');}
+}
+function subRemoveUID(){
+  const uid=document.getElementById('s-rm-uid').value.trim();
+  if(!uid)return showToast('Enter UID','error');
+  subConfirmDel(uid);
+}
+function subConfirmDel(uid){pendingUID=uid;pendingIsMain=false;document.getElementById('modal-msg').textContent='Remove UID: '+uid+'? This cannot be undone.';document.getElementById('modal-del').classList.add('open');}
+
+// ── MODAL ──
+function closeModal(){document.getElementById('modal-del').classList.remove('open');pendingUID=null;}
+async function confirmDelete(){
+  if(!pendingUID)return closeModal();
+  const uid=pendingUID; closeModal();
+  let res,data;
+  if(pendingIsMain){
+    res=await fetch('/admin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid})});
+  } else {
+    res=await fetch('/subadmin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid})});
+  }
+  data=await res.json();
+  if(res.ok&&data.status==='success'){showToast('UID '+uid+' removed!');}
+  else{showToast(data.message||'Remove failed','error');}
+  pendingIsMain?mainLoadUIDs():subLoadUIDs();
+}
+document.getElementById('modal-del').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+// ── RESELLERS ──
+async function createReseller(){
+  const username=document.getElementById('new-res-user').value.trim();
+  const password=document.getElementById('new-res-pass').value.trim();
+  const note=document.getElementById('new-res-note').value.trim();
+  if(!username||!password)return showToast('Username & password required','error');
+  const res=await fetch('/admin/create-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username,password,note})});
+  const data=await res.json();
+  if(res.ok){showToast("Reseller '"+username+"' created!");showResult('res-create-result',"✓ Reseller '"+username+"' created",'success');document.getElementById('new-res-user').value='';document.getElementById('new-res-pass').value='';document.getElementById('new-res-note').value='';loadResellers();}
+  else{showToast(data.message,'error');showResult('res-create-result','✗ '+data.message,'error');}
+}
+async function loadResellers(){
+  const tb=document.getElementById('reseller-tbody');
+  const res=await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
+  const data=await res.json();
+  if(!res.ok||!data.subadmins.length){tb.innerHTML='<tr class="empty-row"><td colspan="3">No resellers yet</td></tr>';return;}
+  tb.innerHTML=data.subadmins.map(sa=>`<tr><td><span class="badge b-blue">${sa.username}</span></td><td style="color:var(--muted);font-size:0.7rem;">${sa.note||'—'}</td><td><button class="btn-danger" onclick="deleteReseller('${sa.username}')">Delete</button></td></tr>`).join('');
+}
+async function deleteReseller(username){
+  if(!confirm("Delete reseller '"+username+"'?"))return;
+  const res=await fetch('/admin/delete-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username})});
+  const data=await res.json();
+  if(res.ok){showToast("Reseller '"+username+"' deleted");loadResellers();}
+  else showToast(data.message,'error');
+}
+
+// ── ENTER KEY ──
+document.getElementById('main-key').addEventListener('keydown',e=>{if(e.key==='Enter')doMainLogin();});
+document.getElementById('sub-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doSubLogin();});
+document.getElementById('sub-user').addEventListener('keydown',e=>{if(e.key==='Enter')doSubLogin();});
+
+// ── AUTO RESTORE ──
+(async function init(){
+  loadSession();
+  if(!SESSION.role)return;
+  if(SESSION.role==='main_admin'&&SESSION.adminKey){
+    try{const r=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey})});if(r.ok){enterMainPanel();return;}}catch(e){}
+    clearSession();
+  }
+  if(SESSION.role==='sub_admin'&&SESSION.username&&SESSION.password){
+    try{const r=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password})});if(r.ok){enterSubPanel();return;}}catch(e){}
+    clearSession();
+  }
+})();
 </script>
 </body>
 </html>
