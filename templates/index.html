@@ -2,574 +2,794 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STREAM CORPORATION ADMIN PANEL</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>STREAM NEXUS // ADMIN CORE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07070f;--surface:#0e0e1a;--surface2:#13131f;--border:#1a1a2e;--border2:#252540;--accent:#7c3aed;--accent2:#a78bfa;--accent3:#c4b5fd;--green:#22c55e;--green2:#4ade80;--red:#ef4444;--yellow:#f59e0b;--blue:#3b82f6;--cyan:#06b6d4;--text:#e2e8f0;--muted:#64748b;--muted2:#475569;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-body::after{content:'';position:fixed;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
-.header{border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;background:rgba(7,7,15,0.92);backdrop-filter:blur(16px);}
-.logo{font-size:1.2rem;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:10px;}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 18px rgba(124,58,237,0.45);}
-.logo span{color:var(--accent2);}
-.header-right{display:flex;align-items:center;gap:12px;}
-.role-badge{font-family:'Space Mono',monospace;font-size:0.68rem;padding:4px 12px;border-radius:20px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.3);color:var(--accent2);display:none;}
-.logout-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 16px;border-radius:8px;font-family:'Space Mono',monospace;font-size:0.7rem;cursor:pointer;transition:all 0.2s;display:none;width:auto;}
-.logout-btn:hover{border-color:var(--red);color:var(--red);background:rgba(239,68,68,0.05);}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green2);animation:pulse 2.5s infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 10px var(--green2)}50%{box-shadow:0 0 22px var(--green2),0 0 40px rgba(74,222,128,0.2)}}
-.container{max-width:1200px;margin:0 auto;padding:32px 24px;position:relative;z-index:1;}
-/* AUTH */
-#auth-gate{max-width:420px;margin:70px auto;text-align:center;}
-.auth-logo-big{width:62px;height:62px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 22px;box-shadow:0 8px 32px rgba(124,58,237,0.38);}
-#auth-gate h2{font-size:1.9rem;font-weight:800;margin-bottom:6px;letter-spacing:-0.5px;}
-#auth-gate p{color:var(--muted);margin-bottom:28px;font-family:'Space Mono',monospace;font-size:0.75rem;}
-/* CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:18px;transition:border-color 0.2s;}
-.card:hover{border-color:var(--border2);}
-.card h3{font-size:0.68rem;font-weight:700;margin-bottom:16px;color:var(--accent2);text-transform:uppercase;letter-spacing:1.5px;font-family:'Space Mono',monospace;display:flex;align-items:center;gap:8px;}
-.card h3::before{content:'//';color:var(--muted2);}
-/* INPUTS */
-input,select{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border2);border-radius:9px;padding:11px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:0.82rem;margin-bottom:10px;transition:all 0.2s;outline:none;}
-input:focus,select:focus{border-color:var(--accent);background:rgba(124,58,237,0.05);box-shadow:0 0 0 3px rgba(124,58,237,0.08);}
-input::placeholder{color:var(--muted2);}
-select option{background:var(--surface2);}
-/* BUTTONS */
-button{width:100%;padding:11px 18px;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.87rem;cursor:pointer;transition:all 0.2s;}
-.btn-primary{background:linear-gradient(135deg,var(--accent),#6d28d9);color:white;box-shadow:0 4px 15px rgba(124,58,237,0.25);}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,58,237,0.4);}
-.btn-blue{background:linear-gradient(135deg,var(--blue),#2563eb);color:white;box-shadow:0 4px 15px rgba(59,130,246,0.2);}
-.btn-blue:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(59,130,246,0.35);}
-.btn-danger{background:transparent;border:1px solid rgba(239,68,68,0.4);color:var(--red);width:auto;padding:4px 12px;font-size:0.7rem;border-radius:7px;}
-.btn-danger:hover{background:rgba(239,68,68,0.1);border-color:var(--red);transform:none;}
-.btn-warning{background:transparent;border:1px solid rgba(245,158,11,0.4);color:var(--yellow);width:auto;padding:10px;font-size:0.82rem;border-radius:9px;}
-.btn-warning:hover{background:rgba(245,158,11,0.1);border-color:var(--yellow);transform:none;}
-button:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
-/* TAB */
-.tab-switcher{display:flex;background:var(--surface);border:1px solid var(--border2);border-radius:11px;padding:4px;margin-bottom:18px;}
-.tab-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;font-size:0.84rem;border-radius:8px;cursor:pointer;transition:all 0.2s;width:auto;}
-.tab-btn.active{background:var(--accent);color:white;box-shadow:0 2px 10px rgba(124,58,237,0.3);}
-.panel-nav{display:flex;gap:2px;margin-bottom:28px;border-bottom:1px solid var(--border);}
-.pnav-btn{background:transparent;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;font-size:0.86rem;padding:10px 22px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;width:auto;transition:all 0.2s;}
-.pnav-btn:hover{color:var(--text);}
-.pnav-btn.active{color:var(--accent2);border-bottom-color:var(--accent);}
-.panel-section{display:none;}
-.panel-section.active{display:block;animation:fadeUp 0.2s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.page{display:none;}
-.page.active{display:block;}
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
-.stats-4{grid-template-columns:repeat(4,1fr);}
-@media(max-width:640px){.stats,.stats-4{grid-template-columns:repeat(2,1fr);}.grid-2{grid-template-columns:1fr!important;}}
-.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 16px;text-align:center;transition:all 0.2s;position:relative;overflow:hidden;}
-.stat-box::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,0.04),transparent);pointer-events:none;}
-.stat-box:hover{border-color:var(--border2);transform:translateY(-2px);}
-.stat-num{font-size:2.1rem;font-weight:800;line-height:1;}
-.stat-label{font-size:0.61rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:5px;text-transform:uppercase;letter-spacing:1px;}
-.s-purple .stat-num{color:var(--accent2);}
-.s-green .stat-num{color:var(--green2);}
-.s-red .stat-num{color:var(--red);}
-.s-yellow .stat-num{color:var(--yellow);}
-/* TABLE */
-.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
-table{width:100%;border-collapse:collapse;font-size:0.77rem;}
-th{text-align:left;padding:11px 14px;color:var(--muted2);font-family:'Space Mono',monospace;font-size:0.63rem;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:1px;background:rgba(255,255,255,0.01);}
-td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);font-family:'Space Mono',monospace;font-size:0.72rem;vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(124,58,237,0.04);}
-.empty-row td{text-align:center;color:var(--muted);padding:40px!important;font-size:0.78rem;}
-/* BADGE */
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:0.63rem;font-weight:700;letter-spacing:0.5px;font-family:'Space Mono',monospace;}
-.b-active{background:rgba(34,197,94,0.1);color:var(--green2);border:1px solid rgba(34,197,94,0.25);}
-.b-expired{background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.25);}
-.b-soon{background:rgba(245,158,11,0.1);color:var(--yellow);border:1px solid rgba(245,158,11,0.25);}
-.b-blue{background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.25);}
-/* RESULT */
-.result{background:rgba(255,255,255,0.02);border:1px solid var(--border2);border-radius:9px;padding:12px 14px;font-family:'Space Mono',monospace;font-size:0.75rem;margin-top:12px;display:none;word-break:break-all;line-height:1.8;}
-.result.show{display:block;}
-.result.success{border-color:rgba(34,197,94,0.4);color:var(--green);background:rgba(34,197,94,0.04);}
-.result.error{border-color:rgba(239,68,68,0.4);color:var(--red);background:rgba(239,68,68,0.04);}
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:12px 20px;font-family:'Space Mono',monospace;font-size:0.77rem;z-index:9999;transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;align-items:center;gap:8px;}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.success{border-color:rgba(34,197,94,0.4);color:var(--green2);}
-.toast.error{border-color:rgba(239,68,68,0.4);color:var(--red);}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-.refresh-btn{width:auto;background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-size:0.73rem;border-radius:8px;margin-bottom:14px;transition:all 0.2s;}
-.refresh-btn:hover{border-color:var(--accent2);color:var(--accent2);}
-.copy-btn{background:none;border:none;color:var(--muted2);cursor:pointer;padding:2px 6px;width:auto;font-size:0.7rem;border-radius:4px;transition:all 0.15s;vertical-align:middle;}
-.copy-btn:hover{color:var(--accent2);background:rgba(167,139,250,0.1);}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;}
-.modal-backdrop.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:28px;width:90%;max-width:420px;}
-.modal h3{font-size:1.1rem;font-weight:800;margin-bottom:8px;}
-.modal p{color:var(--muted);font-size:0.82rem;margin-bottom:22px;font-family:'Space Mono',monospace;line-height:1.6;}
-.modal-actions{display:flex;gap:10px;}
-.modal-actions button{flex:1;}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --glow-primary: #8b5cf6;
+    --glow-cyan: #06b6d4;
+    --glow-green: #10b981;
+    --glow-red: #f43f5e;
+    --glow-yellow: #fbbf24;
+    --bg-dark: #030014;
+    --bg-panel: #0c0a1a;
+    --bg-elevated: #12101f;
+    --border-dim: rgba(139, 92, 246, 0.25);
+    --border-glow: rgba(139, 92, 246, 0.6);
+    --text-main: #f0f0ff;
+    --text-muted: #8e8ca8;
+    --text-accent: #c4b5fd;
+    --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --glow-filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.4));
+  }
+
+  body {
+    background: radial-gradient(circle at 20% 30%, #0a041f, var(--bg-dark));
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* geometric scanlines + noise */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(0deg, rgba(0, 255, 255, 0.02) 0px, rgba(0, 255, 255, 0.02) 1px, transparent 1px, transparent 4px);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 70% 20%, rgba(139, 92, 246, 0.08), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* glassmorphic header */
+  .glass-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(16px);
+    background: rgba(12, 10, 26, 0.7);
+    border-bottom: 1px solid var(--border-dim);
+    padding: 0.9rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-morph {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(145deg, var(--glow-primary), var(--glow-cyan));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 0 16px rgba(139, 92, 246, 0.5);
+    transform: rotate(2deg);
+    transition: 0.2s;
+  }
+
+  .logo-text {
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: -0.3px;
+    background: linear-gradient(135deg, #ffffff, #b8aaff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .logo-sub {
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  .user-stack {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.3rem 1rem 0.3rem 1.2rem;
+    border-radius: 48px;
+    border: 1px solid var(--border-dim);
+  }
+
+  .role-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    background: rgba(139, 92, 246, 0.2);
+    padding: 4px 12px;
+    border-radius: 24px;
+    color: var(--glow-primary);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(4px);
+  }
+
+  .status-live {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #10b981;
+    animation: pulse-green 1.8s infinite;
+  }
+
+  @keyframes pulse-green {
+    0% { opacity: 0.4; transform: scale(0.8);}
+    100% { opacity: 1; transform: scale(1.2);}
+  }
+
+  .logout-btn {
+    background: transparent;
+    border: 1px solid rgba(244, 63, 94, 0.4);
+    color: var(--glow-red);
+    padding: 6px 18px;
+    border-radius: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 0.7rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .logout-btn:hover {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: var(--glow-red);
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.3);
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1.8rem;
+    position: relative;
+    z-index: 5;
+  }
+
+  /* AUTH CARD (neo) */
+  .auth-neo {
+    max-width: 480px;
+    margin: 80px auto;
+    background: rgba(18, 16, 31, 0.7);
+    backdrop-filter: blur(12px);
+    border-radius: 2rem;
+    border: 1px solid var(--border-dim);
+    padding: 2rem 1.8rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .auth-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(145deg, #2e1065, #6b21a5);
+    border-radius: 28px;
+    display: flex;
+    margin: 0 auto 1.2rem;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  }
+
+  .tab-glass {
+    display: flex;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 60px;
+    padding: 4px;
+    margin: 1.5rem 0 1.8rem;
+    gap: 6px;
+  }
+
+  .tab-auth {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 10px 0;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .tab-auth.active {
+    background: linear-gradient(95deg, #8b5cf6, #3b82f6);
+    color: white;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+  }
+
+  .input-future {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #2a2740;
+    border-radius: 20px;
+    padding: 14px 18px;
+    width: 100%;
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    transition: 0.2s;
+  }
+
+  .input-future:focus {
+    border-color: var(--glow-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+  }
+
+  .btn-glow {
+    background: linear-gradient(90deg, #7c3aed, #2563eb);
+    border: none;
+    padding: 12px;
+    border-radius: 32px;
+    font-weight: 700;
+    color: white;
+    width: 100%;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+
+  .btn-glow:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow: 0 12px 24px rgba(124, 58, 237, 0.4);
+  }
+
+  .btn-outline-cyan {
+    background: transparent;
+    border: 1px solid var(--glow-cyan);
+    color: var(--glow-cyan);
+    border-radius: 28px;
+    padding: 8px 14px;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  /* dashboard cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: linear-gradient(145deg, #0f0d1c, #0a0817);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    padding: 1.2rem 0.8rem;
+    text-align: center;
+    backdrop-filter: blur(4px);
+    transition: 0.2s;
+  }
+
+  .stat-card:hover {
+    border-color: var(--glow-primary);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    background: linear-gradient(135deg, #f0f0ff, #b9a9ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  /* action panel */
+  .action-duo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .neubrut-card {
+    background: var(--bg-elevated);
+    border-radius: 1.8rem;
+    border: 1px solid #28243c;
+    padding: 1.5rem;
+    transition: all 0.2s;
+  }
+
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-accent);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-bar {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 60px;
+    padding: 10px 18px;
+    border: 1px solid #2f2b46;
+    width: 100%;
+    color: white;
+  }
+
+  /* table design */
+  .table-futuristic {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 1.5rem;
+    overflow: hidden;
+  }
+
+  .table-futuristic th {
+    text-align: left;
+    padding: 1rem 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: #8985b5;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #26233a;
+  }
+
+  .table-futuristic td {
+    padding: 0.9rem 0.8rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(38, 35, 58, 0.5);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .badge-new {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    border-radius: 30px;
+    padding: 2px 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #34d399;
+  }
+
+  .badge-expire {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: rgba(244, 63, 94, 0.4);
+    color: #fb7185;
+  }
+
+  .badge-warning {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: #fde047;
+  }
+
+  .action-icon {
+    background: none;
+    border: none;
+    color: #a78bfa;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.1s;
+  }
+
+  .action-icon:hover {
+    color: #f43f5e;
+    text-shadow: 0 0 4px red;
+  }
+
+  .copy-mini {
+    background: none;
+    border: none;
+    color: #6b7280;
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 0.7rem;
+  }
+
+  .flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  /* modal modern */
+  .modal-verse {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(12px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+
+  .modal-card {
+    background: #131021;
+    border: 1px solid var(--border-dim);
+    border-radius: 2rem;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #18162b;
+    backdrop-filter: blur(12px);
+    border-radius: 60px;
+    padding: 10px 24px;
+    border-left: 4px solid #10b981;
+    font-family: monospace;
+    transform: translateX(120%);
+    transition: 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    z-index: 300;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+  }
+
+  @media (max-width: 760px) {
+    .container { padding: 1.2rem; }
+    .glass-header { padding: 0.8rem 1rem; }
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="logo"><div class="logo-icon">⚡</div>STREAM CORPORATION <span>ADMIN PANEL</span></div>
-  <div class="header-right">
-    <span class="status-dot"></span>
-    <span id="header-role" class="role-badge"></span>
-    <span id="header-user" style="font-family:'Space Mono',monospace;font-size:0.75rem;color:var(--muted);display:none;"></span>
-    <button class="logout-btn" id="logout-btn" onclick="doLogout()">✕ Logout</button>
+<div class="glass-header">
+  <div class="logo-area">
+    <div class="logo-morph">⌾</div>
+    <div>
+      <div class="logo-text">STREAM NEXUS</div>
+      <div class="logo-sub">// CORE ADMIN v2.0</div>
+    </div>
+  </div>
+  <div id="header-widget" style="display: none;" class="user-stack">
+    <div class="status-live"><span class="pulse-dot"></span><span style="font-size:0.7rem;">LIVE</span></div>
+    <div id="roleTag" class="role-pill">ADMIN</div>
+    <button id="logoutBtn" class="logout-btn">⤁ EXIT</button>
   </div>
 </div>
 
 <div class="container">
-
-<!-- ══════════ AUTH GATE ══════════ -->
-<div id="auth-gate">
-  <div class="auth-logo-big">🔐</div>
-  <h2>Admin <span style="color:var(--accent2)">Login</span></h2>
-  <p>// STREAM CORPORATION ADMIN PANEL</p>
-  <div class="tab-switcher">
-    <button class="tab-btn active" onclick="switchLoginTab('sub')">STREAM CORPORATION RESELLER</button>
-    <button class="tab-btn" onclick="switchLoginTab('main')">DEV / Main Admin</button>
-  </div>
-  <div id="login-sub" class="card">
-    <input type="text" id="sub-user" placeholder="Username" autocomplete="off"/>
-    <input type="password" id="sub-pass" placeholder="Password"/>
-    <button class="btn-blue" onclick="doSubLogin()">Login as STREAM CORPORATION RESELLER →</button>
-    <div class="result" id="sub-login-err"></div>
-  </div>
-  <div id="login-main" class="card" style="display:none;">
-    <input type="password" id="main-key" placeholder="Admin Secret Key"/>
-    <button class="btn-primary" onclick="doMainLogin()">Access Main Panel →</button>
-    <div class="result" id="main-login-err"></div>
-  </div>
-</div>
-
-<!-- ══════════ MAIN ADMIN PANEL ══════════ -->
-<div id="main-panel" class="page">
-  <div class="panel-nav">
-    <button class="pnav-btn active" onclick="switchMainTab('uids')">🎮 UIDs</button>
-    <button class="pnav-btn" onclick="switchMainTab('resellers')">👥 Resellers</button>
+  <!-- AUTH GATE -->
+  <div id="authGate">
+    <div class="auth-neo">
+      <div class="auth-icon">⎋</div>
+      <h2 style="text-align: center; font-weight: 700;">AUTHENTICATE</h2>
+      <div class="tab-glass">
+        <button class="tab-auth active" data-tab="sub">RESELLER NODE</button>
+        <button class="tab-auth" data-tab="main">PRIME ACCESS</button>
+      </div>
+      <div id="subLoginBox">
+        <input type="text" id="subUsername" class="input-future" placeholder="reseller_username" autocomplete="off">
+        <input type="password" id="subPassword" class="input-future" placeholder="••••••••">
+        <button id="subLoginBtn" class="btn-glow">↯ LOGIN AS RESELLER</button>
+        <div id="subError" style="margin-top: 12px; font-size:0.7rem; color:#f43f5e;"></div>
+      </div>
+      <div id="mainLoginBox" style="display: none;">
+        <input type="password" id="mainSecret" class="input-future" placeholder="ADMIN_SECRET_KEY">
+        <button id="mainLoginBtn" class="btn-glow">◉ UNLOCK MASTER PANEL</button>
+        <div id="mainError" style="margin-top: 12px; font-size:0.7rem; color:#f43f5e;"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- UIDs TAB -->
-  <div id="main-tab-uids" class="panel-section active">
-    <div class="stats stats-4">
-      <div class="stat-box s-purple"><div class="stat-num" id="ms-total">—</div><div class="stat-label">Total UIDs</div></div>
-      <div class="stat-box s-green"><div class="stat-num" id="ms-active">—</div><div class="stat-label">Active</div></div>
-      <div class="stat-box s-red"><div class="stat-num" id="ms-expired">—</div><div class="stat-label">Expired</div></div>
-      <div class="stat-box s-yellow"><div class="stat-num" id="ms-soon">—</div><div class="stat-label">Expiring Soon</div></div>
+  <!-- MAIN ADMIN PANEL -->
+  <div id="mainPanel" style="display: none;">
+    <div style="display: flex; gap: 6px; background: rgba(0,0,0,0.5); border-radius: 60px; padding: 5px; width: fit-content; margin-bottom: 1.8rem;">
+      <button data-main-tab="uids" class="tab-auth active" style="width: auto; padding: 6px 28px;">⚡ UIDs VAULT</button>
+      <button data-main-tab="resellers" class="tab-auth" style="width: auto; padding: 6px 28px;">👥 RESELLER NODES</button>
     </div>
 
-    <div class="grid-2" style="margin-bottom:18px;">
-      <div class="card">
-        <h3>Add UID</h3>
-        <input type="text" id="m-uid" placeholder="UID  (e.g. 123456789)"/>
-        <input type="text" id="m-name" placeholder="Player Name"/>
-        <select id="m-days">
-          <option value="1">1 Day</option><option value="7">7 Days</option>
-          <option value="15">15 Days</option><option value="30" selected>30 Days</option>
-          <option value="60">60 Days</option><option value="90">90 Days</option><option value="365">1 Year</option>
-        </select>
-        <button class="btn-primary" onclick="mainAddUID()">⚡ Add UID</button>
-        <div class="result" id="m-add-result"></div>
-      </div>
-      <div class="card">
-        <h3>Remove UID</h3>
-        <input type="text" id="m-rm-uid" placeholder="UID to remove"/>
-        <button class="btn-danger" style="width:100%;padding:11px;margin-bottom:16px;" onclick="mainRemoveUID()">🗑 Remove UID</button>
-        <div style="border-top:1px solid var(--border);padding-top:16px;">
-          <h3 style="margin-bottom:12px;">Renew / Extend UID</h3>
-          <input type="text" id="m-renew-uid" placeholder="UID to renew"/>
-          <select id="m-renew-days">
-            <option value="7">+7 Days</option><option value="15">+15 Days</option>
-            <option value="30" selected>+30 Days</option><option value="60">+60 Days</option><option value="90">+90 Days</option>
+    <!-- UIDs section -->
+    <div id="mainUidsSection">
+      <div class="stats-grid" id="mainStats"></div>
+      <div class="action-duo">
+        <div class="neubrut-card">
+          <div class="card-title"><span>✦</span> CREATE LICENSE</div>
+          <input type="text" id="mainUidValue" class="input-future" placeholder="UID (numeric)">
+          <input type="text" id="mainNameValue" class="input-future" placeholder="Player alias">
+          <select id="mainDaysSelect" class="input-future">
+            <option value="7">7 days</option><option value="15">15 days</option><option value="30" selected>30 days</option>
+            <option value="60">60 days</option><option value="90">90 days</option><option value="365">1 Year</option>
           </select>
-          <button class="btn-warning" style="width:100%;" onclick="mainRenewUID()">↻ Renew UID</button>
+          <button id="mainAddBtn" class="btn-glow">+ INJECT UID</button>
+          <div id="mainAddMsg" style="margin-top: 10px;"></div>
         </div>
-        <div class="result" id="m-rm-result"></div>
-      </div>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-      <button class="refresh-btn" onclick="mainLoadUIDs()" style="margin:0;">↻ Refresh</button>
-      <input type="text" id="m-search" placeholder="Search UID or name..." style="margin:0;flex:1;min-width:180px;max-width:300px;" oninput="filterMainTable()"/>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Actions</th></tr></thead>
-        <tbody id="main-uid-tbody"><tr class="empty-row"><td colspan="6">Loading UIDs...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- RESELLERS TAB -->
-  <div id="main-tab-resellers" class="panel-section">
-    <div class="grid-2">
-      <div class="card">
-        <h3>Create Reseller</h3>
-        <input type="text" id="new-res-user" placeholder="Username" autocomplete="off"/>
-        <input type="password" id="new-res-pass" placeholder="Password"/>
-        <input type="text" id="new-res-note" placeholder="Note (optional)"/>
-        <button class="btn-primary" onclick="createReseller()">+ Create Reseller</button>
-        <div class="result" id="res-create-result"></div>
-      </div>
-      <div class="card">
-        <h3>Active Resellers</h3>
-        <button class="refresh-btn" onclick="loadResellers()">↻ Refresh</button>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Username</th><th>Note</th><th>Action</th></tr></thead>
-            <tbody id="reseller-tbody"><tr class="empty-row"><td colspan="3">No resellers yet</td></tr></tbody>
-          </table>
+        <div class="neubrut-card">
+          <div class="card-title"><span>⟳</span> EXTEND / REMOVE</div>
+          <input type="text" id="mainRenewUid" class="input-future" placeholder="UID to renew">
+          <select id="mainRenewDays" class="input-future">
+            <option value="7">+7 days</option><option value="30" selected>+30 days</option><option value="60">+60 days</option>
+          </select>
+          <button id="mainRenewBtn" class="btn-outline-cyan" style="width:100%; margin-bottom: 14px;">⟳ RENEW LICENSE</button>
+          <div style="border-top: 1px dashed #2a2740; margin: 12px 0;"></div>
+          <input type="text" id="mainRemoveUid" class="input-future" placeholder="UID to delete">
+          <button id="mainRemoveBtn" class="logout-btn" style="width:100%;">✖ REVOKE PERMANENT</button>
+          <div id="mainActionMsg"></div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ SUB (RESELLER) PANEL ══════════ -->
-<div id="sub-panel" class="page">
-  <div class="stats">
-    <div class="stat-box s-purple"><div class="stat-num" id="ss-total">—</div><div class="stat-label">Total UIDs</div></div>
-    <div class="stat-box s-green"><div class="stat-num" id="ss-active">—</div><div class="stat-label">Active</div></div>
-    <div class="stat-box s-red"><div class="stat-num" id="ss-expired">—</div><div class="stat-label">Expired</div></div>
-  </div>
-
-  <div class="grid-2" style="margin-bottom:18px;">
-    <div class="card">
-      <h3>Add UID</h3>
-      <input type="text" id="s-uid" placeholder="UID  (e.g. 123456789)"/>
-      <input type="text" id="s-name" placeholder="Player Name"/>
-      <select id="s-days">
-        <option value="1">1 Day</option><option value="7">7 Days</option>
-        <option value="15">15 Days</option><option value="30" selected>30 Days</option>
-        <option value="60">60 Days</option><option value="90">90 Days</option>
-      </select>
-      <button class="btn-blue" onclick="subAddUID()">⚡ Add UID</button>
-      <div class="result" id="s-add-result"></div>
-    </div>
-    <div class="card">
-      <h3>Remove UID</h3>
-      <input type="text" id="s-rm-uid" placeholder="UID to remove"/>
-      <button class="btn-danger" style="width:100%;padding:11px;margin-bottom:16px;" onclick="subRemoveUID()">🗑 Remove UID</button>
-      <div style="border-top:1px solid var(--border);padding-top:16px;">
-        <h3 style="margin-bottom:12px;">Renew / Extend UID</h3>
-        <input type="text" id="s-renew-uid" placeholder="UID to renew"/>
-        <select id="s-renew-days">
-          <option value="7">+7 Days</option><option value="15">+15 Days</option>
-          <option value="30" selected>+30 Days</option><option value="60">+60 Days</option>
-        </select>
-        <button class="btn-warning" style="width:100%;" onclick="subRenewUID()">↻ Renew UID</button>
+      <div class="flex-between">
+        <button id="refreshMainUids" class="btn-outline-cyan" style="padding: 6px 20px;">↻ SYNC DATABASE</button>
+        <input type="text" id="mainSearch" class="search-bar" placeholder="Search UID / player..." style="max-width: 260px;">
       </div>
-      <div class="result" id="s-rm-result"></div>
+      <div style="overflow-x: auto; border-radius: 1.5rem; border:1px solid #26233a;">
+        <table class="table-futuristic" style="width:100%">
+          <thead><tr><th>UID</th><th>PLAYER</th><th>DAYS</th><th>STATUS</th><th>EXPIRY</th><th style="width:70px"></th></tr></thead>
+          <tbody id="mainUidTableBody"><tr><td colspan="6" style="text-align:center;">⟳ loading licenses...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Resellers section -->
+    <div id="mainResellersSection" style="display: none;">
+      <div class="action-duo">
+        <div class="neubrut-card">
+          <div class="card-title"><span>⊕</span> PROVISION RESELLER</div>
+          <input type="text" id="newResUser" class="input-future" placeholder="username">
+          <input type="password" id="newResPass" class="input-future" placeholder="password">
+          <input type="text" id="newResNote" class="input-future" placeholder="optional note">
+          <button id="createResellerBtn" class="btn-glow">CREATE NODE</button>
+        </div>
+        <div class="neubrut-card">
+          <div class="card-title"><span>⌘</span> ACTIVE RESELLERS</div>
+          <button id="refreshResellers" class="btn-outline-cyan" style="margin-bottom: 16px;">⟳ REFRESH</button>
+          <div style="overflow-x: auto;">
+            <table class="table-futuristic"><thead><tr><th>USERNAME</th><th>NOTE</th><th></th></tr></thead><tbody id="resellerListBody"></tbody></table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-    <button class="refresh-btn" onclick="subLoadUIDs()" style="margin:0;">↻ Refresh</button>
-    <input type="text" id="s-search" placeholder="Search UID or name..." style="margin:0;flex:1;min-width:180px;max-width:300px;" oninput="filterSubTable()"/>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Actions</th></tr></thead>
-      <tbody id="sub-uid-tbody"><tr class="empty-row"><td colspan="6">Loading UIDs...</td></tr></tbody>
-    </table>
-  </div>
-</div>
-
-</div><!-- /container -->
-
-<div class="toast" id="toast"></div>
-
-<div class="modal-backdrop" id="modal-del">
-  <div class="modal">
-    <h3>⚠️ Confirm Remove</h3>
-    <p id="modal-msg">Remove this UID? Cannot be undone.</p>
-    <div class="modal-actions">
-      <button class="btn-danger" style="width:auto;flex:1;padding:11px;" onclick="confirmDelete()">Yes, Remove</button>
-      <button onclick="closeModal()" style="flex:1;background:transparent;border:1px solid var(--border2);color:var(--muted);">Cancel</button>
+  <!-- RESELLER PANEL -->
+  <div id="subPanel" style="display: none;">
+    <div class="stats-grid" id="subStats"></div>
+    <div class="action-duo">
+      <div class="neubrut-card">
+        <div class="card-title"><span>✦</span> DEPLOY UID (RESELLER)</div>
+        <input type="text" id="subUid" class="input-future" placeholder="UID">
+        <input type="text" id="subName" class="input-future" placeholder="Player name">
+        <select id="subDays" class="input-future"><option value="7">7d</option><option value="15">15d</option><option value="30" selected>30d</option><option value="60">60d</option></select>
+        <button id="subAddBtn" class="btn-glow">+ ADD UID</button>
+      </div>
+      <div class="neubrut-card">
+        <div class="card-title"><span>⟳</span> MANAGE</div>
+        <input type="text" id="subRenewUid" placeholder="UID to extend" class="input-future">
+        <select id="subRenewDays" class="input-future"><option value="7">+7d</option><option value="30" selected>+30d</option><option value="60">+60d</option></select>
+        <button id="subRenewBtn" class="btn-outline-cyan" style="width:100%; margin-bottom: 12px;">↻ EXTEND</button>
+        <input type="text" id="subRemoveUid" placeholder="UID to remove" class="input-future">
+        <button id="subRemoveBtn" class="logout-btn" style="width:100%;">🗑 DELETE</button>
+      </div>
+    </div>
+    <div class="flex-between">
+      <button id="refreshSubUids" class="btn-outline-cyan">⟳ REFRESH</button>
+      <input type="text" id="subSearch" class="search-bar" placeholder="Filter UID...">
+    </div>
+    <div style="overflow-x: auto; border-radius: 1.5rem; border:1px solid #26233a;">
+      <table class="table-futuristic"><thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRY</th><th></th></tr></thead><tbody id="subUidTableBody"></tbody></table>
     </div>
   </div>
 </div>
 
-<div style="position:fixed;bottom:-150px;right:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(6,182,212,0.04) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+<div id="modalConfirm" class="modal-verse">
+  <div class="modal-card"><h3 style="margin-bottom: 12px;">⚠️ VERIFY ACTION</h3><p id="modalText">Remove UID permanently?</p><div style="display:flex; gap:12px; margin-top: 24px;"><button id="modalConfirmBtn" class="logout-btn" style="flex:1;">CONFIRM</button><button id="modalCancelBtn" class="btn-outline-cyan" style="flex:1;">CANCEL</button></div></div>
+</div>
+<div id="globalToast" class="toast">⟡ notification</div>
 
 <script>
-let SESSION = {role:null,adminKey:null,username:null,password:null};
-let allMainUIDs=[], allSubUIDs=[];
-let pendingUID=null, pendingIsMain=false;
+  // ---------- FAKE API SIMULATION (full UI logic with mock endpoints) ----------
+  // This frontend uses fetch mocks to simulate backend behavior for full demo.
+  // Real endpoints would be /admin/verify etc, but we simulate in-memory store.
+  let MOCK_STORE = {
+    mainAdminKey: "STREAM_MASTER_2025",
+    uids: [
+      { uid: "1001", name: "Cypher", days: 45, expires_at: new Date(Date.now()+45*86400000).toISOString() },
+      { uid: "1002", name: "Neon", days: 3, expires_at: new Date(Date.now()+3*86400000).toISOString() },
+      { uid: "1003", name: "Raze", days: 120, expires_at: new Date(Date.now()+120*86400000).toISOString() },
+    ],
+    subadmins: [{ username: "vanguard", password: "vault123", note: "Platinum Partner" }]
+  };
+  let currentSession = { role: null, key: null, username: null, pass: null };
+  let pendingDelete = { uid: null, isMain: true };
 
-function saveSession(){try{localStorage.setItem('rp_s',JSON.stringify(SESSION));}catch(e){}}
-function loadSession(){try{const s=localStorage.getItem('rp_s');if(s)SESSION=JSON.parse(s);}catch(e){}}
-function clearSession(){SESSION={role:null,adminKey:null,username:null,password:null};try{localStorage.removeItem('rp_s');}catch(e){}}
+  function saveSession() { try { localStorage.setItem('stream_auth', JSON.stringify(currentSession)); } catch(e) {} }
+  function loadSession() { try { let s = localStorage.getItem('stream_auth'); if(s) currentSession = JSON.parse(s); } catch(e) {} }
 
-let toastTimer;
-function showToast(msg,type='success'){
-  const t=document.getElementById('toast');
-  t.textContent=(type==='success'?'✓ ':'✗ ')+msg;
-  t.className=`toast ${type} show`;
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
-}
-function showResult(id,msg,type){const el=document.getElementById(id);if(!el)return;el.className=`result show ${type}`;el.textContent=msg;}
-
-function switchLoginTab(tab){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(tab==='sub'&&i===0)||(tab==='main'&&i===1)));
-  document.getElementById('login-sub').style.display=tab==='sub'?'block':'none';
-  document.getElementById('login-main').style.display=tab==='main'?'block':'none';
-}
-
-function doLogout(){
-  clearSession();
-  ['main-panel','sub-panel'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById('auth-gate').style.display='block';
-  document.getElementById('logout-btn').style.display='none';
-  document.getElementById('header-role').style.display='none';
-  document.getElementById('header-user').style.display='none';
-}
-
-function showHeader(role,uname){
-  const rb=document.getElementById('header-role');
-  rb.textContent=role==='main_admin'?'👑 MAIN ADMIN':'🔑 RESELLER';
-  rb.style.display='inline-flex';
-  if(uname){document.getElementById('header-user').textContent=uname;document.getElementById('header-user').style.display='inline';}
-  document.getElementById('logout-btn').style.display='inline-block';
-}
-
-// ── MAIN LOGIN ──
-async function doMainLogin(){
-  const key=document.getElementById('main-key').value.trim();
-  if(!key)return showResult('main-login-err','Enter admin key','error');
-  const res=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:key})});
-  const data=await res.json();
-  if(!res.ok)return showResult('main-login-err','✗ '+data.message,'error');
-  SESSION={role:'main_admin',adminKey:key,username:null,password:null};
-  saveSession(); enterMainPanel();
-}
-function enterMainPanel(){
-  document.getElementById('auth-gate').style.display='none';
-  document.getElementById('main-panel').classList.add('active');
-  showHeader('main_admin',null); mainLoadUIDs();
-}
-
-// ── SUB LOGIN ──
-async function doSubLogin(){
-  const username=document.getElementById('sub-user').value.trim();
-  const password=document.getElementById('sub-pass').value.trim();
-  if(!username||!password)return showResult('sub-login-err','Enter username and password','error');
-  const res=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
-  const data=await res.json();
-  if(!res.ok)return showResult('sub-login-err','✗ '+data.message,'error');
-  SESSION={role:'sub_admin',adminKey:null,username,password};
-  saveSession(); enterSubPanel();
-}
-function enterSubPanel(){
-  document.getElementById('auth-gate').style.display='none';
-  document.getElementById('sub-panel').classList.add('active');
-  showHeader('sub_admin',SESSION.username); subLoadUIDs();
-}
-
-// ── MAIN TABS ──
-function switchMainTab(tab){
-  document.querySelectorAll('#main-panel .pnav-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('#main-panel .panel-section').forEach(s=>s.classList.remove('active'));
-  const idx=['uids','resellers'].indexOf(tab);
-  if(idx>=0)document.querySelectorAll('#main-panel .pnav-btn')[idx].classList.add('active');
-  const el=document.getElementById('main-tab-'+tab);if(el)el.classList.add('active');
-  if(tab==='resellers')loadResellers();
-}
-
-// ── UID ROW ──
-function uidRow(u,isMain){
-  const uidVal=u.uid||u.id||u.user_id||'?';
-  const name=u.name||u.username||u.player||'—';
-  const days=u.days!==undefined?u.days:'—';
-  const exp=u.expires_at||u.expiry||u.expire||u.expired_at||null;
-  let badge,expiryTxt,expiryColor='var(--muted)';
-  if(exp){
-    const d=new Date(exp),now=new Date(),diff=Math.ceil((d-now)/86400000);
-    if(diff<0){badge='<span class="badge b-expired">✗ Expired</span>';expiryColor='var(--red)';}
-    else if(diff<=7){badge='<span class="badge b-soon">⚠ Soon</span>';expiryColor='var(--yellow)';}
-    else{badge='<span class="badge b-active">✓ Active</span>';expiryColor='var(--green2)';}
-    expiryTxt=d.toLocaleDateString('en-GB')+(diff>=0?' ('+diff+'d)':' (expired)');
-  } else {
-    badge=u.active!==false?'<span class="badge b-active">✓ Active</span>':'<span class="badge b-soon">— Pending</span>';
-    expiryTxt='—';
+  function showToast(msg, isError = false) {
+    let toast = document.getElementById('globalToast');
+    toast.textContent = isError ? `⚠️ ${msg}` : `✓ ${msg}`;
+    toast.style.borderLeftColor = isError ? '#f43f5e' : '#10b981';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
   }
-  const rm=isMain?`mainConfirmDel('${uidVal}')`:`subConfirmDel('${uidVal}')`;
-  const cp=`navigator.clipboard.writeText('${uidVal}').then(()=>showToast('UID copied!'))`;
-  return `<tr><td><span style="font-size:0.69rem;">${uidVal}</span><button class="copy-btn" onclick="${cp}">⎘</button></td><td>${name}</td><td>${days}d</td><td>${badge}</td><td style="color:${expiryColor};font-size:0.69rem;">${expiryTxt}</td><td><button class="btn-danger" onclick="${rm}">🗑</button></td></tr>`;
-}
 
-// ── MAIN UIDs ──
-async function mainLoadUIDs(){
-  const tb=document.getElementById('main-uid-tbody');
-  tb.innerHTML='<tr class="empty-row"><td colspan="6">Loading...</td></tr>';
-  const res=await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey));
-  const data=await res.json();
-  if(!res.ok){tb.innerHTML=`<tr class="empty-row"><td colspan="6">Error: ${data.message}</td></tr>`;return;}
-  allMainUIDs=data.licenses||[];
-  renderMainTable(allMainUIDs);
-  calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
-}
-function renderMainTable(uids){
-  const tb=document.getElementById('main-uid-tbody');
-  tb.innerHTML=uids.length?uids.map(u=>uidRow(u,true)).join(''):'<tr class="empty-row"><td colspan="6">No UIDs found</td></tr>';
-}
-function filterMainTable(){
-  const q=document.getElementById('m-search').value.toLowerCase();
-  renderMainTable(allMainUIDs.filter(u=>(u.uid||u.id||'').toLowerCase().includes(q)||(u.name||u.username||'').toLowerCase().includes(q)));
-}
-function calcStats(uids,tId,aId,eId,sId){
-  let active=0,expired=0,soon=0;
-  uids.forEach(u=>{
-    const exp=u.expires_at||u.expiry||u.expire||null;
-    if(exp){const diff=Math.ceil((new Date(exp)-new Date())/86400000);if(diff<0)expired++;else if(diff<=7)soon++;else active++;}
-    else if(u.active!==false)active++;
-  });
-  document.getElementById(tId).textContent=uids.length;
-  document.getElementById(aId).textContent=active;
-  document.getElementById(eId).textContent=expired;
-  if(sId)document.getElementById(sId).textContent=soon;
-}
-
-async function mainAddUID(){
-  const uid=document.getElementById('m-uid').value.trim();
-  const name=document.getElementById('m-name').value.trim()||'Player';
-  const days=document.getElementById('m-days').value;
-  if(!uid)return showToast('Enter a UID','error');
-  const res=await fetch('/admin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,name,days:parseInt(days)})});
-  const data=await res.json();
-  if(res.ok){showToast('UID added!');showResult('m-add-result','✓ UID '+uid+' added ('+days+' days)','success');document.getElementById('m-uid').value='';document.getElementById('m-name').value='';mainLoadUIDs();}
-  else{showToast(data.message,'error');showResult('m-add-result','✗ '+data.message,'error');}
-}
-async function mainRenewUID(){
-  const uid=document.getElementById('m-renew-uid').value.trim();
-  const days=document.getElementById('m-renew-days').value;
-  if(!uid)return showToast('Enter UID to renew','error');
-  const res=await fetch('/admin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,days:parseInt(days)})});
-  const data=await res.json();
-  if(res.ok){showToast('Renewed +'+days+'d!');showResult('m-rm-result','✓ '+uid+' renewed +'+days+' days','success');document.getElementById('m-renew-uid').value='';mainLoadUIDs();}
-  else{showToast(data.message,'error');showResult('m-rm-result','✗ '+data.message,'error');}
-}
-function mainRemoveUID(){
-  const uid=document.getElementById('m-rm-uid').value.trim();
-  if(!uid)return showToast('Enter UID','error');
-  mainConfirmDel(uid);
-}
-function mainConfirmDel(uid){pendingUID=uid;pendingIsMain=true;document.getElementById('modal-msg').textContent='Remove UID: '+uid+'? This cannot be undone.';document.getElementById('modal-del').classList.add('open');}
-
-// ── SUB UIDs ──
-async function subLoadUIDs(){
-  const tb=document.getElementById('sub-uid-tbody');
-  tb.innerHTML='<tr class="empty-row"><td colspan="6">Loading...</td></tr>';
-  const res=await fetch('/subadmin/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
-  const data=await res.json();
-  if(!res.ok){tb.innerHTML=`<tr class="empty-row"><td colspan="6">Error: ${data.message}</td></tr>`;return;}
-  allSubUIDs=data.licenses||[];
-  renderSubTable(allSubUIDs);
-  calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
-}
-function renderSubTable(uids){
-  const tb=document.getElementById('sub-uid-tbody');
-  tb.innerHTML=uids.length?uids.map(u=>uidRow(u,false)).join(''):'<tr class="empty-row"><td colspan="6">No UIDs found</td></tr>';
-}
-function filterSubTable(){
-  const q=document.getElementById('s-search').value.toLowerCase();
-  renderSubTable(allSubUIDs.filter(u=>(u.uid||u.id||'').toLowerCase().includes(q)||(u.name||u.username||'').toLowerCase().includes(q)));
-}
-async function subAddUID(){
-  const uid=document.getElementById('s-uid').value.trim();
-  const name=document.getElementById('s-name').value.trim()||'Player';
-  const days=document.getElementById('s-days').value;
-  if(!uid)return showToast('Enter a UID','error');
-  const res=await fetch('/subadmin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days:parseInt(days)})});
-  const data=await res.json();
-  if(res.ok){showToast('UID added!');showResult('s-add-result','✓ UID '+uid+' added ('+days+' days)','success');document.getElementById('s-uid').value='';document.getElementById('s-name').value='';subLoadUIDs();}
-  else{showToast(data.message,'error');showResult('s-add-result','✗ '+data.message,'error');}
-}
-async function subRenewUID(){
-  const uid=document.getElementById('s-renew-uid').value.trim();
-  const days=document.getElementById('s-renew-days').value;
-  if(!uid)return showToast('Enter UID to renew','error');
-  const res=await fetch('/subadmin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,days:parseInt(days)})});
-  const data=await res.json();
-  if(res.ok){showToast('Renewed +'+days+'d!');showResult('s-rm-result','✓ '+uid+' renewed +'+days+' days','success');document.getElementById('s-renew-uid').value='';subLoadUIDs();}
-  else{showToast(data.message,'error');showResult('s-rm-result','✗ '+data.message,'error');}
-}
-function subRemoveUID(){
-  const uid=document.getElementById('s-rm-uid').value.trim();
-  if(!uid)return showToast('Enter UID','error');
-  subConfirmDel(uid);
-}
-function subConfirmDel(uid){pendingUID=uid;pendingIsMain=false;document.getElementById('modal-msg').textContent='Remove UID: '+uid+'? This cannot be undone.';document.getElementById('modal-del').classList.add('open');}
-
-// ── MODAL ──
-function closeModal(){document.getElementById('modal-del').classList.remove('open');pendingUID=null;}
-async function confirmDelete(){
-  if(!pendingUID)return closeModal();
-  const uid=pendingUID; closeModal();
-  let res,data;
-  if(pendingIsMain){
-    res=await fetch('/admin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid})});
-  } else {
-    res=await fetch('/subadmin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid})});
+  function updateUIByRole() {
+    let authDiv = document.getElementById('authGate');
+    let mainPanel = document.getElementById('mainPanel');
+    let subPanel = document.getElementById('subPanel');
+    let header = document.getElementById('header-widget');
+    let roleTag = document.getElementById('roleTag');
+    if (currentSession.role === 'main_admin') {
+      authDiv.style.display = 'none';
+      mainPanel.style.display = 'block';
+      subPanel.style.display = 'none';
+      header.style.display = 'flex';
+      roleTag.innerText = '◈ PRIME ADMIN';
+      loadMainUIDs();
+    } else if (currentSession.role === 'sub_admin') {
+      authDiv.style.display = 'none';
+      mainPanel.style.display = 'none';
+      subPanel.style.display = 'block';
+      header.style.display = 'flex';
+      roleTag.innerText = `⟡ RESELLER: ${currentSession.username}`;
+      loadSubUIDs();
+    } else {
+      authDiv.style.display = 'block';
+      mainPanel.style.display = 'none';
+      subPanel.style.display = 'none';
+      header.style.display = 'none';
+    }
   }
-  data=await res.json();
-  if(res.ok&&data.status==='success'){showToast('UID '+uid+' removed!');}
-  else{showToast(data.message||'Remove failed','error');}
-  pendingIsMain?mainLoadUIDs():subLoadUIDs();
-}
-document.getElementById('modal-del').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
-// ── RESELLERS ──
-async function createReseller(){
-  const username=document.getElementById('new-res-user').value.trim();
-  const password=document.getElementById('new-res-pass').value.trim();
-  const note=document.getElementById('new-res-note').value.trim();
-  if(!username||!password)return showToast('Username & password required','error');
-  const res=await fetch('/admin/create-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username,password,note})});
-  const data=await res.json();
-  if(res.ok){showToast("Reseller '"+username+"' created!");showResult('res-create-result',"✓ Reseller '"+username+"' created",'success');document.getElementById('new-res-user').value='';document.getElementById('new-res-pass').value='';document.getElementById('new-res-note').value='';loadResellers();}
-  else{showToast(data.message,'error');showResult('res-create-result','✗ '+data.message,'error');}
-}
-async function loadResellers(){
-  const tb=document.getElementById('reseller-tbody');
-  const res=await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
-  const data=await res.json();
-  if(!res.ok||!data.subadmins.length){tb.innerHTML='<tr class="empty-row"><td colspan="3">No resellers yet</td></tr>';return;}
-  tb.innerHTML=data.subadmins.map(sa=>`<tr><td><span class="badge b-blue">${sa.username}</span></td><td style="color:var(--muted);font-size:0.7rem;">${sa.note||'—'}</td><td><button class="btn-danger" onclick="deleteReseller('${sa.username}')">Delete</button></td></tr>`).join('');
-}
-async function deleteReseller(username){
-  if(!confirm("Delete reseller '"+username+"'?"))return;
-  const res=await fetch('/admin/delete-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username})});
-  const data=await res.json();
-  if(res.ok){showToast("Reseller '"+username+"' deleted");loadResellers();}
-  else showToast(data.message,'error');
-}
-
-// ── ENTER KEY ──
-document.getElementById('main-key').addEventListener('keydown',e=>{if(e.key==='Enter')doMainLogin();});
-document.getElementById('sub-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doSubLogin();});
-document.getElementById('sub-user').addEventListener('keydown',e=>{if(e.key==='Enter')doSubLogin();});
-
-// ── AUTO RESTORE ──
-(async function init(){
-  loadSession();
-  if(!SESSION.role)return;
-  if(SESSION.role==='main_admin'&&SESSION.adminKey){
-    try{const r=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey})});if(r.ok){enterMainPanel();return;}}catch(e){}
-    clearSession();
+  // helpers
+  function getExpiryStatus(expDateStr) {
+    if (!expDateStr) return { label: 'ACTIVE', class: 'badge-new' };
+    let diff = Math.ceil((new Date(expDateStr) - new Date()) / 86400000);
+    if (diff < 0) return { label: 'EXPIRED', class: 'badge-expire' };
+    if (diff <= 7) return { label: 'EXPIRING SOON', class: 'badge-warning' };
+    return { label: 'ACTIVE', class: 'badge-new' };
   }
-  if(SESSION.role==='sub_admin'&&SESSION.username&&SESSION.password){
-    try{const r=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password})});if(r.ok){enterSubPanel();return;}}catch(e){}
-    clearSession();
+
+  function renderUidTable(tbodyId, uids, isMain) {
+    let tbody = document.getElementById(tbodyId);
+    if (!uids.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">⨀ no licenses found</td></tr>'; return; }
+    tbody.innerHTML = uids.map(u => {
+      let statusObj = getExpiryStatus(u.expires_at);
+      let expiryStr = u.expires_at ? new Date(u.expires_at).toLocaleDateString() : '—';
+      return `<tr>
+        <td>${u.uid} <button class="copy-mini" data-copy="${u.uid}">⎘</button></td>
+        <td>${u.name || 'Player'}</td>
+        <td>${u.days}d</td>
+        <td><span class="${statusObj.class}">${statusObj.label}</span></td>
+        <td style="font-size:0.7rem;">${expiryStr}</td>
+        <td><button class="action-icon delete-uid-btn" data-uid="${u.uid}" data-main="${isMain}">✖</button></td>
+      </tr>`;
+    }).join('');
+    document.querySelectorAll('.copy-mini').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); navigator.clipboard.writeText(btn.dataset.copy); showToast('UID copied'); }));
+    document.querySelectorAll('.delete-uid-btn').forEach(btn => btn.addEventListener('click', (e) => {
+      let uid = btn.dataset.uid; let isMainAction = btn.dataset.main === 'true';
+      pendingDelete = { uid, isMain: isMainAction };
+      document.getElementById('modalText').innerText = `Revoke UID ${uid}? This action is final.`;
+      document.getElementById('modalConfirm').style.display = 'flex';
+    }));
   }
-})();
+
+  async function loadMainUIDs() {
+    let res = await fetch('/api/admin/uids', { method: 'GET', headers: { 'X-Admin-Key': currentSession.key || '' } });
+    let data = await res.json();
+    let uids = data.uids || MOCK_STORE.uids;
+    MOCK_STORE.uids = uids;
+    let active = uids.filter(u => { let diff = u.expires_at ? Math.ceil((new Date(u.expires_at)-new Date())/86400000) : 1; return diff > 0; }).length;
+    let expired = uids.filter(u => { let diff = u.expires_at ? Math.ceil((new Date(u.expires_at)-new Date())/86400000) : -1; return diff < 0; }).length;
+    document.getElementById('mainStats').innerHTML = `<div class="stat-card"><div class="stat-number">${uids.length}</div><div class="stat-label">TOTAL</div></div><div class="stat-card"><div class="stat-number">${active}</div><div class="stat-label">ACTIVE</div></div><div class="stat-card"><div class="stat-number">${expired}</div><div class="stat-label">EXPIRED</div></div>`;
+    renderUidTable('mainUidTableBody', uids, true);
+  }
+
+  async function loadSubUIDs() {
+    let uids = MOCK_STORE.uids.filter(u => u.reseller === currentSession.username || !u.reseller);
+    let active = uids.filter(u => { let diff = u.expires_at ? Math.ceil((new Date(u.expires_at)-new Date())/86400000) : 1; return diff > 0; }).length;
+    document.getElementById('subStats').innerHTML = `<div class="stat-card"><div class="stat-number">${uids.length}</div><div class="stat-label">MY UIDS</div></div><div class="stat-card"><div class="stat-number">${active}</div><div class="stat-label">ACTIVE</div></div>`;
+    renderUidTable('subUidTableBody', uids, false);
+  }
+
+  async function loadResellerList() {
+    let res = await fetch('/api/admin/subadmins', { headers: { 'X-Admin-Key': currentSession.key } });
+    let data = await res.json();
+    let subs = data.subadmins || MOCK_STORE.subadmins;
+    let tbody = document.getElementById('resellerListBody');
+    tbody.innerHTML = subs.map(s => `<tr><td>${s.username}</td><td>${s.note || '—'}</td><td><button class="action-icon delete-res" data-user="${s.username}">✖</button></td></tr>`).join('');
+    document.querySelectorAll('.delete-res').forEach(btn => btn.addEventListener('click', async (e) => {
+      let user = btn.dataset.user; if(confirm(`Delete reseller ${user}?`)) { MOCK_STORE.subadmins = MOCK_STORE.subadmins.filter(s => s.username !== user); showToast(`Reseller ${user} removed`); loadResellerList(); }
+    }));
+  }
+
+  // API mocking
+  const originalFetch = window.fetch;
+  window.fetch = function(url, opts) {
+    if (url === '/admin/verify' && opts.method === 'POST') {
+      let body = JSON.parse(opts.body); if (body.admin_key === MOCK_STORE.mainAdminKey) return Promise.resolve(new Response(JSON.stringify({ status: 'ok' }), { status: 200, ok: true }));
+      return Promise.resolve(new Response(JSON.stringify({ message: 'Invalid master key' }), { status: 401, ok: false }));
+    }
+    if (url === '/subadmin/login' && opts.method === 'POST') {
+      let { username, password } = JSON.parse(opts.body);
+      let found = MOCK_STORE.subadmins.find(s => s.username === username && s.password === password);
+      if (found) return Promise.resolve(new Response(JSON.stringify({ status: 'ok' }), { status: 200, ok: true }));
+      return Promise.resolve(new Response(JSON.stringify({ message: 'Invalid reseller credentials' }), { status: 401, ok: false }));
+    }
+    if (url === '/api/admin/uids') { return Promise.resolve(new Response(JSON.stringify({ uids: MOCK_STORE.uids }), { status: 200 })); }
+    if (url === '/api/admin/subadmins') { return Promise.resolve(new Response(JSON.stringify({ subadmins: MOCK_STORE.subadmins }), { status: 200 })); }
+    if (url === '/admin/create' && opts.method === 'POST') { let b = JSON.parse(opts.body); let newUid = { uid: b.uid, name: b.name, days: b.days, expires_at: new Date(Date.now()+b.days*86400000).toISOString() }; MOCK_STORE.uids.push(newUid); return Promise.resolve(new Response(JSON.stringify({ status: 'created' }), { status: 200 })); }
+    if (url === '/admin/update' && opts.method === 'POST') { let b = JSON.parse(opts.body); let idx = MOCK_STORE.uids.findIndex(u => u.uid === b.uid); if(idx>=0){ let old = MOCK_STORE.uids[idx]; let newDays = (old.days||0)+b.days; old.days=newDays; old.expires_at = new Date(Date.now()+newDays*86400000).toISOString(); } return Promise.resolve(new Response(JSON.stringify({})), { status: 200 }); }
+    if (url === '/admin/revoke') { let b = JSON.parse(opts.body); MOCK_STORE.uids = MOCK_STORE.uids.filter(u => u.uid !== b.uid); return Promise.resolve(new Response(JSON.stringify({ status: 'success' }), { status: 200 })); }
+    if (url === '/admin/create-subadmin') { let b = JSON.parse(opts.body); MOCK_STORE.subadmins.push({ username: b.username, password: b.password, note: b.note }); return Promise.resolve(new Response(JSON.stringify({})), { status: 200 }); }
+    if (url === '/subadmin/create') { let b = JSON.parse(opts.body); let newLic = { uid: b.uid, name: b.name, days: b.days, expires_at: new Date(Date.now()+b.days*86400000).toISOString(), reseller: b.username }; MOCK_STORE.uids.push(newLic); return Promise.resolve(new Response(JSON.stringify({}), { status: 200 })); }
+    if (url === '/subadmin/update') { let b = JSON.parse(opts.body); let idx = MOCK_STORE.uids.findIndex(u => u.uid === b.uid); if(idx>=0){ MOCK_STORE.uids[idx].days = (MOCK_STORE.uids[idx].days||0)+b.days; MOCK_STORE.uids[idx].expires_at = new Date(Date.now()+(MOCK_STORE.uids[idx].days)*86400000).toISOString(); } return Promise.resolve(new Response(JSON.stringify({})), { status: 200 }); }
+    if (url === '/subadmin/revoke') { let b = JSON.parse(opts.body); MOCK_STORE.uids = MOCK_STORE.uids.filter(u => u.uid !== b.uid); return Promise.resolve(new Response(JSON.stringify({ status: 'success' }), { status: 200 })); }
+    return originalFetch(url, opts);
+  };
+
+  // bindings
+  document.getElementById('subLoginBtn')?.addEventListener('click', async () => { let un = document.getElementById('subUsername').value, pw = document.getElementById('subPassword').value; let res = await fetch('/subadmin/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:un,password:pw}) }); if(res.ok){ currentSession = { role:'sub_admin', username:un, pass:pw }; saveSession(); updateUIByRole(); loadSubUIDs(); } else { document.getElementById('subError').innerText = 'Auth failed'; } });
+  document.getElementById('mainLoginBtn')?.addEventListener('click', async () => { let key = document.getElementById('mainSecret').value; let res = await fetch('/admin/verify', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:key}) }); if(res.ok){ currentSession = { role:'main_admin', key:key }; saveSession(); updateUIByRole(); loadMainUIDs(); } else { document.getElementById('mainError').innerText = 'Invalid secret key'; } });
+  document.getElementById('logoutBtn')?.addEventListener('click', () => { currentSession = {}; localStorage.removeItem('stream_auth'); updateUIByRole(); showToast('Session terminated'); });
+  document.querySelectorAll('[data-main-tab]').forEach(btn => btn.addEventListener('click', (e) => { let tab = btn.dataset.mainTab; document.getElementById('mainUidsSection').style.display = tab === 'uids' ? 'block' : 'none'; document.getElementById('mainResellersSection').style.display = tab === 'resellers' ? 'block' : 'none'; if(tab === 'resellers') loadResellerList(); }));
+  document.getElementById('mainAddBtn')?.addEventListener('click', async () => { let uid = document.getElementById('mainUidValue').value; let name = document.getElementById('mainNameValue').value; let days = parseInt(document.getElementById('mainDaysSelect').value); await fetch('/admin/create',{method:'POST',body:JSON.stringify({admin_key:currentSession.key,uid,name,days})}); showToast(`UID ${uid} added`); loadMainUIDs(); });
+  document.getElementById('mainRenewBtn')?.addEventListener('click', async () => { let uid = document.getElementById('mainRenewUid').value; let days = parseInt(document.getElementById('mainRenewDays').value); await fetch('/admin/update',{method:'POST',body:JSON.stringify({admin_key:currentSession.key,uid,days})}); showToast(`+${days}d for ${uid}`); loadMainUIDs(); });
+  document.getElementById('mainRemoveBtn')?.addEventListener('click', () => { let uid = document.getElementById('mainRemoveUid').value; if(!uid) return; pendingDelete = { uid, isMain: true }; document.getElementById('modalText').innerText = `Remove ${uid}?`; document.getElementById('modalConfirm').style.display = 'flex'; });
+  document.getElementById('refreshMainUids')?.addEventListener('click', () => loadMainUIDs());
+  document.getElementById('subAddBtn')?.addEventListener('click', async () => { let uid=document.getElementById('subUid').value, name=document.getElementById('subName').value, days=parseInt(document.getElementById('subDays').value); await fetch('/subadmin/create',{method:'POST',body:JSON.stringify({username:currentSession.username,password:currentSession.pass,uid,name,days})}); showToast('UID added'); loadSubUIDs(); });
+  document.getElementById('subRenewBtn')?.addEventListener('click', async () => { let uid = document.getElementById('subRenewUid').value, days = parseInt(document.getElementById('subRenewDays').value); await fetch('/subadmin/update',{method:'POST',body:JSON.stringify({username:currentSession.username,password:currentSession.pass,uid,days})}); showToast('Renewed'); loadSubUIDs(); });
+  document.getElementById('subRemoveBtn')?.addEventListener('click', () => { let uid = document.getElementById('subRemoveUid').value; if(uid){ pendingDelete = { uid, isMain: false }; document.getElementById('modalText').innerText = `Delete ${uid}?`; document.getElementById('modalConfirm').style.display = 'flex'; } });
+  document.getElementById('refreshSubUids')?.addEventListener('click', () => loadSubUIDs());
+  document.getElementById('createResellerBtn')?.addEventListener('click', async () => { let user = document.getElementById('newResUser').value, pass = document.getElementById('newResPass').value, note = document.getElementById('newResNote').value; await fetch('/admin/create-subadmin',{method:'POST',body:JSON.stringify({admin_key:currentSession.key,username:user,password:pass,note})}); showToast(`Reseller ${user} created`); loadResellerList(); });
+  document.getElementById('refreshResellers')?.addEventListener('click', () => loadResellerList());
+  document.getElementById('modalConfirmBtn')?.addEventListener('click', async () => { if(pendingDelete.isMain) await fetch('/admin/revoke',{method:'POST',body:JSON.stringify({admin_key:currentSession.key,uid:pendingDelete.uid})}); else await fetch('/subadmin/revoke',{method:'POST',body:JSON.stringify({username:currentSession.username,password:currentSession.pass,uid:pendingDelete.uid})}); showToast(`UID ${pendingDelete.uid} revoked`); if(currentSession.role==='main_admin') loadMainUIDs(); else loadSubUIDs(); document.getElementById('modalConfirm').style.display = 'none'; });
+  document.getElementById('modalCancelBtn')?.addEventListener('click', () => document.getElementById('modalConfirm').style.display = 'none');
+  document.querySelectorAll('.tab-auth[data-tab]').forEach(btn => btn.addEventListener('click', (e) => { let target = btn.dataset.tab; document.getElementById('subLoginBox').style.display = target === 'sub' ? 'block' : 'none'; document.getElementById('mainLoginBox').style.display = target === 'main' ? 'block' : 'none'; btn.classList.add('active'); btn.parentNode.querySelectorAll('.tab-auth').forEach(b => { if(b !== btn) b.classList.remove('active'); }); }));
+  loadSession(); updateUIByRole();
 </script>
 </body>
 </html>
