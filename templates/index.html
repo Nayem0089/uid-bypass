@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>STREAM CORPORATION |  ADMIN PANEL v3.0</title>
+<title>STREAM CORPORATION | ADMIN PANEL v4.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * {
@@ -35,12 +35,11 @@ body {
   font-family: 'Inter', sans-serif;
   color: var(--text-primary);
   min-height: 100vh;
-  backdrop-filter: blur(0px);
   font-size: 14px;
 }
 
-/* ✦ GLASS CORE ✦ */
-.glass-panel, .sidebar, .card, .stat-card, .auth-box, .modal, .table-glass, .top-bar input {
+/* GLASS CORE */
+.sidebar, .card, .stat-card, .auth-box, .modal, .table-glass {
   background: var(--glass-surface);
   backdrop-filter: blur(14px);
   border: 1px solid var(--glass-stroke);
@@ -142,6 +141,12 @@ body {
   transition: 0.2s;
 }
 .btn-glass:hover { transform: scale(0.98); box-shadow: 0 6px 16px rgba(239,68,68,0.3); }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--accent-neon);
+  color: var(--accent-neon);
+}
+.btn-outline:hover { background: rgba(239,68,68,0.15); }
 
 /* LAYOUT */
 #app-layout {
@@ -301,6 +306,8 @@ th {
   background: rgba(0,0,0,0.3);
   color: var(--text-secondary);
   font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 td {
   padding: 16px 20px;
@@ -315,8 +322,10 @@ td {
 .badge-active { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
 .badge-expired { background: rgba(239,68,68,0.2); color: #f87171; }
 .badge-soon { background: rgba(249,115,22,0.2); color: #fb923c; }
-.btn-icon { background: none; border: 1px solid rgba(239,68,68,0.4); border-radius: 30px; padding: 6px 14px; color: #f87171; cursor: pointer; }
+.btn-icon { background: none; border: 1px solid rgba(239,68,68,0.4); border-radius: 30px; padding: 6px 14px; color: #f87171; cursor: pointer; font-size: 12px; }
 .btn-icon:hover { background: rgba(239,68,68,0.2); }
+.copy-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; margin-left: 6px; font-size: 12px; }
+.copy-btn:hover { color: white; }
 
 .toast-gloss {
   position: fixed;
@@ -351,6 +360,11 @@ td {
   width: 380px;
   border: 1px solid rgba(239,68,68,0.3);
 }
+
+/* Expiry counter highlight */
+.expiry-soon { color: #fb923c; font-weight: 600; }
+.expiry-critical { color: #f87171; font-weight: 700; }
+.expiry-safe { color: #4ade80; }
 </style>
 </head>
 <body>
@@ -359,7 +373,7 @@ td {
   <div class="auth-box">
     <div class="auth-logo">⚡🛡️</div>
     <h2>STREAM <span class="auth-gradient">NEBULA</span></h2>
-    <p style="text-align:center; font-size:12px; color:#9ca3af; margin-bottom:12px;">// ADMIN PORTAL v3</p>
+    <p style="text-align:center; font-size:12px; color:#9ca3af; margin-bottom:12px;">// ADMIN PORTAL v4.0</p>
     <div class="tab-switch">
       <button class="tab-btn active" onclick="switchLoginTab('sub')">RESELLER</button>
       <button class="tab-btn" onclick="switchLoginTab('main')">MASTER ADMIN</button>
@@ -431,13 +445,17 @@ td {
           <input type="text" id="m-search" class="input-glow" style="width:260px;" placeholder="🔍 Filter UID or Name">
         </div>
         <div class="table-glass">
-          <table><thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES (REMAINING)</th><th>ACTION</th></tr></thead>
-          <tbody id="main-uid-tbody"><tr><td colspan="6" style="text-align:center;">Loading nebula data...</td></tr></tbody></table>
+          <table>
+            <thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES (REMAINING)</th><th>ACTION</th></tr></thead>
+            <tbody id="main-uid-tbody"><tr><td colspan="6" style="text-align:center;">Loading nebula data...</td></tr></tbody>
+          </table>
         </div>
       </div>
       <div id="main-tab-resellers" class="panel-section">
-        <div class="card-grid-2"><div class="card"><h3>CREATE RESELLER</h3><input id="new-res-user" class="input-glow" placeholder="Username"><input id="new-res-pass" class="input-glow" placeholder="Password"><input id="new-res-note" class="input-glow" placeholder="Note"><button class="btn-glass" onclick="createReseller()">CREATE</button><div id="res-create-result"></div></div>
-        <div class="card"><h3>RESELLER LIST</h3><button class="btn-glass" style="margin-bottom:16px;" onclick="loadResellers()">⟳ Refresh</button><div class="table-glass"><table><thead><tr><th>Username</th><th>Note</th><th>Action</th></tr></thead><tbody id="reseller-tbody"><tr><td colspan="3">—</td></tr></tbody></table></div></div></div>
+        <div class="card-grid-2">
+          <div class="card"><h3>👑 CREATE RESELLER</h3><input id="new-res-user" class="input-glow" placeholder="Username"><input id="new-res-pass" class="input-glow" placeholder="Password"><input id="new-res-note" class="input-glow" placeholder="Note"><button class="btn-glass" onclick="createReseller()">CREATE</button><div id="res-create-result"></div></div>
+          <div class="card"><h3>📋 RESELLER LIST</h3><button class="btn-glass" style="margin-bottom:16px;" onclick="loadResellers()">⟳ Refresh</button><div class="table-glass"><table><thead><tr><th>Username</th><th>Note</th><th>Action</th></tr></thead><tbody id="reseller-tbody"><tr><td colspan="3">—</td></tr></tbody></table></div></div>
+        </div>
       </div>
     </div>
     <!-- SUB PANEL (RESELLER) -->
@@ -447,10 +465,14 @@ td {
         <div class="stat-card"><div class="stat-number" style="color:#22c55e;" id="ss-active">—</div><div class="stat-label">Active</div></div>
         <div class="stat-card"><div class="stat-number" style="color:#ef4444;" id="ss-expired">—</div><div class="stat-label">Expired</div></div>
       </div>
-      <div class="card-grid-2"><div class="card"><h3>➕ ADD UID</h3><input id="s-uid" class="input-glow" placeholder="UID"><input id="s-name" class="input-glow" placeholder="Name"><select id="s-days" class="input-glow"><option value="1">1D</option><option value="7">7D</option><option value="15">15D</option><option value="30" selected>30D</option><option value="60">60D</option></select><button class="btn-glass" onclick="subAddUID()">SAVE</button><div id="s-add-result"></div></div>
-      <div class="card"><h3>⚙️ MANAGE</h3><input id="s-rm-uid" placeholder="UID to remove" class="input-glow"><button class="btn-glass" style="background:#4a0e0e;" onclick="subRemoveUID()">REMOVE</button><div style="border-top:1px solid rgba(255,255,255,0.1); margin:12px 0;"></div><input id="s-renew-uid" class="input-glow" placeholder="UID to renew"><select id="s-renew-days" class="input-glow"><option value="7">+7 Days</option><option value="15">+15 Days</option><option value="30" selected>+30 Days</option></select><button class="btn-glass" style="background:#3b2a0e;" onclick="subRenewUID()">RENEW</button><div id="s-rm-result"></div></div></div>
+      <div class="card-grid-2">
+        <div class="card"><h3>➕ ADD UID</h3><input id="s-uid" class="input-glow" placeholder="UID"><input id="s-name" class="input-glow" placeholder="Name"><select id="s-days" class="input-glow"><option value="1">1D</option><option value="7">7D</option><option value="15">15D</option><option value="30" selected>30D</option><option value="60">60D</option></select><button class="btn-glass" onclick="subAddUID()">SAVE</button><div id="s-add-result"></div></div>
+        <div class="card"><h3>⚙️ MANAGE</h3><input id="s-rm-uid" placeholder="UID to remove" class="input-glow"><button class="btn-glass" style="background:#4a0e0e;" onclick="subRemoveUID()">REMOVE</button><div style="border-top:1px solid rgba(255,255,255,0.1); margin:12px 0;"></div><input id="s-renew-uid" class="input-glow" placeholder="UID to renew"><select id="s-renew-days" class="input-glow"><option value="7">+7 Days</option><option value="15">+15 Days</option><option value="30" selected>+30 Days</option></select><button class="btn-glass" style="background:#3b2a0e;" onclick="subRenewUID()">RENEW</button><div id="s-rm-result"></div></div>
+      </div>
       <div style="display:flex; gap:16px; margin:20px 0;"><button class="btn-glass" style="width:auto;" onclick="subLoadUIDs()">⟳ REFRESH</button><input id="s-search" class="input-glow" placeholder="🔍 Search UID"></div>
-      <div class="table-glass"><table><thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES (Remaining)</th><th>ACTION</th></tr></thead><tbody id="sub-uid-tbody"><tr><td colspan="6">Loading...</td></tr></tbody></table></div>
+      <div class="table-glass">
+        <table><thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES (REMAINING)</th><th>ACTION</th></tr></thead><tbody id="sub-uid-tbody"><tr><td colspan="6">Loading...</td></tr></tbody></table>
+      </div>
     </div>
   </div>
 </div>
@@ -458,7 +480,7 @@ td {
 <div id="modalDelete" class="modal-glass"><div class="modal-card"><h3>⚠️ DESTROY UID</h3><p id="modal-text" style="margin:20px 0;">Are you sure?</p><div style="display:flex; gap:16px;"><button class="btn-glass" style="background:#ef4444;" onclick="confirmDeleteAction()">DELETE</button><button class="btn-glass" style="background:#222;" onclick="closeModalAction()">CANCEL</button></div></div></div>
 
 <script>
-// ---------- DAY COUNT & DATE HELPER (glossy logic with remaining days) ----------
+// ---------- DAYS REMAINING CALCULATOR (CORE FEATURE) ----------
 function calculateRemaining(expiryDateStr) {
   if (!expiryDateStr) return null;
   const exp = new Date(expiryDateStr);
@@ -467,72 +489,177 @@ function calculateRemaining(expiryDateStr) {
   if (diffMs <= 0) return 0;
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
-function formatExpiryWithRemaining(expiryDateStr) {
-  if (!expiryDateStr) return "—";
-  const expDate = new Date(expiryDateStr);
-  const remaining = calculateRemaining(expiryDateStr);
-  if (remaining === 0) return expDate.toLocaleDateString() + " (Expired)";
-  if (remaining < 0) return expDate.toLocaleDateString() + " (Expired)";
-  return `${expDate.toLocaleDateString()} (${remaining} days left)`;
+
+function getRemainingClass(remaining) {
+  if (remaining === null) return '';
+  if (remaining <= 0) return 'expiry-critical';
+  if (remaining <= 3) return 'expiry-critical';
+  if (remaining <= 7) return 'expiry-soon';
+  return 'expiry-safe';
 }
 
-// Core session & state
+function formatExpiryWithRemaining(expiryDateStr) {
+  if (!expiryDateStr) return '<span class="expiry-safe">—</span>';
+  const expDate = new Date(expiryDateStr);
+  const remaining = calculateRemaining(expiryDateStr);
+  const dateStr = expDate.toLocaleDateString('en-GB');
+  
+  if (remaining === null) return `<span>${dateStr}</span>`;
+  if (remaining <= 0) return `<span class="expiry-critical">${dateStr} (EXPIRED)</span>`;
+  if (remaining <= 3) return `<span class="expiry-critical">${dateStr} (${remaining} days left!)</span>`;
+  if (remaining <= 7) return `<span class="expiry-soon">${dateStr} (${remaining} days left)</span>`;
+  return `<span class="expiry-safe">${dateStr} (${remaining} days left)</span>`;
+}
+
+// Session & State
 let SESSION = {role:null, adminKey:null, username:null, password:null};
 let allMainUIDs=[], allSubUIDs=[];
 let pendingUID=null, pendingIsMain=false;
+
 function saveSession(){try{localStorage.setItem('rp_s',JSON.stringify(SESSION));}catch(e){}}
 function loadSession(){try{const s=localStorage.getItem('rp_s');if(s)SESSION=JSON.parse(s);}catch(e){}}
 function clearSession(){SESSION={role:null,adminKey:null,username:null,password:null};localStorage.removeItem('rp_s');}
+
 function showToast(msg,type='success'){ const t=document.getElementById('toastMsg'); t.textContent=(type==='success'?'✨ ':'⚠️ ')+msg; t.className='toast-gloss show'; setTimeout(()=>t.classList.remove('show'),2800);}
 function showResult(elId,msg,type){ let el=document.getElementById(elId); if(!el)return; el.innerHTML= `<span style="color:${type==='success'?'#22c55e':'#ef4444'}">${msg}</span>`; setTimeout(()=>el.innerHTML='',3000);}
+
 function switchLoginTab(tab){ document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(tab==='sub'&&i===0)||(tab==='main'&&i===1))); document.getElementById('login-sub').style.display=tab==='sub'?'block':'none'; document.getElementById('login-main').style.display=tab==='main'?'block':'none';}
+
 async function doMainLogin(){ const key=document.getElementById('main-key').value.trim(); if(!key)return showResult('main-login-err','Enter Master Key','error'); const res=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:key})}); const data=await res.json(); if(!res.ok)return showResult('main-login-err','✗ '+data.message,'error'); SESSION={role:'main_admin',adminKey:key,username:null,password:null}; saveSession(); enterMainPanel();}
+
 function enterMainPanel(){ document.getElementById('auth-gate').style.display='none'; document.getElementById('app-layout').style.display='flex'; document.getElementById('main-panel').classList.add('active'); document.getElementById('sub-panel').classList.remove('active'); showHeader('main_admin',null); mainLoadUIDs(); }
+
 async function doSubLogin(){ const u=document.getElementById('sub-user').value.trim(), p=document.getElementById('sub-pass').value.trim(); if(!u||!p)return showResult('sub-login-err','Enter credentials','error'); const res=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}); const data=await res.json(); if(!res.ok)return showResult('sub-login-err','✗ '+data.message,'error'); SESSION={role:'sub_admin',adminKey:null,username:u,password:p}; saveSession(); enterSubPanel();}
+
 function enterSubPanel(){ document.getElementById('auth-gate').style.display='none'; document.getElementById('app-layout').style.display='flex'; document.getElementById('sub-panel').classList.add('active'); document.getElementById('main-panel').classList.remove('active'); showHeader('sub_admin',SESSION.username); subLoadUIDs();}
-function showHeader(role,uname){ document.getElementById('sidebar-role').textContent=role==='main_admin'?'MAIN ADMIN':'RESELLER'; if(uname){ document.getElementById('sidebar-user').textContent=uname; document.getElementById('sidebar-avatar').textContent=uname[0].toUpperCase();} else{ document.getElementById('sidebar-user').textContent='ADMINISTRATOR'; document.getElementById('sidebar-avatar').textContent='A';} if(role==='main_admin') document.getElementById('nav-resellers').style.display='flex'; else document.getElementById('nav-resellers').style.display='none';}
-function switchMainTab(tab){ document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); document.getElementById('nav-'+tab).classList.add('active'); document.querySelectorAll('#main-panel .panel-section').forEach(s=>s.classList.remove('active')); document.getElementById('main-tab-'+tab).classList.add('active'); if(tab==='resellers') loadResellers();}
-function doLogout(){ clearSession(); document.getElementById('app-layout').style.display='none'; document.getElementById('auth-gate').style.display='flex'; document.getElementById('main-panel').classList.remove('active'); document.getElementById('sub-panel').classList.remove('active');}
-function renderUIDRow(u,isMain){
-  const uidVal=u.uid||u.id||u.user_id||'?';
-  const name=u.name||u.username||u.player||'—';
-  const days=u.days!==undefined?u.days:'—';
-  const expRaw=u.expires_at||u.expiry||u.expire||null;
-  let badgeHtml='', expiryPretty='—';
-  if(expRaw){
-    const remaining = calculateRemaining(expRaw);
-    if(remaining===null){badgeHtml='<span class="badge badge-active">Active</span>'; expiryPretty=new Date(expRaw).toLocaleDateString();}
-    else if(remaining<=0){ badgeHtml='<span class="badge badge-expired">Expired</span>'; expiryPretty=`${new Date(expRaw).toLocaleDateString()} (0d)`; }
-    else if(remaining<=7){ badgeHtml='<span class="badge badge-soon">⚠️ Soon</span>'; expiryPretty=`${new Date(expRaw).toLocaleDateString()} (${remaining}d left)`; }
-    else { badgeHtml='<span class="badge badge-active">● Active</span>'; expiryPretty=`${new Date(expRaw).toLocaleDateString()} (${remaining}d)`; }
-  } else { badgeHtml='<span class="badge badge-active">Active</span>'; expiryPretty='—'; }
-  const rmFn=isMain?`openModal('${uidVal}',true)`:`openModal('${uidVal}',false)`;
-  return `<tr><td style="font-family:monospace;">${uidVal} <button class="copy-btn" onclick="navigator.clipboard.writeText('${uidVal}');showToast('Copied!')">📋</button></td><td>${name}</td><td>${days}d</td><td>${badgeHtml}</td><td style="font-size:12px;">${expiryPretty}</td><td><button class="btn-icon" onclick="${rmFn}">DELETE</button></td></tr>`;
+
+function showHeader(role,uname){ 
+  document.getElementById('sidebar-role').textContent=role==='main_admin'?'MAIN ADMIN':'RESELLER'; 
+  if(uname){ document.getElementById('sidebar-user').textContent=uname; document.getElementById('sidebar-avatar').textContent=uname[0].toUpperCase();} 
+  else{ document.getElementById('sidebar-user').textContent='ADMINISTRATOR'; document.getElementById('sidebar-avatar').textContent='A';} 
+  // Reseller Tab ONLY for Main Admin - and it stays at top position (above exit)
+  if(role==='main_admin'){ 
+    document.getElementById('nav-resellers').style.display='flex'; 
+  } else { 
+    document.getElementById('nav-resellers').style.display='none'; 
+  }
 }
-// main UID actions
-async function mainLoadUIDs(){ const tb=document.getElementById('main-uid-tbody'); tb.innerHTML='<tr><td colspan="6">Loading...</td></tr>'; const res=await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey)); const data=await res.json(); if(!res.ok){ tb.innerHTML=`<tr><td colspan="6">Error: ${data.message}</td></tr>`; return;} allMainUIDs=data.licenses||[]; renderMainTable(allMainUIDs); calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');}
+
+function switchMainTab(tab){ 
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); 
+  document.getElementById('nav-'+tab).classList.add('active'); 
+  document.querySelectorAll('#main-panel .panel-section').forEach(s=>s.classList.remove('active')); 
+  document.getElementById('main-tab-'+tab).classList.add('active'); 
+  if(tab==='resellers') loadResellers();
+}
+
+function doLogout(){ clearSession(); document.getElementById('app-layout').style.display='none'; document.getElementById('auth-gate').style.display='flex'; document.getElementById('main-panel').classList.remove('active'); document.getElementById('sub-panel').classList.remove('active');}
+
+// Render Row with DAYS LEFT COUNT
+function renderUIDRow(u,isMain){
+  const uidVal = u.uid || u.id || u.user_id || '?';
+  const name = u.name || u.username || u.player || '—';
+  const days = u.days !== undefined ? u.days : '—';
+  const expRaw = u.expires_at || u.expiry || u.expire || null;
+  let badgeHtml = '';
+  let remainingDays = null;
+  
+  if(expRaw){
+    remainingDays = calculateRemaining(expRaw);
+    if(remainingDays === null || remainingDays <= 0){ 
+      badgeHtml = '<span class="badge badge-expired">✖ EXPIRED</span>'; 
+    } else if(remainingDays <= 7){ 
+      badgeHtml = '<span class="badge badge-soon">⚠️ SOON</span>'; 
+    } else { 
+      badgeHtml = '<span class="badge badge-active">● ACTIVE</span>'; 
+    }
+  } else { 
+    badgeHtml = '<span class="badge badge-active">ACTIVE</span>'; 
+  }
+  
+  const expiryHtml = formatExpiryWithRemaining(expRaw);
+  const rmFn = isMain ? `openModal('${uidVal}',true)` : `openModal('${uidVal}',false)`;
+  
+  return `<tr>
+    <td style="font-family:monospace;">${uidVal} <button class="copy-btn" onclick="navigator.clipboard.writeText('${uidVal}');showToast('Copied!')">📋</button></td>
+    <td>${name}</td>
+    <td>${days}d</td>
+    <td>${badgeHtml}</td>
+    <td>${expiryHtml}</td>
+    <td><button class="btn-icon" onclick="${rmFn}">DELETE</button></td>
+  </tr>`;
+}
+
+// Main UID functions
+async function mainLoadUIDs(){ 
+  const tb=document.getElementById('main-uid-tbody'); 
+  tb.innerHTML='<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>'; 
+  const res=await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey)); 
+  const data=await res.json(); 
+  if(!res.ok){ tb.innerHTML=`<tr><td colspan="6">Error: ${data.message}</td></tr>`; return;} 
+  allMainUIDs=data.licenses||[]; 
+  renderMainTable(allMainUIDs); 
+  calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
+}
+
 function renderMainTable(uids){ const tb=document.getElementById('main-uid-tbody'); tb.innerHTML=uids.length?uids.map(u=>renderUIDRow(u,true)).join(''):'<tr><td colspan="6">✨ No UIDs found</td></tr>';}
 function filterMainTable(){ const q=document.getElementById('m-search').value.toLowerCase(); renderMainTable(allMainUIDs.filter(u=>(u.uid||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));}
-function calcStats(uids,tId,aId,eId,sId){ let active=0,expired=0,soon=0; uids.forEach(u=>{ const exp=u.expires_at||u.expiry||null; if(exp){ const diff=calculateRemaining(exp); if(diff<=0) expired++; else if(diff<=7) soon++; else active++; } else active++; }); document.getElementById(tId).textContent=uids.length; document.getElementById(aId).textContent=active; document.getElementById(eId).textContent=expired; if(sId)document.getElementById(sId).textContent=soon;}
+
+function calcStats(uids,tId,aId,eId,sId){ 
+  let active=0,expired=0,soon=0; 
+  uids.forEach(u=>{ 
+    const exp=u.expires_at||u.expiry||null; 
+    if(exp){ 
+      const diff=calculateRemaining(exp); 
+      if(diff<=0) expired++; 
+      else if(diff<=7) soon++; 
+      else active++; 
+    } else active++; 
+  }); 
+  document.getElementById(tId).textContent=uids.length; 
+  document.getElementById(aId).textContent=active; 
+  document.getElementById(eId).textContent=expired; 
+  if(sId)document.getElementById(sId).textContent=soon;
+}
+
 async function mainAddUID(){ const uid=document.getElementById('m-uid').value.trim(), name=document.getElementById('m-name').value.trim()||'Player', days=document.getElementById('m-days').value; if(!uid)return showToast('UID required','error'); const res=await fetch('/admin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,name,days:parseInt(days)})}); const data=await res.json(); if(res.ok){ showToast('UID created!'); showResult('m-add-result','✓ UID added','success'); document.getElementById('m-uid').value='';document.getElementById('m-name').value=''; mainLoadUIDs();} else{ showToast(data.message,'error'); showResult('m-add-result','✗ '+data.message,'error');}}
+
 async function mainRenewUID(){ const uid=document.getElementById('m-renew-uid').value.trim(), days=document.getElementById('m-renew-days').value; if(!uid)return showToast('Enter UID','error'); const res=await fetch('/admin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,days:parseInt(days)})}); const data=await res.json(); if(res.ok){ showToast(`Renewed +${days} days`); showResult('m-rm-result','✓ Renewed','success'); document.getElementById('m-renew-uid').value=''; mainLoadUIDs();} else{ showToast(data.message,'error');}}
 function mainRemoveUID(){ const uid=document.getElementById('m-rm-uid').value.trim(); if(!uid)return showToast('Enter UID','error'); openModal(uid,true);}
-async function subLoadUIDs(){ const tb=document.getElementById('sub-uid-tbody'); tb.innerHTML='<tr><td colspan="6">Loading...</td></tr>'; const res=await fetch('/subadmin/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password)); const data=await res.json(); if(!res.ok){ tb.innerHTML=`<tr><td colspan="6">Error: ${data.message}</td></table>`; return;} allSubUIDs=data.licenses||[]; renderSubTable(allSubUIDs); calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);}
-function renderSubTable(uids){ const tb=document.getElementById('sub-uid-tbody'); tb.innerHTML=uids.length?uids.map(u=>renderUIDRow(u,false)).join(''):'<tr><td colspan="6">No UIDs found</tr>';}
+
+// Sub UID functions
+async function subLoadUIDs(){ 
+  const tb=document.getElementById('sub-uid-tbody'); 
+  tb.innerHTML='<tr><td colspan="6" style="text-align:center;">Loading......</td></tr>'; 
+  const res=await fetch('/subadmin/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password)); 
+  const data=await res.json(); 
+  if(!res.ok){ tb.innerHTML=`<tr><td colspan="6">Error: ${data.message}</td></tr>`; return;} 
+  allSubUIDs=data.licenses||[]; 
+  renderSubTable(allSubUIDs); 
+  calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
+}
+function renderSubTable(uids){ const tb=document.getElementById('sub-uid-tbody'); tb.innerHTML=uids.length?uids.map(u=>renderUIDRow(u,false)).join(''):'<tr><td colspan="6">No UIDs found</td></tr>';}
 function filterSubTable(){ const q=document.getElementById('s-search').value.toLowerCase(); renderSubTable(allSubUIDs.filter(u=>(u.uid||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));}
 async function subAddUID(){ const uid=document.getElementById('s-uid').value.trim(), name=document.getElementById('s-name').value.trim()||'Player', days=document.getElementById('s-days').value; if(!uid)return showToast('UID required','error'); const res=await fetch('/subadmin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days:parseInt(days)})}); if(res.ok){ showToast('UID added'); showResult('s-add-result','✓ Added','success'); document.getElementById('s-uid').value='';document.getElementById('s-name').value=''; subLoadUIDs();} else{ const data=await res.json(); showToast(data.message,'error');}}
 async function subRenewUID(){ const uid=document.getElementById('s-renew-uid').value.trim(), days=document.getElementById('s-renew-days').value; if(!uid)return showToast('Enter UID','error'); const res=await fetch('/subadmin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,days:parseInt(days)})}); if(res.ok){ showToast(`Renewed +${days} days`); showResult('s-rm-result','✓ Renewed','success'); document.getElementById('s-renew-uid').value=''; subLoadUIDs();} else{ const data=await res.json(); showToast(data.message,'error');}}
 function subRemoveUID(){ const uid=document.getElementById('s-rm-uid').value.trim(); if(!uid)return showToast('Enter UID','error'); openModal(uid,false);}
+
 function openModal(uid,isMain){ pendingUID=uid; pendingIsMain=isMain; document.getElementById('modal-text').innerHTML=`Remove <strong>${uid}</strong>? This action is irreversible.`; document.getElementById('modalDelete').classList.add('open');}
 function closeModalAction(){ document.getElementById('modalDelete').classList.remove('open'); pendingUID=null;}
 async function confirmDeleteAction(){ if(!pendingUID) return closeModalAction(); const uid=pendingUID; const isMain=pendingIsMain; closeModalAction(); let res; if(isMain){ res=await fetch('/admin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid})}); } else { res=await fetch('/subadmin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid})}); } const data=await res.json(); if(res.ok && data.status==='success'){ showToast('UID revoked'); isMain?mainLoadUIDs():subLoadUIDs(); } else { showToast(data.message||'Failed','error'); }}
+
+// Reseller management
 async function createReseller(){ const u=document.getElementById('new-res-user').value.trim(), p=document.getElementById('new-res-pass').value.trim(), n=document.getElementById('new-res-note').value.trim(); if(!u||!p) return showToast('Fill username/password','error'); const res=await fetch('/admin/create-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:u,password:p,note:n})}); if(res.ok){ showToast('Reseller created'); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; loadResellers(); }else{ const d=await res.json(); showToast(d.message,'error');}}
-async function loadResellers(){ const tb=document.getElementById('reseller-tbody'); const res=await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey)); const data=await res.json(); if(!res.ok||!data.subadmins.length){ tb.innerHTML='<tr><td colspan="3">No resellers</tr>'; return;} tb.innerHTML=data.subadmins.map(s=>`<tr><td><span class="badge badge-active">${s.username}</span></td><td>${s.note||'—'}</td><td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>`).join('');}
+async function loadResellers(){ const tb=document.getElementById('reseller-tbody'); const res=await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey)); const data=await res.json(); if(!res.ok||!data.subadmins.length){ tb.innerHTML='<tr><td colspan="3">No resellers</td></tr>'; return;} tb.innerHTML=data.subadmins.map(s=>`<tr><td><span class="badge badge-active">${s.username}</span></td><td>${s.note||'—'}</td><td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td></tr>`).join('');}
 async function deleteReseller(uname){ if(!confirm(`Delete ${uname}?`)) return; const res=await fetch('/admin/delete-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:uname})}); if(res.ok){ showToast('Reseller deleted'); loadResellers();}}
-document.getElementById('m-search').addEventListener('input',filterMainTable); document.getElementById('s-search').addEventListener('input',filterSubTable);
-// generate chips
-function genChips(containerId,selectId,options){ const wrap=document.getElementById(containerId); if(!wrap) return; const sel=document.getElementById(selectId); const values=[1,7,15,30,60,90,365]; if(selectId==='m-renew-days') values.splice(4,2); values.forEach(v=>{ const chip=document.createElement('span'); chip.className='chip'+(sel.value==v?' selected':''); chip.innerText=v+'d'; chip.onclick=()=>{ sel.value=v; document.querySelectorAll(`#${containerId} .chip`).forEach(c=>c.classList.remove('selected')); chip.classList.add('selected'); }; wrap.appendChild(chip); });}
+
+// Event listeners and chips
+document.getElementById('m-search').addEventListener('input',filterMainTable); 
+document.getElementById('s-search').addEventListener('input',filterSubTable);
+
+function genChips(containerId,selectId,optionsArr){ const wrap=document.getElementById(containerId); if(!wrap) return; const sel=document.getElementById(selectId); wrap.innerHTML=''; optionsArr.forEach(v=>{ const chip=document.createElement('span'); chip.className='chip'+(parseInt(sel.value)===v?' selected':''); chip.innerText=v+'d'; chip.onclick=()=>{ sel.value=v; document.querySelectorAll(`#${containerId} .chip`).forEach(c=>c.classList.remove('selected')); chip.classList.add('selected'); }; wrap.appendChild(chip); });}
 window.onload=()=>{ genChips('m-chips','m-days',[1,7,15,30,60,90,365]); genChips('m-renew-chips','m-renew-days',[7,15,30,60]); };
+
 (async function init(){ loadSession(); if(SESSION.role==='main_admin'&&SESSION.adminKey){ try{ const r=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey})}); if(r.ok){ enterMainPanel(); return; } }catch(e){} clearSession(); } if(SESSION.role==='sub_admin'&&SESSION.username){ try{ const r=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password})}); if(r.ok){ enterSubPanel(); return; } }catch(e){} clearSession(); } })();
 </script>
 </body>
