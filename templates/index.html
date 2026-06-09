@@ -252,174 +252,40 @@ body {
   flex-shrink: 0;
 }
 
-/* ===== ইউনিক নেভিগেশন স্টাইল (শুধু UID VAULT, RESELLERS, EXIT এর জন্য) ===== */
 .nav-section {
-  padding: 20px 12px;
+  padding: 16px 0;
   flex: 1;
   overflow-y: auto;
-  position: relative;
 }
 
-/* মেনু হেডার (ঐচ্ছিক ইউনিক লুক) */
-.nav-section::before {
-  content: '• MAIN MENU •';
-  position: absolute;
-  top: 0;
-  left: 20px;
-  font-size: 9px;
-  letter-spacing: 2px;
-  color: var(--accent-neon);
-  background: rgba(239,68,68,0.15);
-  padding: 2px 12px;
-  border-radius: 30px;
-  backdrop-filter: blur(4px);
-  font-weight: 700;
-}
-
-/* ইউনিক নেভিগেশন বাটন */
 .nav-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 18px;
+  padding: 14px 24px;
   width: 100%;
   background: transparent;
   border: none;
   color: var(--text-secondary);
   font-weight: 600;
   font-size: 13px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin: 10px 0;
-  border-radius: 14px;
-  position: relative;
-  overflow: hidden;
+  transition: 0.2s;
+  margin: 3px 0;
+  border-left: 3px solid transparent;
 }
 
-/* হোভার ইফেক্ট - গ্লাস ফ্রস্ট */
-.nav-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05));
-  transition: width 0.4s ease;
-  z-index: -1;
-}
+.nav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.04); }
 
-.nav-item:hover::before {
-  width: 100%;
-}
-
-.nav-item:hover {
-  color: white;
-  transform: translateX(5px);
-  text-shadow: 0 0 5px rgba(239,68,68,0.5);
-}
-
-/* অ্যাক্টিভ স্টাইল - ৩ডি এম্বসড ইফেক্ট */
 .nav-item.active {
-  background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(239,68,68,0.08));
+  background: rgba(239,68,68,0.12);
+  border-left: 3px solid var(--accent-neon);
   color: white;
-  border-radius: 14px;
-  box-shadow: 0 4px 15px rgba(239,68,68,0.15), inset 0 1px 0 rgba(255,255,255,0.1);
-  transform: translateX(0);
+  text-shadow: 0 0 8px rgba(239,68,68,0.3);
 }
 
-/* অ্যাক্টিভ ইন্ডিকেটর - ডান পাশে গ্লো বার */
-.nav-item.active::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 50%;
-  background: var(--accent-neon);
-  border-radius: 3px;
-  box-shadow: 0 0 8px var(--accent-neon);
-  animation: glowBar 1s ease-in-out infinite alternate;
-}
-
-@keyframes glowBar {
-  from { opacity: 0.6; height: 40%; }
-  to { opacity: 1; height: 60%; }
-}
-
-/* আইকন অ্যানিমেশন */
-.nav-icon {
-  font-size: 18px;
-  width: 28px;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.nav-item:hover .nav-icon {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 4px rgba(239,68,68,0.6));
-}
-
-.nav-item.active .nav-icon {
-  transform: scale(1.05);
-  text-shadow: 0 0 8px rgba(239,68,68,0.8);
-}
-
-/* ইউনিক স্ট্যাটাস ইন্ডিকেটর (অ্যাক্টিভ বাটনের পাশে ডট) */
-.nav-status {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  background: #22c55e;
-  border-radius: 50%;
-  margin-left: auto;
-  box-shadow: 0 0 8px #22c55e;
-  animation: pulse 1.5s ease-in-out infinite;
-  opacity: 0;
-}
-
-.nav-item.active .nav-status {
-  opacity: 1;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-/* এক্সিট বাটন স্পেশাল - অলাদা স্টাইল */
-.nav-item:last-child {
-  margin-top: 30px;
-  border-top: 1px solid rgba(239,68,68,0.2);
-  border-radius: 14px;
-  background: rgba(239,68,68,0.05);
-}
-
-.nav-item:last-child:hover {
-  background: rgba(239,68,68,0.15);
-  border-top-color: rgba(239,68,68,0.4);
-}
-
-.nav-item:last-child .nav-icon {
-  filter: drop-shadow(0 0 3px rgba(239,68,68,0.5));
-}
-
-/* টুলটিপ ইফেক্ট (হোভার করলে নামের পাশে ইফেক্ট) */
-.nav-item:hover span:first-of-type {
-  position: relative;
-}
-
-.nav-item:hover span:first-of-type::after {
-  content: '⚡';
-  position: absolute;
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 10px;
-  opacity: 0.7;
-}
+.nav-icon { font-size: 18px; width: 20px; text-align: center; }
 
 .user-profile {
   padding: 20px 24px;
@@ -883,25 +749,14 @@ tr:hover td { background: rgba(239,68,68,0.03); }
       </div>
     </div>
     <div class="nav-section">
-      <!-- UID VAULT - ইউনিক ডিজাইন -->
       <button class="nav-item active" id="nav-uids" onclick="switchMainTab('uids')">
-        <span class="nav-icon">🎮</span>
-        <span>UID VAULT</span>
-        <span class="nav-status"></span>
+        <span class="nav-icon">🎮</span> UID VAULT
       </button>
-      
-      <!-- RESELLERS - ইউনিক ডিজাইন -->
       <button class="nav-item" id="nav-resellers" style="display:none;" onclick="switchMainTab('resellers')">
-        <span class="nav-icon">👥</span>
-        <span>RESELLERS</span>
-        <span class="nav-status"></span>
+        <span class="nav-icon">👥</span> RESELLERS
       </button>
-      
-      <!-- EXIT - স্পেশাল ইউনিক ডিজাইন -->
       <button class="nav-item" onclick="doLogout()">
-        <span class="nav-icon">🚪</span>
-        <span>EXIT</span>
-        <span class="nav-status"></span>
+        <span class="nav-icon">🚪</span> EXIT
       </button>
     </div>
     <div class="user-profile">
@@ -997,7 +852,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
               </tr>
             </thead>
             <tbody id="main-uid-tbody">
-              <tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading nebula data...<\/td><\/tr>
+              <tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading nebula data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1027,7 +882,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
                   <tr><th>Username</th><th>Note</th><th>Action</th></tr>
                 </thead>
                 <tbody id="reseller-tbody">
-                  <tr><td colspan="3" style="text-align:center; color:#6b7280;">—<\/td><\/tr>
+                  <tr><td colspan="3" style="text-align:center; color:#6b7280;">—</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1091,12 +946,12 @@ tr:hover td { background: rgba(239,68,68,0.03); }
         <input id="s-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Search UID or Name">
       </div>
       <div class="table-glass">
-        </table>
+        <table>
           <thead>
             <tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th></tr>
           </thead>
           <tbody id="sub-uid-tbody">
-            <tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...<\/td><\/tr>
+            <tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr>
           </tbody>
         </table>
       </div>
@@ -1337,20 +1192,20 @@ function calcStats(uids, tId, aId, eId, sId){
 // ===== MAIN UID FUNCTIONS =====
 async function mainLoadUIDs(){
   const tb = document.getElementById('main-uid-tbody');
-  tb.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:30px;">Loading...<\/td><\/tr>';
+  tb.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:30px;">Loading...</td></tr>';
   try{
     const res = await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey));
     const data = await res.json();
-    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171; text-align:center;">Error: ${data.message}<\/td><\/tr>`; return; }
+    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171; text-align:center;">Error: ${data.message}</td></tr>`; return; }
     allMainUIDs = data.licenses || [];
     renderMainTable(allMainUIDs);
     calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
-  }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error<\/td><\/tr>'; }
+  }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
 }
 
 function renderMainTable(uids){
   const tb = document.getElementById('main-uid-tbody');
-  tb.innerHTML = uids.length ? uids.map(u => renderUIDRow(u,true)).join('') : '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">✨ No UIDs found<\/td><\/tr>';
+  tb.innerHTML = uids.length ? uids.map(u => renderUIDRow(u,true)).join('') : '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">✨ No UIDs found</td></tr>';
 }
 
 function filterMainTable(){
@@ -1388,20 +1243,20 @@ function mainRemoveUID(){
 // ===== SUB UID FUNCTIONS =====
 async function subLoadUIDs(){
   const tb = document.getElementById('sub-uid-tbody');
-  tb.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:30px;">Loading...<\/td><\/tr>';
+  tb.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:30px;">Loading...</td></tr>';
   try{
     const res = await fetch('/subadmin/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
     const data = await res.json();
-    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171;">Error: ${data.message}<\/td><\/tr>`; return; }
+    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171;">Error: ${data.message}</td></tr>`; return; }
     allSubUIDs = data.licenses || [];
     renderSubTable(allSubUIDs);
     calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
-  }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error<\/td><\/tr>'; }
+  }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
 }
 
 function renderSubTable(uids){
   const tb = document.getElementById('sub-uid-tbody');
-  tb.innerHTML = uids.length ? uids.map(u => renderUIDRow(u,false)).join('') : '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">No UIDs found<\/td><\/tr>';
+  tb.innerHTML = uids.length ? uids.map(u => renderUIDRow(u,false)).join('') : '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">No UIDs found</td></tr>';
 }
 
 function filterSubTable(){
@@ -1461,58 +1316,34 @@ async function confirmDeleteAction(){
   else showToast(data.message||'Failed','error');
 }
 
-// ===== RESELLER MANAGEMENT with UNIQUE EFFECTS =====
+// ===== RESELLER MANAGEMENT =====
 async function createReseller(){
   const u = document.getElementById('new-res-user').value.trim();
   const p = document.getElementById('new-res-pass').value.trim();
   const n = document.getElementById('new-res-note').value.trim();
   if(!u||!p) return showToast('Fill username/password','error');
   const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n})});
-  if(res.ok){ showToast('✨ Reseller created successfully!'); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); loadResellers(); }
+  if(res.ok){ showToast('Reseller created'); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); loadResellers(); }
   else { const d = await res.json(); showToast(d.message,'error'); }
 }
 
 async function loadResellers(){
   const tb = document.getElementById('reseller-tbody');
-  tb.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#6b7280;">⟳ Loading...<\/td><\/tr>';
-  
-  // Add shimmer effect
-  const shimmer = document.createElement('style');
-  shimmer.id = 'shimmer-style-reseller';
-  if(!document.getElementById('shimmer-style-reseller')){
-    shimmer.textContent = `
-      @keyframes shimmerReseller {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-      }
-      .shimmer-loading-reseller {
-        background: linear-gradient(90deg, rgba(239,68,68,0.05) 25%, rgba(239,68,68,0.15) 50%, rgba(239,68,68,0.05) 75%);
-        background-size: 200% 100%;
-        animation: shimmerReseller 1.5s infinite;
-      }
-    `;
-    document.head.appendChild(shimmer);
-  }
-  
+  tb.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
   const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
   const data = await res.json();
-  if(!res.ok || !data.subadmins || !data.subadmins.length){ 
-    tb.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#6b7280; padding:30px;">✨ No resellers found<\/td><\/tr>'; 
-    return; 
-  }
-  
-  // Unique reseller list design with icons
+  if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="3" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
   tb.innerHTML = data.subadmins.map(s => `<tr>
-    <td style="padding:12px 16px;"><span class="badge badge-active" style="animation: glowPulse 2s infinite;">👑 ${s.username}</span><\/td>
-    <td style="color:#9ca3af; font-size:12px; padding:12px 16px;">${s.note || '—'}<\/td>
-    <td style="padding:12px 16px;"><button class="btn-icon" onclick="deleteReseller('${s.username}')" style="transition: all 0.2s;">🗑 REMOVE<\/button><\/td>
+    <td><span class="badge badge-active">${s.username}</span></td>
+    <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
+    <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
   </tr>`).join('');
 }
 
 async function deleteReseller(uname){
-  if(!confirm(`⚠️ Delete reseller: ${uname}? This action cannot be undone.`)) return;
+  if(!confirm(`Delete reseller: ${uname}?`)) return;
   const res = await fetch('/admin/delete-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:uname})});
-  if(res.ok){ showToast('🗑 Reseller deleted successfully!'); loadResellers(); }
+  if(res.ok){ showToast('Reseller deleted'); loadResellers(); }
 }
 
 // ===== EVENT LISTENERS =====
