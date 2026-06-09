@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>STREAM CORPORATION | NEBULA ADMIN v5.0</title>
+<title>STREAM CORPORATION | ADMIN PORTAL v5.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,7 +31,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ===== PARTICLE CANVAS ===== */
+/* PARTICLE CANVAS */
 #particle-canvas {
   position: fixed;
   top: 0; left: 0;
@@ -40,7 +40,7 @@ body {
   z-index: 0;
 }
 
-/* ===== GLASS CORE ===== */
+/* GLASS CORE */
 .sidebar, .card, .stat-card, .auth-box, .table-glass {
   background: var(--glass-surface);
   backdrop-filter: blur(14px);
@@ -51,7 +51,7 @@ body {
   z-index: 1;
 }
 
-/* ===== AUTH GATE ===== */
+/* AUTH GATE */
 #auth-gate {
   min-height: 100vh;
   display: flex;
@@ -82,6 +82,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 32px;
+  font-weight: 800;
   margin: 0 auto 22px;
   border: 1px solid rgba(239,68,68,0.6);
   box-shadow: 0 0 24px rgba(239,68,68,0.35), inset 0 0 20px rgba(239,68,68,0.08);
@@ -100,7 +101,6 @@ body {
   letter-spacing: -0.5px;
 }
 
-/* ===== PREMIUM GLOW TEXT ===== */
 .auth-gradient {
   background: linear-gradient(120deg, #ffffff 0%, #ef4444 40%, #ff8a8a 70%, #ffffff 100%);
   background-size: 200% auto;
@@ -116,20 +116,9 @@ body {
   100% { background-position: 200% center; }
 }
 
-.glow-red {
-  color: #ef4444;
-  text-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.4), 0 0 40px rgba(239,68,68,0.2);
-}
-
-.glow-green {
-  color: #22c55e;
-  text-shadow: 0 0 10px rgba(34,197,94,0.7), 0 0 20px rgba(34,197,94,0.4);
-}
-
-.glow-orange {
-  color: #f97316;
-  text-shadow: 0 0 10px rgba(249,115,22,0.7), 0 0 20px rgba(249,115,22,0.4);
-}
+.glow-red { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.4); }
+.glow-green { color: #22c55e; text-shadow: 0 0 10px rgba(34,197,94,0.7), 0 0 20px rgba(34,197,94,0.4); }
+.glow-orange { color: #f97316; text-shadow: 0 0 10px rgba(249,115,22,0.7), 0 0 20px rgba(249,115,22,0.4); }
 
 .brand-title {
   font-size: 18px;
@@ -214,7 +203,7 @@ body {
   box-shadow: 0 6px 20px rgba(239,68,68,0.4);
 }
 
-/* ===== LAYOUT ===== */
+/* LAYOUT */
 #app-layout {
   display: none;
   min-height: 100vh;
@@ -257,6 +246,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 22px;
+  font-weight: 800;
   box-shadow: 0 0 16px rgba(239,68,68,0.5), inset 0 0 10px rgba(255,255,255,0.1);
   animation: logoPulse 3s ease-in-out infinite;
   flex-shrink: 0;
@@ -338,7 +328,7 @@ body {
 .panel-section { display: none; }
 .panel-section.active { display: block; }
 
-/* ===== PAGE HEADER ===== */
+/* PAGE HEADER */
 .page-header {
   margin-bottom: 28px;
 }
@@ -360,7 +350,7 @@ body {
   margin-top: 4px;
 }
 
-/* ===== STATS GRID ===== */
+/* STATS GRID */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4,1fr);
@@ -416,7 +406,7 @@ body {
   font-weight: 600;
 }
 
-/* ===== CARD GRID ===== */
+/* CARD GRID */
 .card-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -451,7 +441,7 @@ body {
   color: rgba(255,255,255,0.9);
 }
 
-/* ===== CHIP GROUP ===== */
+/* CHIP GROUP */
 .chip-group {
   display: flex;
   flex-wrap: wrap;
@@ -480,7 +470,7 @@ body {
   box-shadow: 0 0 10px rgba(239,68,68,0.2);
 }
 
-/* ===== TABLE ===== */
+/* TABLE */
 .table-glass {
   border-radius: 24px;
   overflow: hidden;
@@ -514,7 +504,7 @@ td {
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(239,68,68,0.03); }
 
-/* ===== BADGES ===== */
+/* BADGES */
 .badge {
   padding: 5px 12px;
   border-radius: 40px;
@@ -548,12 +538,12 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   text-shadow: 0 0 8px rgba(249,115,22,0.4);
 }
 
-/* ===== EXPIRY COLORS ===== */
+/* EXPIRY COLORS */
 .expiry-critical { color: #f87171; font-weight: 700; text-shadow: 0 0 8px rgba(239,68,68,0.4); }
 .expiry-soon { color: #fb923c; font-weight: 600; text-shadow: 0 0 8px rgba(249,115,22,0.3); }
 .expiry-safe { color: #4ade80; text-shadow: 0 0 6px rgba(34,197,94,0.3); }
 
-/* ===== DAYS REMAINING BADGE ===== */
+/* DAYS REMAINING BADGE */
 .days-remaining {
   display: inline-flex;
   align-items: center;
@@ -564,7 +554,6 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   font-weight: 700;
   font-family: 'Space Mono', monospace;
   letter-spacing: 0.3px;
-  margin-left: 8px;
 }
 
 .days-remaining.safe {
@@ -592,7 +581,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   50% { opacity: 0.65; }
 }
 
-/* ===== BUTTONS ===== */
+/* BUTTONS */
 .btn-icon {
   background: none;
   border: 1px solid rgba(239,68,68,0.3);
@@ -639,7 +628,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 
 .btn-refresh:hover { background: rgba(239,68,68,0.2); box-shadow: 0 0 12px rgba(239,68,68,0.2); }
 
-/* ===== SEARCH INPUT ===== */
+/* SEARCH WRAP */
 .search-wrap {
   display: flex;
   justify-content: space-between;
@@ -648,7 +637,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   gap: 16px;
 }
 
-/* ===== TOAST ===== */
+/* TOAST */
 .toast-gloss {
   position: fixed;
   bottom: 30px;
@@ -670,7 +659,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 
 .toast-gloss.show { transform: translateY(0); opacity: 1; }
 
-/* ===== MODAL ===== */
+/* MODAL */
 .modal-glass {
   position: fixed;
   inset: 0;
@@ -707,7 +696,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 
 .result-msg { min-height: 20px; margin-top: 8px; font-size: 13px; }
 
-/* ===== UID MONO ===== */
+/* UID MONO */
 .uid-mono {
   font-family: 'Space Mono', monospace;
   font-size: 12px;
@@ -724,8 +713,10 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 <!-- AUTH GATE -->
 <div id="auth-gate">
   <div class="auth-box">
-    <div class="auth-logo">⚡</div>
-    <h2>STREAM <span class="auth-gradient">NEBULA</span></h2>
+    <div class="auth-logo">
+      <span style="font-weight:800; font-size:28px;">SC</span>
+    </div>
+    <h2>STREAM <span class="auth-gradient">CORPORATION</span></h2>
     <p style="text-align:center; font-size:11px; color:#6b7280; margin-bottom:14px; letter-spacing:1px;">// ADMIN PORTAL v5.0</p>
     <div class="tab-switch">
       <button class="tab-btn active" onclick="switchLoginTab('sub')">RESELLER</button>
@@ -749,10 +740,12 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 <div id="app-layout">
   <div class="sidebar">
     <div class="brand">
-      <div class="brand-icon">✨</div>
+      <div class="brand-icon">
+        <span style="font-weight:800; font-size:18px;">SC</span>
+      </div>
       <div>
         <div class="brand-title">STREAM CORP</div>
-        <span style="font-size:10px; color:#6b7280; letter-spacing:1px;">NEBULA EDITION</span>
+        <span style="font-size:10px; color:#6b7280; letter-spacing:1px;">MANAGEMENT PANEL</span>
       </div>
     </div>
     <div class="nav-section">
@@ -980,7 +973,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 </div>
 
 <script>
-// ===== PARTICLE SYSTEM =====
+// ===== PARTICLE SYSTEM (same as before) =====
 (function(){
   const canvas = document.getElementById('particle-canvas');
   const ctx = canvas.getContext('2d');
@@ -989,107 +982,23 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
-
   window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
 
-  const COLORS = [
-    'rgba(239,68,68,',
-    'rgba(59,130,246,',
-    'rgba(139,92,246,',
-    'rgba(249,115,22,',
-    'rgba(34,197,94,',
-  ];
-
-  function createParticle(){
-    return {
-      x: Math.random() * W,
-      y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 1.5 + 0.3,
-      alpha: Math.random() * 0.5 + 0.1,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      pulse: Math.random() * Math.PI * 2,
-      pulseSpeed: Math.random() * 0.02 + 0.005,
-    };
-  }
-
+  const COLORS = ['rgba(239,68,68,', 'rgba(59,130,246,', 'rgba(139,92,246,', 'rgba(249,115,22,', 'rgba(34,197,94,'];
+  function createParticle(){ return { x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, r: Math.random() * 1.5 + 0.3, alpha: Math.random() * 0.5 + 0.1, color: COLORS[Math.floor(Math.random() * COLORS.length)], pulse: Math.random() * Math.PI * 2, pulseSpeed: Math.random() * 0.02 + 0.005 }; }
   for(let i = 0; i < 120; i++) particles.push(createParticle());
 
   function draw(){
     ctx.clearRect(0, 0, W, H);
-
-    // Draw connections
     for(let i = 0; i < particles.length; i++){
       for(let j = i+1; j < particles.length; j++){
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if(dist < 100){
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(239,68,68,${0.06 * (1 - dist/100)})`;
-          ctx.lineWidth = 0.5;
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.stroke();
-        }
+        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < 100){ ctx.beginPath(); ctx.strokeStyle = `rgba(239,68,68,${0.06 * (1 - dist/100)})`; ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); }
       }
     }
-
-    // Draw glow orbs (background)
-    const orbs = [
-      {x: W*0.15, y: H*0.3, r: 220, color: 'rgba(239,68,68,0.04)'},
-      {x: W*0.85, y: H*0.7, r: 200, color: 'rgba(59,130,246,0.03)'},
-      {x: W*0.5, y: H*0.5, r: 300, color: 'rgba(139,92,246,0.02)'},
-    ];
-    orbs.forEach(o => {
-      const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-      g.addColorStop(0, o.color);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(o.x, o.y, o.r, 0, Math.PI*2);
-      ctx.fill();
-    });
-
-    // Draw & update particles
-    particles.forEach(p => {
-      p.pulse += p.pulseSpeed;
-      const a = p.alpha * (0.7 + 0.3 * Math.sin(p.pulse));
-
-      // Mouse glow interaction
-      const mdx = p.x - mouse.x;
-      const mdy = p.y - mouse.y;
-      const mdist = Math.sqrt(mdx*mdx + mdy*mdy);
-      if(mdist < 120){
-        const force = (120 - mdist) / 120;
-        const gA = 0.12 * force;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * (1 + force * 3), 0, Math.PI*2);
-        ctx.fillStyle = p.color + (gA) + ')';
-        ctx.fill();
-      }
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fillStyle = p.color + a + ')';
-      ctx.fill();
-
-      // Soft glow
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI*2);
-      ctx.fillStyle = p.color + (a * 0.15) + ')';
-      ctx.fill();
-
-      p.x += p.vx;
-      p.y += p.vy;
-
-      if(p.x < 0) p.x = W;
-      if(p.x > W) p.x = 0;
-      if(p.y < 0) p.y = H;
-      if(p.y > H) p.y = 0;
-    });
-
+    const orbs = [{x: W*0.15, y: H*0.3, r: 220, color: 'rgba(239,68,68,0.04)'},{x: W*0.85, y: H*0.7, r: 200, color: 'rgba(59,130,246,0.03)'},{x: W*0.5, y: H*0.5, r: 300, color: 'rgba(139,92,246,0.02)'}];
+    orbs.forEach(o => { const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r); g.addColorStop(0, o.color); g.addColorStop(1, 'transparent'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2); ctx.fill(); });
+    particles.forEach(p => { p.pulse += p.pulseSpeed; const a = p.alpha * (0.7 + 0.3 * Math.sin(p.pulse)); const mdx = p.x - mouse.x, mdy = p.y - mouse.y, mdist = Math.sqrt(mdx*mdx + mdy*mdy); if(mdist < 120){ const force = (120 - mdist) / 120; const gA = 0.12 * force; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1 + force * 3), 0, Math.PI*2); ctx.fillStyle = p.color + (gA) + ')'; ctx.fill(); } ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = p.color + a + ')'; ctx.fill(); ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI*2); ctx.fillStyle = p.color + (a * 0.15) + ')'; ctx.fill(); p.x += p.vx; if(p.x < 0) p.x = W; if(p.x > W) p.x = 0; if(p.y < 0) p.y = H; if(p.y > H) p.y = 0; });
     requestAnimationFrame(draw);
   }
   draw();
@@ -1222,7 +1131,7 @@ function doLogout(){
   document.getElementById('sub-panel').classList.remove('active');
 }
 
-// ===== RENDER ROW — FIXED STATUS =====
+// ===== RENDER ROW =====
 function renderUIDRow(u, isMain){
   const uidVal = u.uid || u.id || u.user_id || '?';
   const name = u.name || u.username || u.player || '—';
@@ -1260,7 +1169,7 @@ function renderUIDRow(u, isMain){
   </tr>`;
 }
 
-// ===== STATS — FIXED LOGIC =====
+// ===== STATS =====
 function calcStats(uids, tId, aId, eId, sId){
   let active=0, expired=0, soon=0;
   uids.forEach(u => {
