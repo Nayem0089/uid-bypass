@@ -146,12 +146,12 @@ td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); font-s
 <div class="card-grid-2"><div class="card"><h3>➕ CREATE UID</h3><input type="text" id="m-uid" class="input-glow" placeholder="User ID"><input type="text" id="m-name" class="input-glow" placeholder="Player Name"><select id="m-days" class="input-glow"><option value="1">1 Day</option><option value="7">7 Days</option><option value="15">15 Days</option><option value="30" selected>30 Days</option><option value="60">60 Days</option><option value="90">90 Days</option><option value="365">1 Year</option></select><button class="btn-glass" onclick="mainAddUID()">💾 SAVE & ACTIVATE</button><div class="result-msg" id="m-add-result"></div></div>
 <div class="card"><h3>⚙️ MANAGE UID</h3><input type="text" id="m-rm-uid" class="input-glow" placeholder="UID to remove"><button class="btn-glass" style="background:linear-gradient(135deg,#7f1d1d,#450a0a); margin-bottom:18px;" onclick="mainRemoveUID()">🗑 REMOVE UID</button><div style="border-top:1px solid rgba(255,255,255,0.07); margin:10px 0 18px;"></div><input type="text" id="m-renew-uid" class="input-glow" placeholder="UID to extend"><select id="m-renew-days" class="input-glow"><option value="7">+7 Days</option><option value="15">+15 Days</option><option value="30" selected>+30 Days</option><option value="60">+60 Days</option></select><button class="btn-glass" style="background:linear-gradient(135deg,#78350f,#451a03);" onclick="mainRenewUID()">↻ RENEW / EXTEND</button><div class="result-msg" id="m-rm-result"></div></div></div>
 <div class="search-wrap"><button class="btn-refresh" onclick="mainLoadUIDs()">⟳ REFRESH</button><input type="text" id="m-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Filter UID or Name"></div>
-<div class="table-glass"><table><thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th></tr></thead><tbody id="main-uid-tbody"><tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr></tbody></table></div>
+<div class="table-glass"><table><thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th><tr></thead><tbody id="main-uid-tbody"><tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr></tbody></table>
 </div>
 <div id="main-tab-resellers" class="panel-section">
 <div class="page-header"><h1>👥 RESELLERS & POINTS</h1><p>MANAGE SUB-ADMIN ACCOUNTS | EACH UID COSTS 1 POINT</p></div>
 <div class="card-grid-2"><div class="card"><h3>👑 CREATE RESELLER</h3><input id="new-res-user" class="input-glow" placeholder="Username"><input type="password" id="new-res-pass" class="input-glow" placeholder="Password"><input id="new-res-points" class="input-glow" placeholder="Initial Points" value="10"><input id="new-res-note" class="input-glow" placeholder="Note (optional)"><button class="btn-glass" onclick="createReseller()">✨ CREATE RESELLER</button><div class="result-msg" id="res-create-result"></div></div>
-<div class="card"><h3>📋 RESELLER LIST</h3><button class="btn-refresh" style="margin-bottom:16px; width:100%;" onclick="loadResellers()">⟳ Refresh List</button><div class="table-glass"><table><thead><tr><th>Username</th><th>Points</th><th>Note</th><th>Action</th></tr></thead><tbody id="reseller-tbody"><tr><td colspan="4" style="text-align:center; color:#6b7280;">—</td></tr></tbody></table></div></div></div>
+<div class="card"><h3>📋 RESELLER LIST</h3><button class="btn-refresh" style="margin-bottom:16px; width:100%;" onclick="loadResellers()">⟳ Refresh List</button><div class="table-glass"><table><thead><tr><th>Username</th><th>Points</th><th>Note</th><th>Action</th></tr></thead><tbody id="reseller-tbody"><tr><td colspan="4" style="text-align:center; color:#6b7280;">—</td></tr></tbody></table</div></div></div>
 </div>
 </div>
 <div id="sub-panel" class="page">
@@ -160,7 +160,8 @@ td { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); font-s
 <div class="card-grid-2"><div class="card"><h3>➕ ADD UID (COSTS 1 POINT)</h3><input id="s-uid" class="input-glow" placeholder="UID"><input id="s-name" class="input-glow" placeholder="Name"><select id="s-days" class="input-glow"><option value="1">1 Day</option><option value="7">7 Days</option><option value="15">15 Days</option><option value="30" selected>30 Days</option><option value="60">60 Days</option></select><button class="btn-glass" onclick="subAddUID()">💾 SAVE (1 POINT)</button><div class="result-msg" id="s-add-result"></div></div>
 <div class="card"><h3>⚙️ MANAGE</h3><input id="s-rm-uid" placeholder="UID to remove" class="input-glow"><button class="btn-glass" style="background:linear-gradient(135deg,#7f1d1d,#450a0a); margin-bottom:16px;" onclick="subRemoveUID()">🗑 REMOVE</button><div style="border-top:1px solid rgba(255,255,255,0.07); margin:10px 0 16px;"></div><input id="s-renew-uid" class="input-glow" placeholder="UID to renew"><select id="s-renew-days" class="input-glow"><option value="7">+7 Days</option><option value="15">+15 Days</option><option value="30" selected>+30 Days</option></select><button class="btn-glass" style="background:linear-gradient(135deg,#78350f,#451a03);" onclick="subRenewUID()">↻ RENEW</button><div class="result-msg" id="s-rm-result"></div></div></div>
 <div class="search-wrap"><button class="btn-refresh" onclick="subLoadUIDs()">⟳ REFRESH</button><input id="s-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Search UID or Name"></div>
-<div class="table-glass"><table><thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th></tr></thead><tbody id="sub-uid-tbody"><tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr></tbody></table></div>
+<div class="table-glass"><tr><thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th></tr></thead><tbody id="sub-uid-tbody"><tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr></tbody></table>
+</div>
 </div>
 </div>
 </div>
@@ -226,14 +227,23 @@ async function loadResellerPoints(){
         if(res.ok){
             const data=await res.json();
             if(data.points!==undefined) document.getElementById('sub-points-display').innerHTML=`⭐ POINTS: ${data.points}`;
+        } else {
+            // Fallback: try to get from local storage or set default
+            console.log('Points API error, using stored value');
         }
-    }catch(e){}
+    } catch(e){ console.log('Points fetch error:', e); }
 }
 
-async function updateResellerPointsOnServer(points){
+async function updateResellerPointsOnServer(newPoints){
     try{
-        await fetch('/subadmin/update-points', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, points})});
-    }catch(e){}
+        const res=await fetch('/subadmin/update-points', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, points:newPoints})});
+        if(res.ok){
+            const data=await res.json();
+            if(data.points) document.getElementById('sub-points-display').innerHTML=`⭐ POINTS: ${data.points}`;
+            return true;
+        }
+        return false;
+    } catch(e){ console.log('Points update error:', e); return false; }
 }
 
 function enterMainPanel(){
@@ -351,7 +361,7 @@ window.deleteReseller=async function(uname){
     }catch(e){ showToast('Error','error'); }
 };
 
-// ===== SUB ADMIN ফাংশন (API সংযুক্ত + পয়েন্ট চেক) =====
+// ===== SUB ADMIN ফাংশন (FIXED - পয়েন্ট ডিডাক্ট সঠিকভাবে কাজ করবে) =====
 async function subLoadUIDs(){
     const tb=document.getElementById('sub-uid-tbody');
     tb.innerHTML='<tr><td colspan="7" style="text-align:center; padding:30px;">Loading...</td></tr>';
@@ -369,42 +379,105 @@ function renderSubTable(uids){
     const tb=document.getElementById('sub-uid-tbody');
     tb.innerHTML=uids.length?uids.map(u=>renderUIDRow(u,false)).join(''):'<tr><td colspan="7" style="text-align:center; padding:40px;">No UIDs found</td></tr>';
 }
+
 window.subAddUID=async function(){
     const uid=document.getElementById('s-uid').value.trim();
     const name=document.getElementById('s-name').value.trim()||'Player';
     const days=document.getElementById('s-days').value;
     if(!uid) return showToast('UID required','error');
-    try{
+    
+    try {
+        // প্রথমে পয়েন্ট চেক করুন
         const pointsRes=await fetch(`/subadmin/points?username=${encodeURIComponent(SESSION.username)}&password=${encodeURIComponent(SESSION.password)}`);
+        if(!pointsRes.ok) {
+            showToast('Failed to check points','error');
+            return;
+        }
         const pointsData=await pointsRes.json();
-        if(pointsData.points<1) return showToast('❌ Not enough points!','error');
         
-        const res=await fetch('/subadmin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, name, days:parseInt(days)})});
-        if(res.ok){
-            await fetch('/subadmin/deduct-point', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password})});
-            showToast('UID added, 1 point deducted');
-            showResult('s-add-result','✓ Added','success');
-            document.getElementById('s-uid').value='';
-            document.getElementById('s-name').value='';
-            subLoadUIDs();
-        } else { const data=await res.json(); showToast(data.message,'error'); }
-    }catch(e){ showToast('Error','error'); }
+        if(pointsData.points < 1) {
+            showToast('❌ Not enough points! Need 1 point to add UID','error');
+            showResult('s-add-result','❌ Insufficient points!','error');
+            return;
+        }
+        
+        // পয়েন্ট আছে, তাহলে UID তৈরি করুন
+        const createRes=await fetch('/subadmin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({
+            username:SESSION.username, 
+            password:SESSION.password, 
+            uid, 
+            name, 
+            days:parseInt(days)
+        })});
+        
+        const createData=await createRes.json();
+        
+        if(createRes.ok && createData.status === 'success') {
+            // সফলভাবে UID তৈরি হয়েছে, এখন পয়েন্ট ডিডাক্ট করুন
+            const deductRes=await fetch('/subadmin/deduct-point', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({
+                username:SESSION.username, 
+                password:SESSION.password
+            })});
+            
+            if(deductRes.ok) {
+                showToast('✅ UID added! 1 point deducted');
+                showResult('s-add-result','✓ UID added successfully!','success');
+                document.getElementById('s-uid').value='';
+                document.getElementById('s-name').value='';
+                await subLoadUIDs(); // Refresh the list
+                await loadResellerPoints(); // Update points display
+            } else {
+                // UID তৈরি হয়েছে কিন্তু পয়েন্ট ডিডাক্ট হয়নি - এটা ব্যাকএন্ড ইস্যু
+                showToast('⚠️ UID created but point deduction failed. Contact admin.','error');
+                showResult('s-add-result','⚠️ UID created but point not deducted','error');
+                await subLoadUIDs();
+            }
+        } else {
+            showToast(createData.message || 'Failed to create UID','error');
+            showResult('s-add-result','✗ '+(createData.message||'Creation failed'),'error');
+        }
+    } catch(e) {
+        console.error('Error in subAddUID:', e);
+        showToast('Network error','error');
+        showResult('s-add-result','✗ Network error','error');
+    }
 };
+
 window.subRenewUID=async function(){
     const uid=document.getElementById('s-renew-uid').value.trim();
     const days=document.getElementById('s-renew-days').value;
     if(!uid) return showToast('Enter UID','error');
     try{
         const res=await fetch('/subadmin/update', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, days:parseInt(days)})});
-        if(res.ok){ showToast(`Renewed +${days} days`); showResult('s-rm-result','✓ Renewed','success'); document.getElementById('s-renew-uid').value=''; subLoadUIDs(); }
-        else { const data=await res.json(); showToast(data.message,'error'); }
+        if(res.ok){ 
+            showToast(`Renewed +${days} days`); 
+            showResult('s-rm-result','✓ Renewed','success'); 
+            document.getElementById('s-renew-uid').value=''; 
+            subLoadUIDs(); 
+        } else { 
+            const data=await res.json(); 
+            showToast(data.message,'error'); 
+        }
     }catch(e){ showToast('Error','error'); }
 };
-window.subRemoveUID=function(){ const uid=document.getElementById('s-rm-uid').value.trim(); if(!uid) return showToast('Enter UID','error'); openModal(uid,false); };
+
+window.subRemoveUID=function(){ 
+    const uid=document.getElementById('s-rm-uid').value.trim(); 
+    if(!uid) return showToast('Enter UID','error'); 
+    openModal(uid,false); 
+};
 
 // ===== DELETE MODAL =====
-function openModal(uid, isMain){ pendingUID=uid; pendingIsMain=isMain; document.getElementById('modal-text').innerHTML=`Remove UID <strong>${uid}</strong>?<br><span style="font-size:12px;">This action is irreversible.</span>`; document.getElementById('modalDelete').classList.add('open'); }
-function closeModalAction(){ document.getElementById('modalDelete').classList.remove('open'); pendingUID=null; }
+function openModal(uid, isMain){ 
+    pendingUID=uid; 
+    pendingIsMain=isMain; 
+    document.getElementById('modal-text').innerHTML=`Remove UID <strong>${uid}</strong>?<br><span style="font-size:12px;">This action is irreversible.</span>`; 
+    document.getElementById('modalDelete').classList.add('open'); 
+}
+function closeModalAction(){ 
+    document.getElementById('modalDelete').classList.remove('open'); 
+    pendingUID=null; 
+}
 window.confirmDeleteAction=async function(){
     if(!pendingUID) return closeModalAction();
     const uid=pendingUID, isMain=pendingIsMain;
@@ -414,8 +487,10 @@ window.confirmDeleteAction=async function(){
         if(isMain) res=await fetch('/admin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid})});
         else res=await fetch('/subadmin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid})});
         const data=await res.json();
-        if(res.ok && data.status==='success'){ showToast('UID revoked'); isMain?mainLoadUIDs():subLoadUIDs(); }
-        else showToast(data.message||'Failed','error');
+        if(res.ok && data.status==='success'){ 
+            showToast('UID revoked'); 
+            isMain?mainLoadUIDs():subLoadUIDs(); 
+        } else showToast(data.message||'Failed','error');
     }catch(e){ showToast('Error','error'); }
 };
 
@@ -452,9 +527,20 @@ window.switchMainTab=function(tab){
 };
 document.getElementById('m-search').addEventListener('input',filterMainTable);
 document.getElementById('s-search').addEventListener('input',filterSubTable);
-function genChips(containerId,selectId,optionsArr){ const wrap=document.getElementById(containerId); if(!wrap) return; const sel=document.getElementById(selectId); wrap.innerHTML=''; optionsArr.forEach(v=>{ const chip=document.createElement('span'); chip.className='chip'+(parseInt(sel.value)===v?' selected':''); chip.innerText=v+'d'; chip.onclick=()=>{ sel.value=v; document.querySelectorAll('#'+containerId+' .chip').forEach(c=>c.classList.remove('selected')); chip.classList.add('selected'); }; wrap.appendChild(chip); }); }
-window.onload=()=>{ genChips('m-chips','m-days',[1,7,15,30,60,90,365]); genChips('m-renew-chips','m-renew-days',[7,15,30,60]); };
-(async function init(){ loadSession(); if(SESSION.role==='main_admin' && SESSION.adminKey){ try{ const r=await fetch('/admin/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey})}); if(r.ok){ enterMainPanel(); return; } }catch(e){} clearSession(); } if(SESSION.role==='sub_admin' && SESSION.username){ try{ const r=await fetch('/subadmin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password})}); if(r.ok){ enterSubPanel(); await loadResellerPoints(); return; } }catch(e){} clearSession(); } })();
+
+window.onload=()=>{ 
+    // Initialize
+    loadSession(); 
+    if(SESSION.role==='main_admin' && SESSION.adminKey){ 
+        fetch('/admin/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey})})
+        .then(r=>{ if(r.ok) enterMainPanel(); else clearSession(); })
+        .catch(()=>clearSession());
+    } else if(SESSION.role==='sub_admin' && SESSION.username){ 
+        fetch('/subadmin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password})})
+        .then(r=>{ if(r.ok) { enterSubPanel(); loadResellerPoints(); } else clearSession(); })
+        .catch(()=>clearSession());
+    }
+};
 </script>
 </body>
 </html>
