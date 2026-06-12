@@ -1,1396 +1,377 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>STREAM CORPORATION | ADMIN PORTAL v5.0</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-:root {
-  --bg-deep: #05050a;
-  --glass-surface: rgba(15, 15, 25, 0.65);
-  --glass-stroke: rgba(255, 255, 255, 0.08);
-  --accent-neon: #ef4444;
-  --accent-glow: #ff5a5a;
-  --green-neon: #22c55e;
-  --orange-neon: #f97316;
-  --blue-neon: #3b82f6;
-  --text-primary: #f0f2fc;
-  --text-secondary: #9ca3af;
-  --text-dim: #6b7280;
-}
-
-body {
-  background: var(--bg-deep);
-  font-family: 'Inter', sans-serif;
-  color: var(--text-primary);
-  min-height: 100vh;
-  font-size: 14px;
-  overflow-x: hidden;
-}
-
-/* PARTICLE CANVAS */
-#particle-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* GLASS CORE */
-.sidebar, .card, .stat-card, .auth-box, .table-glass {
-  background: var(--glass-surface);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--glass-stroke);
-  border-radius: 28px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-  position: relative;
-  z-index: 1;
-}
-
-/* AUTH GATE */
-#auth-gate {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  position: relative;
-  z-index: 2;
-}
-
-.auth-box {
-  width: 100%;
-  max-width: 440px;
-  padding: 36px 30px;
-  backdrop-filter: blur(24px);
-  background: rgba(8, 8, 18, 0.82);
-  border-radius: 40px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  box-shadow: 0 0 60px rgba(239,68,68,0.08), 0 0 120px rgba(59,130,246,0.04);
-}
-
-.auth-logo {
-  width: 72px;
-  height: 72px;
-  background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(0,0,0,0.3));
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: 800;
-  margin: 0 auto 22px;
-  border: 1px solid rgba(239,68,68,0.6);
-  box-shadow: 0 0 24px rgba(239,68,68,0.35), inset 0 0 20px rgba(239,68,68,0.08);
-  animation: logoPulse 3s ease-in-out infinite;
-}
-
-@keyframes logoPulse {
-  0%,100% { box-shadow: 0 0 24px rgba(239,68,68,0.35), inset 0 0 20px rgba(239,68,68,0.08); }
-  50% { box-shadow: 0 0 40px rgba(239,68,68,0.55), inset 0 0 30px rgba(239,68,68,0.15); }
-}
-
-.auth-box h2 {
-  font-size: 30px;
-  font-weight: 800;
-  text-align: center;
-  letter-spacing: -0.5px;
-}
-
-.auth-gradient {
-  background: linear-gradient(120deg, #ffffff 0%, #ef4444 40%, #ff8a8a 70%, #ffffff 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: textShine 4s linear infinite;
-  filter: drop-shadow(0 0 12px rgba(239,68,68,0.5));
-}
-
-@keyframes textShine {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-
-.glow-red { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.4); }
-.glow-green { color: #22c55e; text-shadow: 0 0 10px rgba(34,197,94,0.7), 0 0 20px rgba(34,197,94,0.4); }
-.glow-orange { color: #f97316; text-shadow: 0 0 10px rgba(249,115,22,0.7), 0 0 20px rgba(249,115,22,0.4); }
-
-.brand-title {
-  font-size: 18px;
-  font-weight: 800;
-  background: linear-gradient(120deg, #fff 0%, #ef4444 50%, #fff 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: textShine 5s linear infinite;
-}
-
-.tab-switch {
-  display: flex;
-  background: rgba(0,0,0,0.5);
-  border-radius: 60px;
-  padding: 5px;
-  margin: 20px 0;
-  gap: 8px;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
-.tab-btn {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 12px;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  border-radius: 40px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.tab-btn.active {
-  background: linear-gradient(135deg, #ef4444, #b91c1c);
-  color: white;
-  box-shadow: 0 4px 14px rgba(239,68,68,0.45), 0 0 20px rgba(239,68,68,0.2);
-}
-
-.input-glow {
-  background: rgba(0,0,0,0.55) !important;
-  border: 1px solid rgba(255,255,255,0.09);
-  border-radius: 20px;
-  padding: 14px 18px;
-  width: 100%;
-  color: white;
-  margin-bottom: 16px;
-  backdrop-filter: blur(4px);
-  transition: 0.2s;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-}
-
-.input-glow:focus {
-  border-color: rgba(239,68,68,0.6);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(239,68,68,0.15), 0 0 12px rgba(239,68,68,0.1);
-}
-
-.input-glow option { background: #0f0f1a; }
-
-.btn-glass {
-  width: 100%;
-  background: linear-gradient(135deg, #dc2626, #7f1d1d);
-  border: none;
-  padding: 14px;
-  border-radius: 40px;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.3px;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
-  box-shadow: 0 4px 14px rgba(239,68,68,0.25);
-}
-
-.btn-glass:hover {
-  transform: scale(0.98);
-  box-shadow: 0 6px 20px rgba(239,68,68,0.4);
-}
-
-/* LAYOUT */
-#app-layout {
-  display: none;
-  min-height: 100vh;
-  position: relative;
-  z-index: 1;
-}
-
-.sidebar {
-  width: 280px;
-  position: fixed;
-  left: 0; top: 0;
-  height: 100vh;
-  border-radius: 0 32px 32px 0;
-  backdrop-filter: blur(24px);
-  background: rgba(5, 5, 12, 0.88);
-  border-left: none;
-  border-top: none;
-  border-bottom: none;
-  border-right: 1px solid rgba(239,68,68,0.15);
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-}
-
-.brand {
-  padding: 28px 24px;
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  flex-shrink: 0;
-}
-
-.brand-icon {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #ef4444, #7f1d1d);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 800;
-  box-shadow: 0 0 16px rgba(239,68,68,0.5), inset 0 0 10px rgba(255,255,255,0.1);
-  animation: logoPulse 3s ease-in-out infinite;
-  flex-shrink: 0;
-}
-
-.nav-section {
-  padding: 16px 0;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 24px;
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: 0.2s;
-  margin: 3px 0;
-  border-left: 3px solid transparent;
-}
-
-.nav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.04); }
-
-.nav-item.active {
-  background: rgba(239,68,68,0.12);
-  border-left: 3px solid var(--accent-neon);
-  color: white;
-  text-shadow: 0 0 8px rgba(239,68,68,0.3);
-}
-
-.nav-icon { font-size: 18px; width: 20px; text-align: center; }
-
-.user-profile {
-  padding: 20px 24px;
-  border-top: 1px solid rgba(255,255,255,0.07);
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.avatar {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(145deg, #ef4444, #991b1b);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 16px;
-  box-shadow: 0 0 12px rgba(239,68,68,0.3);
-  flex-shrink: 0;
-}
-
-.main-content {
-  margin-left: 280px;
-  padding: 30px 34px;
-  position: relative;
-  z-index: 1;
-}
-
-.page { display: none; animation: fadeSlide 0.3s ease; }
-.page.active { display: block; }
-
-@keyframes fadeSlide {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.panel-section { display: none; }
-.panel-section.active { display: block; }
-
-/* PAGE HEADER */
-.page-header {
-  margin-bottom: 28px;
-}
-.page-header h1 {
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  background: linear-gradient(120deg, #ffffff 0%, #ef4444 50%, #ffffff 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: textShine 5s linear infinite;
-}
-.page-header p {
-  color: var(--text-dim);
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  margin-top: 4px;
-}
-
-/* STATS GRID */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4,1fr);
-  gap: 18px;
-  margin-bottom: 28px;
-}
-
-.stat-card {
-  padding: 22px 20px;
-  border-radius: 24px;
-  background: rgba(10,10,20,0.7);
-  border: 1px solid rgba(255,255,255,0.06);
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(239,68,68,0.5), transparent);
-}
-
-.stat-card:hover {
-  border-color: rgba(239,68,68,0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 20px rgba(239,68,68,0.05);
-}
-
-.stat-number {
-  font-size: 40px;
-  font-weight: 800;
-  font-family: 'Space Mono', monospace;
-  line-height: 1;
-}
-
-.stat-number.white { 
-  background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.stat-number.green { color: #22c55e; text-shadow: 0 0 16px rgba(34,197,94,0.4); }
-.stat-number.red { color: #ef4444; text-shadow: 0 0 16px rgba(239,68,68,0.4); }
-.stat-number.orange { color: #f97316; text-shadow: 0 0 16px rgba(249,115,22,0.4); }
-
-.stat-label {
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  margin-top: 8px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-/* CARD GRID */
-.card-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px;
-  margin-bottom: 28px;
-}
-
-.card {
-  padding: 26px;
-  border-radius: 28px;
-  background: rgba(10,10,20,0.65);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.07);
-  position: relative;
-  overflow: hidden;
-}
-
-.card::after {
-  content: '';
-  position: absolute;
-  top: -50%; right: -50%;
-  width: 100%; height: 100%;
-  background: radial-gradient(circle, rgba(239,68,68,0.04) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-.card h3 {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  margin-bottom: 20px;
-  color: rgba(255,255,255,0.9);
-}
-
-/* CHIP GROUP */
-.chip-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 10px 0 16px;
-}
-
-.chip {
-  background: rgba(25,25,40,0.9);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 6px 14px;
-  border-radius: 40px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.15s;
-  color: var(--text-secondary);
-}
-
-.chip:hover { border-color: rgba(239,68,68,0.4); color: white; }
-
-.chip.selected {
-  background: rgba(239,68,68,0.2);
-  border-color: rgba(239,68,68,0.6);
-  color: #ff8a8a;
-  box-shadow: 0 0 10px rgba(239,68,68,0.2);
-}
-
-/* TABLE */
-.table-glass {
-  border-radius: 24px;
-  overflow: hidden;
-  margin-top: 16px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(8,8,16,0.6);
-  backdrop-filter: blur(12px);
-}
-
-table { width: 100%; border-collapse: collapse; }
-
-th {
-  text-align: left;
-  padding: 16px 20px;
-  background: rgba(0,0,0,0.4);
-  color: var(--text-dim);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-td {
-  padding: 15px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  font-size: 13px;
-  vertical-align: middle;
-}
-
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(239,68,68,0.03); }
-
-/* BADGES */
-.badge {
-  padding: 5px 12px;
-  border-radius: 40px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.badge-active {
-  background: rgba(34,197,94,0.12);
-  color: #4ade80;
-  border: 1px solid rgba(34,197,94,0.25);
-  text-shadow: 0 0 8px rgba(34,197,94,0.4);
-  box-shadow: 0 0 8px rgba(34,197,94,0.1);
-}
-
-.badge-expired {
-  background: rgba(239,68,68,0.12);
-  color: #f87171;
-  border: 1px solid rgba(239,68,68,0.25);
-  text-shadow: 0 0 8px rgba(239,68,68,0.4);
-}
-
-.badge-soon {
-  background: rgba(249,115,22,0.12);
-  color: #fb923c;
-  border: 1px solid rgba(249,115,22,0.25);
-  text-shadow: 0 0 8px rgba(249,115,22,0.4);
-}
-
-/* EXPIRY COLORS */
-.expiry-critical { color: #f87171; font-weight: 700; text-shadow: 0 0 8px rgba(239,68,68,0.4); }
-.expiry-soon { color: #fb923c; font-weight: 600; text-shadow: 0 0 8px rgba(249,115,22,0.3); }
-.expiry-safe { color: #4ade80; text-shadow: 0 0 6px rgba(34,197,94,0.3); }
-
-/* DAYS REMAINING BADGE */
-.days-remaining {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 30px;
-  font-size: 11px;
-  font-weight: 700;
-  font-family: 'Space Mono', monospace;
-  letter-spacing: 0.3px;
-}
-
-.days-remaining.safe {
-  background: rgba(34,197,94,0.1);
-  border: 1px solid rgba(34,197,94,0.25);
-  color: #4ade80;
-}
-
-.days-remaining.warn {
-  background: rgba(249,115,22,0.1);
-  border: 1px solid rgba(249,115,22,0.3);
-  color: #fb923c;
-  animation: warnPulse 1.5s ease-in-out infinite;
-}
-
-.days-remaining.crit {
-  background: rgba(239,68,68,0.12);
-  border: 1px solid rgba(239,68,68,0.35);
-  color: #f87171;
-  animation: warnPulse 0.8s ease-in-out infinite;
-}
-
-@keyframes warnPulse {
-  0%,100% { opacity: 1; }
-  50% { opacity: 0.65; }
-}
-
-/* BUTTONS */
-.btn-icon {
-  background: none;
-  border: 1px solid rgba(239,68,68,0.3);
-  border-radius: 30px;
-  padding: 5px 12px;
-  color: #f87171;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 600;
-  transition: 0.15s;
-}
-
-.btn-icon:hover {
-  background: rgba(239,68,68,0.15);
-  border-color: rgba(239,68,68,0.6);
-  box-shadow: 0 0 8px rgba(239,68,68,0.2);
-}
-
-.copy-btn {
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  margin-left: 5px;
-  font-size: 11px;
-  padding: 2px 5px;
-  border-radius: 6px;
-  transition: 0.15s;
-}
-
-.copy-btn:hover { color: white; background: rgba(255,255,255,0.08); }
-
-.btn-refresh {
-  background: rgba(239,68,68,0.1);
-  border: 1px solid rgba(239,68,68,0.3);
-  color: #f87171;
-  padding: 10px 22px;
-  border-radius: 40px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  transition: 0.2s;
-}
-
-.btn-refresh:hover { background: rgba(239,68,68,0.2); box-shadow: 0 0 12px rgba(239,68,68,0.2); }
-
-/* SEARCH WRAP */
-.search-wrap {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 18px 0;
-  gap: 16px;
-}
-
-/* TOAST */
-.toast-gloss {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: rgba(5,5,12,0.92);
-  backdrop-filter: blur(24px);
-  padding: 14px 24px;
-  border-radius: 60px;
-  border: 1px solid rgba(239,68,68,0.4);
-  border-left: 4px solid var(--accent-neon);
-  z-index: 9999;
-  transform: translateY(100px);
-  opacity: 0;
-  transition: 0.35s cubic-bezier(0.2,0.9,0.4,1.1);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(239,68,68,0.1);
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.toast-gloss.show { transform: translateY(0); opacity: 1; }
-
-/* MODAL */
-.modal-glass {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(16px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-glass.open { display: flex; }
-
-.modal-card {
-  background: rgba(12,12,22,0.97);
-  backdrop-filter: blur(28px);
-  border-radius: 40px;
-  padding: 34px;
-  width: 380px;
-  border: 1px solid rgba(239,68,68,0.35);
-  box-shadow: 0 0 60px rgba(239,68,68,0.1);
-  animation: fadeSlide 0.25s ease;
-}
-
-.modal-card h3 {
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 16px;
-  color: #f87171;
-  text-shadow: 0 0 10px rgba(239,68,68,0.3);
-}
-
-.modal-btns { display: flex; gap: 14px; margin-top: 6px; }
-
-.result-msg { min-height: 20px; margin-top: 8px; font-size: 13px; }
-
-/* UID MONO */
-.uid-mono {
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  color: rgba(255,255,255,0.85);
-  letter-spacing: 0.3px;
-}
-</style>
-</head>
-<body>
-
-<!-- PARTICLE CANVAS -->
-<canvas id="particle-canvas"></canvas>
-
-<!-- AUTH GATE -->
-<div id="auth-gate">
-  <div class="auth-box">
-    <div class="auth-logo">
-      <span style="font-weight:800; font-size:28px;">SC</span>
-    </div>
-    <h2>STREAM <span class="auth-gradient">CORPORATION</span></h2>
-    <p style="text-align:center; font-size:11px; color:#6b7280; margin-bottom:14px; letter-spacing:1px;">// ADMIN PORTAL v5.0</p>
-    <div class="tab-switch">
-      <button class="tab-btn active" onclick="switchLoginTab('sub')">RESELLER</button>
-      <button class="tab-btn" onclick="switchLoginTab('main')">MASTER ADMIN</button>
-    </div>
-    <div id="login-sub">
-      <input type="text" id="sub-user" class="input-glow" placeholder="Reseller Username">
-      <input type="password" id="sub-pass" class="input-glow" placeholder="Password">
-      <button class="btn-glass" onclick="doSubLogin()">⟁ ACCESS PANEL</button>
-      <div class="result-msg" id="sub-login-err"></div>
-    </div>
-    <div id="login-main" style="display:none;">
-      <input type="password" id="main-key" class="input-glow" placeholder="Master Secret Key">
-      <button class="btn-glass" onclick="doMainLogin()">⛊ UNLOCK SYSTEM</button>
-      <div class="result-msg" id="main-login-err"></div>
-    </div>
-  </div>
-</div>
-
-<!-- APP LAYOUT -->
-<div id="app-layout">
-  <div class="sidebar">
-    <div class="brand">
-      <div class="brand-icon">
-        <span style="font-weight:800; font-size:18px;">SC</span>
-      </div>
-      <div>
-        <div class="brand-title">STREAM CORP</div>
-        <span style="font-size:10px; color:#6b7280; letter-spacing:1px;">MANAGEMENT PANEL</span>
-      </div>
-    </div>
-    <div class="nav-section">
-      <button class="nav-item active" id="nav-uids" onclick="switchMainTab('uids')">
-        <span class="nav-icon">🎮</span> UID VAULT
-      </button>
-      <button class="nav-item" id="nav-resellers" style="display:none;" onclick="switchMainTab('resellers')">
-        <span class="nav-icon">👥</span> RESELLERS
-      </button>
-      <button class="nav-item" onclick="doLogout()">
-        <span class="nav-icon">🚪</span> EXIT
-      </button>
-    </div>
-    <div class="user-profile">
-      <div class="avatar" id="sidebar-avatar">A</div>
-      <div>
-        <div id="sidebar-user" style="font-weight:700; font-size:14px;">Admin</div>
-        <div id="sidebar-role" style="font-size:11px; color:#ef4444; font-weight:600; text-shadow: 0 0 8px rgba(239,68,68,0.4);">Main Admin</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="main-content">
-    <!-- MAIN ADMIN PANEL -->
-    <div id="main-panel" class="page">
-
-      <!-- UID VAULT TAB -->
-      <div id="main-tab-uids" class="panel-section active">
-        <div class="page-header">
-          <h1>🎮 UID VAULT</h1>
-          <p>MANAGE & MONITOR ACTIVE LICENSES</p>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-number white" id="ms-total">—</div>
-            <div class="stat-label">Total UIDs</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number green" id="ms-active">—</div>
-            <div class="stat-label">Active</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number red" id="ms-expired">—</div>
-            <div class="stat-label">Expired</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number orange" id="ms-soon">—</div>
-            <div class="stat-label">Expiring ≤7d</div>
-          </div>
-        </div>
-
-        <div class="card-grid-2">
-          <div class="card">
-            <h3>➕ CREATE UID</h3>
-            <input type="text" id="m-uid" class="input-glow" placeholder="User ID (e.g. 123456789)">
-            <input type="text" id="m-name" class="input-glow" placeholder="Player Name">
-            <select id="m-days" class="input-glow">
-              <option value="1">1 Day</option>
-              <option value="7">7 Days</option>
-              <option value="15">15 Days</option>
-              <option value="30" selected>30 Days</option>
-              <option value="60">60 Days</option>
-              <option value="90">90 Days</option>
-              <option value="365">1 Year</option>
-            </select>
-            <div class="chip-group" id="m-chips"></div>
-            <button class="btn-glass" onclick="mainAddUID()">💾 SAVE & ACTIVATE</button>
-            <div class="result-msg" id="m-add-result"></div>
-          </div>
-          <div class="card">
-            <h3>⚙️ MANAGE UID</h3>
-            <input type="text" id="m-rm-uid" class="input-glow" placeholder="UID to remove">
-            <button class="btn-glass" style="background:linear-gradient(135deg,#7f1d1d,#450a0a); margin-bottom:18px;" onclick="mainRemoveUID()">🗑 REMOVE UID</button>
-            <div style="border-top:1px solid rgba(255,255,255,0.07); margin:10px 0 18px;"></div>
-            <input type="text" id="m-renew-uid" class="input-glow" placeholder="UID to extend">
-            <select id="m-renew-days" class="input-glow">
-              <option value="7">+7 Days</option>
-              <option value="15">+15 Days</option>
-              <option value="30" selected>+30 Days</option>
-              <option value="60">+60 Days</option>
-            </select>
-            <div class="chip-group" id="m-renew-chips"></div>
-            <button class="btn-glass" style="background:linear-gradient(135deg,#78350f,#451a03);" onclick="mainRenewUID()">↻ RENEW / EXTEND</button>
-            <div class="result-msg" id="m-rm-result"></div>
-          </div>
-        </div>
-
-        <div class="search-wrap">
-          <button class="btn-refresh" onclick="mainLoadUIDs()">⟳ REFRESH</button>
-          <input type="text" id="m-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Filter UID or Name">
-        </div>
-
-        <div class="table-glass">
-          <table>
-            <thead>
-              <tr>
-                <th>UID</th>
-                <th>NAME</th>
-                <th>DAYS</th>
-                <th>STATUS</th>
-                <th>EXPIRES</th>
-                <th>DAYS LEFT</th>
-                <th>ACTION</th>
-              </tr>
-            </thead>
-            <tbody id="main-uid-tbody">
-              <tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading nebula data...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- RESELLERS TAB -->
-      <div id="main-tab-resellers" class="panel-section">
-        <div class="page-header">
-          <h1>👥 RESELLERS</h1>
-          <p>MANAGE SUB-ADMIN ACCOUNTS</p>
-        </div>
-        <div class="card-grid-2">
-          <div class="card">
-            <h3>👑 CREATE RESELLER</h3>
-            <input id="new-res-user" class="input-glow" placeholder="Username">
-            <input type="password" id="new-res-pass" class="input-glow" placeholder="Password">
-            <input id="new-res-note" class="input-glow" placeholder="Note (optional)">
-            <button class="btn-glass" onclick="createReseller()">✨ CREATE RESELLER</button>
-            <div class="result-msg" id="res-create-result"></div>
-          </div>
-          <div class="card">
-            <h3>📋 RESELLER LIST</h3>
-            <button class="btn-refresh" style="margin-bottom:16px; width:100%;" onclick="loadResellers()">⟳ Refresh List</button>
-            <div class="table-glass">
-              <table>
-                <thead>
-                  <tr><th>Username</th><th>Note</th><th>Action</th></tr>
-                </thead>
-                <tbody id="reseller-tbody">
-                  <tr><td colspan="3" style="text-align:center; color:#6b7280;">—</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SUB PANEL (RESELLER) -->
-    <div id="sub-panel" class="page">
-      <div class="page-header">
-        <h1>🎮 MY UID VAULT</h1>
-        <p>RESELLER PANEL</p>
-      </div>
-      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="stat-card">
-          <div class="stat-number white" id="ss-total">—</div>
-          <div class="stat-label">Total</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number green" id="ss-active">—</div>
-          <div class="stat-label">Active</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number red" id="ss-expired">—</div>
-          <div class="stat-label">Expired</div>
-        </div>
-      </div>
-      <div class="card-grid-2">
-        <div class="card">
-          <h3>➕ ADD UID</h3>
-          <input id="s-uid" class="input-glow" placeholder="UID">
-          <input id="s-name" class="input-glow" placeholder="Name">
-          <select id="s-days" class="input-glow">
-            <option value="1">1 Day</option>
-            <option value="7">7 Days</option>
-            <option value="15">15 Days</option>
-            <option value="30" selected>30 Days</option>
-            <option value="60">60 Days</option>
-          </select>
-          <button class="btn-glass" onclick="subAddUID()">💾 SAVE</button>
-          <div class="result-msg" id="s-add-result"></div>
-        </div>
-        <div class="card">
-          <h3>⚙️ MANAGE</h3>
-          <input id="s-rm-uid" placeholder="UID to remove" class="input-glow">
-          <button class="btn-glass" style="background:linear-gradient(135deg,#7f1d1d,#450a0a); margin-bottom:16px;" onclick="subRemoveUID()">🗑 REMOVE</button>
-          <div style="border-top:1px solid rgba(255,255,255,0.07); margin:10px 0 16px;"></div>
-          <input id="s-renew-uid" class="input-glow" placeholder="UID to renew">
-          <select id="s-renew-days" class="input-glow">
-            <option value="7">+7 Days</option>
-            <option value="15">+15 Days</option>
-            <option value="30" selected>+30 Days</option>
-          </select>
-          <button class="btn-glass" style="background:linear-gradient(135deg,#78350f,#451a03);" onclick="subRenewUID()">↻ RENEW</button>
-          <div class="result-msg" id="s-rm-result"></div>
-        </div>
-      </div>
-      <div class="search-wrap">
-        <button class="btn-refresh" onclick="subLoadUIDs()">⟳ REFRESH</button>
-        <input id="s-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Search UID or Name">
-      </div>
-      <div class="table-glass">
-        <table>
-          <thead>
-            <tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th></tr>
-          </thead>
-          <tbody id="sub-uid-tbody">
-            <tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="toastMsg" class="toast-gloss"></div>
-
-<div id="modalDelete" class="modal-glass">
-  <div class="modal-card">
-    <h3>⚠️ DESTROY UID</h3>
-    <p id="modal-text" style="margin:16px 0; color:#9ca3af; font-size:14px;">Are you sure?</p>
-    <div class="modal-btns">
-      <button class="btn-glass" style="background:linear-gradient(135deg,#dc2626,#7f1d1d);" onclick="confirmDeleteAction()">🗑 DELETE</button>
-      <button class="btn-glass" style="background:rgba(30,30,40,0.8); border:1px solid rgba(255,255,255,0.1);" onclick="closeModalAction()">CANCEL</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ===== PARTICLE SYSTEM (same as before) =====
-(function(){
-  const canvas = document.getElementById('particle-canvas');
-  const ctx = canvas.getContext('2d');
-  let W, H, particles = [], mouse = {x: -999, y: -999};
-
-  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-
-  const COLORS = ['rgba(239,68,68,', 'rgba(59,130,246,', 'rgba(139,92,246,', 'rgba(249,115,22,', 'rgba(34,197,94,'];
-  function createParticle(){ return { x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, r: Math.random() * 1.5 + 0.3, alpha: Math.random() * 0.5 + 0.1, color: COLORS[Math.floor(Math.random() * COLORS.length)], pulse: Math.random() * Math.PI * 2, pulseSpeed: Math.random() * 0.02 + 0.005 }; }
-  for(let i = 0; i < 120; i++) particles.push(createParticle());
-
-  function draw(){
-    ctx.clearRect(0, 0, W, H);
-    for(let i = 0; i < particles.length; i++){
-      for(let j = i+1; j < particles.length; j++){
-        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx*dx + dy*dy);
-        if(dist < 100){ ctx.beginPath(); ctx.strokeStyle = `rgba(239,68,68,${0.06 * (1 - dist/100)})`; ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); }
-      }
-    }
-    const orbs = [{x: W*0.15, y: H*0.3, r: 220, color: 'rgba(239,68,68,0.04)'},{x: W*0.85, y: H*0.7, r: 200, color: 'rgba(59,130,246,0.03)'},{x: W*0.5, y: H*0.5, r: 300, color: 'rgba(139,92,246,0.02)'}];
-    orbs.forEach(o => { const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r); g.addColorStop(0, o.color); g.addColorStop(1, 'transparent'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2); ctx.fill(); });
-    particles.forEach(p => { p.pulse += p.pulseSpeed; const a = p.alpha * (0.7 + 0.3 * Math.sin(p.pulse)); const mdx = p.x - mouse.x, mdy = p.y - mouse.y, mdist = Math.sqrt(mdx*mdx + mdy*mdy); if(mdist < 120){ const force = (120 - mdist) / 120; const gA = 0.12 * force; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (1 + force * 3), 0, Math.PI*2); ctx.fillStyle = p.color + (gA) + ')'; ctx.fill(); } ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fillStyle = p.color + a + ')'; ctx.fill(); ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI*2); ctx.fillStyle = p.color + (a * 0.15) + ')'; ctx.fill(); p.x += p.vx; if(p.x < 0) p.x = W; if(p.x > W) p.x = 0; if(p.y < 0) p.y = H; if(p.y > H) p.y = 0; });
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-// ===== SESSION & STATE =====
-let SESSION = {role:null, adminKey:null, username:null, password:null};
-let allMainUIDs = [], allSubUIDs = [];
-let pendingUID = null, pendingIsMain = false;
-
-function saveSession(){ try{ localStorage.setItem('rp_s', JSON.stringify(SESSION)); }catch(e){} }
-function loadSession(){ try{ const s=localStorage.getItem('rp_s'); if(s) SESSION=JSON.parse(s); }catch(e){} }
-function clearSession(){ SESSION={role:null,adminKey:null,username:null,password:null}; localStorage.removeItem('rp_s'); }
-
-// ===== UI HELPERS =====
-function showToast(msg, type='success'){
-  const t = document.getElementById('toastMsg');
-  t.textContent = (type==='success' ? '✨ ' : '⚠️ ') + msg;
-  t.style.borderLeftColor = type==='success' ? '#22c55e' : '#ef4444';
-  t.className = 'toast-gloss show';
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-function showResult(elId, msg, type){
-  let el = document.getElementById(elId);
-  if(!el) return;
-  el.innerHTML = `<span style="color:${type==='success'?'#4ade80':'#f87171'}; font-size:12px; font-weight:600;">${msg}</span>`;
-  setTimeout(() => el.innerHTML = '', 3500);
-}
-
-// ===== DAYS REMAINING CALCULATOR =====
-function calculateRemaining(expiryDateStr){
-  if(!expiryDateStr) return null;
-  const exp = new Date(expiryDateStr);
-  const now = new Date();
-  const diffMs = exp - now;
-  if(diffMs <= 0) return 0;
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-}
-
-function renderDaysLeftBadge(remaining){
-  if(remaining === null) return '';
-  if(remaining <= 0) return `<span class="days-remaining crit">EXPIRED</span>`;
-  if(remaining <= 3) return `<span class="days-remaining crit">⚡ ${remaining}d</span>`;
-  if(remaining <= 7) return `<span class="days-remaining warn">⏳ ${remaining}d</span>`;
-  return `<span class="days-remaining safe">✓ ${remaining}d</span>`;
-}
-
-function formatExpiry(expiryDateStr){
-  if(!expiryDateStr) return '<span style="color:#6b7280;">—</span>';
-  const d = new Date(expiryDateStr);
-  return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
-}
-
-// ===== AUTH =====
-function switchLoginTab(tab){
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (tab==='sub'&&i===0)||(tab==='main'&&i===1)));
-  document.getElementById('login-sub').style.display = tab==='sub' ? 'block' : 'none';
-  document.getElementById('login-main').style.display = tab==='main' ? 'block' : 'none';
-}
-
-async function doMainLogin(){
-  const key = document.getElementById('main-key').value.trim();
-  if(!key) return showResult('main-login-err','Enter Master Key','error');
-  try{
-    const res = await fetch('/admin/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:key})});
-    const data = await res.json();
-    if(!res.ok) return showResult('main-login-err','✗ '+(data.message||'Invalid key'),'error');
-    SESSION = {role:'main_admin', adminKey:key, username:null, password:null};
-    saveSession(); enterMainPanel();
-  }catch(e){ showResult('main-login-err','Connection error','error'); }
-}
-
-async function doSubLogin(){
-  const u = document.getElementById('sub-user').value.trim();
-  const p = document.getElementById('sub-pass').value.trim();
-  if(!u||!p) return showResult('sub-login-err','Enter credentials','error');
-  try{
-    const res = await fetch('/subadmin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})});
-    const data = await res.json();
-    if(!res.ok) return showResult('sub-login-err','✗ '+(data.message||'Invalid credentials'),'error');
-    SESSION = {role:'sub_admin', adminKey:null, username:u, password:p};
-    saveSession(); enterSubPanel();
-  }catch(e){ showResult('sub-login-err','Connection error','error'); }
-}
-
-function enterMainPanel(){
-  document.getElementById('auth-gate').style.display = 'none';
-  document.getElementById('app-layout').style.display = 'flex';
-  document.getElementById('main-panel').classList.add('active');
-  document.getElementById('sub-panel').classList.remove('active');
-  showHeader('main_admin', null);
-  mainLoadUIDs();
-}
-
-function enterSubPanel(){
-  document.getElementById('auth-gate').style.display = 'none';
-  document.getElementById('app-layout').style.display = 'flex';
-  document.getElementById('sub-panel').classList.add('active');
-  document.getElementById('main-panel').classList.remove('active');
-  showHeader('sub_admin', SESSION.username);
-  subLoadUIDs();
-}
-
-function showHeader(role, uname){
-  document.getElementById('sidebar-role').textContent = role==='main_admin' ? 'MAIN ADMIN' : 'RESELLER';
-  if(uname){
-    document.getElementById('sidebar-user').textContent = uname;
-    document.getElementById('sidebar-avatar').textContent = uname[0].toUpperCase();
-  } else {
-    document.getElementById('sidebar-user').textContent = 'ADMINISTRATOR';
-    document.getElementById('sidebar-avatar').textContent = 'A';
-  }
-  document.getElementById('nav-resellers').style.display = role==='main_admin' ? 'flex' : 'none';
-}
-
-function switchMainTab(tab){
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('nav-'+tab).classList.add('active');
-  document.querySelectorAll('#main-panel .panel-section').forEach(s => s.classList.remove('active'));
-  document.getElementById('main-tab-'+tab).classList.add('active');
-  if(tab==='resellers') loadResellers();
-}
-
-function doLogout(){
-  clearSession();
-  document.getElementById('app-layout').style.display = 'none';
-  document.getElementById('auth-gate').style.display = 'flex';
-  document.getElementById('main-panel').classList.remove('active');
-  document.getElementById('sub-panel').classList.remove('active');
-}
-
-// ===== RENDER ROW =====
-function renderUIDRow(u, isMain){
-  const uidVal = u.uid || u.id || u.user_id || '?';
-  const name = u.name || u.username || u.player || '—';
-  const days = u.days !== undefined ? u.days : '—';
-  const expRaw = u.expires_at || u.expiry || u.expire || null;
-
-  let badgeHtml = '';
-  let remaining = null;
-
-  if(expRaw){
-    remaining = calculateRemaining(expRaw);
-    if(remaining <= 0){
-      badgeHtml = '<span class="badge badge-expired">✖ EXPIRED</span>';
-    } else if(remaining <= 7){
-      badgeHtml = '<span class="badge badge-soon">⚠ SOON</span>';
-    } else {
-      badgeHtml = '<span class="badge badge-active">● ACTIVE</span>';
-    }
-  } else {
-    badgeHtml = '<span class="badge badge-active">● ACTIVE</span>';
-  }
-
-  const expiryStr = formatExpiry(expRaw);
-  const daysLeftHtml = renderDaysLeftBadge(remaining);
-  const rmFn = isMain ? `openModal('${uidVal}',true)` : `openModal('${uidVal}',false)`;
-
-  return `<tr>
-    <td><span class="uid-mono">${uidVal}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${uidVal}');showToast('Copied!')">📋</button></td>
-    <td style="font-weight:600; color:rgba(255,255,255,0.85);">${name}</td>
-    <td><span style="font-family:'Space Mono',monospace; font-size:13px; color:#9ca3af;">${days}d</span></td>
-    <td>${badgeHtml}</td>
-    <td style="font-size:12px; color:#9ca3af;">${expiryStr}</td>
-    <td>${daysLeftHtml}</td>
-    <td><button class="btn-icon" onclick="${rmFn}">DELETE</button></td>
-  </tr>`;
-}
-
-// ===== STATS =====
-function calcStats(uids, tId, aId, eId, sId){
-  let active=0, expired=0, soon=0;
-  uids.forEach(u => {
-    const exp = u.expires_at || u.expiry || u.expire || null;
-    if(exp){
-      const diff = calculateRemaining(exp);
-      if(diff <= 0) expired++;
-      else if(diff <= 7) soon++;
-      else active++;
-    } else {
-      active++;
-    }
-  });
-  document.getElementById(tId).textContent = uids.length;
-  document.getElementById(aId).textContent = active;
-  document.getElementById(eId).textContent = expired;
-  if(sId) document.getElementById(sId).textContent = soon;
-}
-
-// ===== MAIN UID FUNCTIONS =====
-async function mainLoadUIDs(){
-  const tb = document.getElementById('main-uid-tbody');
-  tb.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:30px;">Loading...</td></tr>';
-  try{
-    const res = await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey));
-    const data = await res.json();
-    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171; text-align:center;">Error: ${data.message}</td></tr>`; return; }
-    allMainUIDs = data.licenses || [];
-    renderMainTable(allMainUIDs);
-    calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
-  }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
-}
-
-function renderMainTable(uids){
-  const tb = document.getElementById('main-uid-tbody');
-  tb.innerHTML = uids.length ? uids.map(u => renderUIDRow(u,true)).join('') : '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">✨ No UIDs found</td></tr>';
-}
-
-function filterMainTable(){
-  const q = document.getElementById('m-search').value.toLowerCase();
-  renderMainTable(allMainUIDs.filter(u => (u.uid||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q)));
-}
-
-async function mainAddUID(){
-  const uid = document.getElementById('m-uid').value.trim();
-  const name = document.getElementById('m-name').value.trim() || 'Player';
-  const days = document.getElementById('m-days').value;
-  if(!uid) return showToast('UID required','error');
-  const res = await fetch('/admin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid, name, days:parseInt(days)})});
-  const data = await res.json();
-  if(res.ok){ showToast('UID created!'); showResult('m-add-result','✓ UID added','success'); document.getElementById('m-uid').value=''; document.getElementById('m-name').value=''; mainLoadUIDs(); }
-  else { showToast(data.message,'error'); showResult('m-add-result','✗ '+data.message,'error'); }
-}
-
-async function mainRenewUID(){
-  const uid = document.getElementById('m-renew-uid').value.trim();
-  const days = document.getElementById('m-renew-days').value;
-  if(!uid) return showToast('Enter UID','error');
-  const res = await fetch('/admin/update', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid, days:parseInt(days)})});
-  const data = await res.json();
-  if(res.ok){ showToast(`Renewed +${days} days`); showResult('m-rm-result','✓ Renewed','success'); document.getElementById('m-renew-uid').value=''; mainLoadUIDs(); }
-  else showToast(data.message,'error');
-}
-
-function mainRemoveUID(){
-  const uid = document.getElementById('m-rm-uid').value.trim();
-  if(!uid) return showToast('Enter UID','error');
-  openModal(uid, true);
-}
-
-// ===== SUB UID FUNCTIONS =====
-async function subLoadUIDs(){
-  const tb = document.getElementById('sub-uid-tbody');
-  tb.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:30px;">Loading...</td></tr>';
-  try{
-    const res = await fetch('/subadmin/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
-    const data = await res.json();
-    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171;">Error: ${data.message}</td></tr>`; return; }
-    allSubUIDs = data.licenses || [];
-    renderSubTable(allSubUIDs);
-    calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
-  }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
-}
-
-function renderSubTable(uids){
-  const tb = document.getElementById('sub-uid-tbody');
-  tb.innerHTML = uids.length ? uids.map(u => renderUIDRow(u,false)).join('') : '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">No UIDs found</td></tr>';
-}
-
-function filterSubTable(){
-  const q = document.getElementById('s-search').value.toLowerCase();
-  renderSubTable(allSubUIDs.filter(u => (u.uid||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q)));
-}
-
-async function subAddUID(){
-  const uid = document.getElementById('s-uid').value.trim();
-  const name = document.getElementById('s-name').value.trim() || 'Player';
-  const days = document.getElementById('s-days').value;
-  if(!uid) return showToast('UID required','error');
-  const res = await fetch('/subadmin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, name, days:parseInt(days)})});
-  if(res.ok){ showToast('UID added'); showResult('s-add-result','✓ Added','success'); document.getElementById('s-uid').value=''; document.getElementById('s-name').value=''; subLoadUIDs(); }
-  else { const data = await res.json(); showToast(data.message,'error'); }
-}
-
-async function subRenewUID(){
-  const uid = document.getElementById('s-renew-uid').value.trim();
-  const days = document.getElementById('s-renew-days').value;
-  if(!uid) return showToast('Enter UID','error');
-  const res = await fetch('/subadmin/update', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, days:parseInt(days)})});
-  if(res.ok){ showToast(`Renewed +${days} days`); showResult('s-rm-result','✓ Renewed','success'); document.getElementById('s-renew-uid').value=''; subLoadUIDs(); }
-  else { const data = await res.json(); showToast(data.message,'error'); }
-}
-
-function subRemoveUID(){
-  const uid = document.getElementById('s-rm-uid').value.trim();
-  if(!uid) return showToast('Enter UID','error');
-  openModal(uid, false);
-}
-
-// ===== MODAL =====
-function openModal(uid, isMain){
-  pendingUID = uid; pendingIsMain = isMain;
-  document.getElementById('modal-text').innerHTML = `Remove UID <span style="font-family:monospace; color:#f87171; font-weight:700;">${uid}</span>?<br><span style="font-size:12px; color:#6b7280;">This action is irreversible.</span>`;
-  document.getElementById('modalDelete').classList.add('open');
-}
-
-function closeModalAction(){
-  document.getElementById('modalDelete').classList.remove('open');
-  pendingUID = null;
-}
-
-async function confirmDeleteAction(){
-  if(!pendingUID) return closeModalAction();
-  const uid = pendingUID, isMain = pendingIsMain;
-  closeModalAction();
-  let res;
-  if(isMain){
-    res = await fetch('/admin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid})});
-  } else {
-    res = await fetch('/subadmin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid})});
-  }
-  const data = await res.json();
-  if(res.ok && data.status==='success'){ showToast('UID revoked'); isMain ? mainLoadUIDs() : subLoadUIDs(); }
-  else showToast(data.message||'Failed','error');
-}
-
-// ===== RESELLER MANAGEMENT =====
-async function createReseller(){
-  const u = document.getElementById('new-res-user').value.trim();
-  const p = document.getElementById('new-res-pass').value.trim();
-  const n = document.getElementById('new-res-note').value.trim();
-  if(!u||!p) return showToast('Fill username/password','error');
-  const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n})});
-  if(res.ok){ showToast('Reseller created'); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); loadResellers(); }
-  else { const d = await res.json(); showToast(d.message,'error'); }
-}
-
-async function loadResellers(){
-  const tb = document.getElementById('reseller-tbody');
-  tb.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
-  const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
-  const data = await res.json();
-  if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="3" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
-  tb.innerHTML = data.subadmins.map(s => `<tr>
-    <td><span class="badge badge-active">${s.username}</span></td>
-    <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
-    <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
-  </tr>`).join('');
-}
-
-async function deleteReseller(uname){
-  if(!confirm(`Delete reseller: ${uname}?`)) return;
-  const res = await fetch('/admin/delete-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:uname})});
-  if(res.ok){ showToast('Reseller deleted'); loadResellers(); }
-}
-
-// ===== EVENT LISTENERS =====
-document.getElementById('m-search').addEventListener('input', filterMainTable);
-document.getElementById('s-search').addEventListener('input', filterSubTable);
-
-// ===== CHIPS =====
-function genChips(containerId, selectId, optionsArr){
-  const wrap = document.getElementById(containerId);
-  if(!wrap) return;
-  const sel = document.getElementById(selectId);
-  wrap.innerHTML = '';
-  optionsArr.forEach(v => {
-    const chip = document.createElement('span');
-    chip.className = 'chip' + (parseInt(sel.value)===v ? ' selected' : '');
-    chip.innerText = v + 'd';
-    chip.onclick = () => {
-      sel.value = v;
-      document.querySelectorAll('#'+containerId+' .chip').forEach(c => c.classList.remove('selected'));
-      chip.classList.add('selected');
-    };
-    wrap.appendChild(chip);
-  });
-}
-
-window.onload = () => {
-  genChips('m-chips', 'm-days', [1,7,15,30,60,90,365]);
-  genChips('m-renew-chips', 'm-renew-days', [7,15,30,60]);
-};
-
-// ===== AUTO-LOGIN =====
-(async function init(){
-  loadSession();
-  if(SESSION.role==='main_admin' && SESSION.adminKey){
-    try{
-      const r = await fetch('/admin/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey})});
-      if(r.ok){ enterMainPanel(); return; }
-    }catch(e){}
-    clearSession();
-  }
-  if(SESSION.role==='sub_admin' && SESSION.username){
-    try{
-      const r = await fetch('/subadmin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password})});
-      if(r.ok){ enterSubPanel(); return; }
-    }catch(e){}
-    clearSession();
-  }
-})();
-</script>
-</body>
+import os
+import requests
+import threading
+import time
+from flask import Flask, request, jsonify, render_template
+from dotenv import load_dotenv
+from pymongo import MongoClient
+from datetime import datetime, timedelta
+
+load_dotenv()
+
+app = Flask(__name__)
+
+# CONFIG
+SENSIX_BASE   = os.environ.get("SENSIX_BASE", "http://new.sensix.shop:2005")
+SENSIX_APIKEY = os.environ.get("SENSIX_APIKEY", "SENSIX-6E1D04F888A3CC09C952D58EE63971C919D777C43EB90B5E")
+ADMIN_KEY     = os.environ.get("ADMIN_KEY", "changeme_admin_key")
+SELF_URL      = os.environ.get("SELF_URL", "")  # e.g. https://your-app.onrender.com
+
+# MONGODB SETUP
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://NAYEM:1122@cluster0.ywmyozb.mongodb.net/?appName=Cluster0")
+try:
+    mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000, tls=True, tlsAllowInvalidCertificates=True)
+    mongo_client.server_info()
+    db = mongo_client["sensix_panel"]
+    subadmins_col    = db["subadmins"]
+    uid_ownership_col = db["uid_ownership"]
+    print("MongoDB connected OK")
+except Exception as e:
+    print(f"MongoDB FAILED: {e}")
+    mongo_client      = None
+    db                = None
+    subadmins_col     = None
+    uid_ownership_col = None
+
+SENSIX_HEADERS = {
+    "X-AUTH-KEY": SENSIX_APIKEY,
+    "Content-Type": "application/json"
+}
+
+def sensix(method, path, **kwargs):
+    url = f"{SENSIX_BASE}{path}"
+    try:
+        r = requests.request(method, url, headers=SENSIX_HEADERS, timeout=20, **kwargs)
+        try:
+            return r.json(), r.status_code
+        except Exception:
+            return {"error": r.text}, r.status_code
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}, 503
+
+
+# ===== SELF PING (Render sleep prevention) =====
+def self_ping():
+    """Every 5 minutes ping self to prevent Render from sleeping"""
+    while True:
+        time.sleep(300)  # 5 minutes
+        if SELF_URL:
+            try:
+                requests.get(SELF_URL + "/ping", timeout=10)
+                print(f"[SELF-PING] OK — {datetime.utcnow().strftime('%H:%M:%S')}")
+            except Exception as e:
+                print(f"[SELF-PING] Failed: {e}")
+
+ping_thread = threading.Thread(target=self_ping, daemon=True)
+ping_thread.start()
+
+@app.route('/ping')
+def ping():
+    return jsonify({"status": "alive", "time": datetime.utcnow().isoformat()}), 200
+
+
+# ===== HELPERS =====
+def merge_expiry(uids):
+    """Merge expires_at from MongoDB into UID list"""
+    if uid_ownership_col is None:
+        return uids
+    for u in uids:
+        uid_val = u.get("uid") or u.get("id") or ""
+        if not uid_val:
+            continue
+        doc = uid_ownership_col.find_one({"uid": uid_val})
+        if doc:
+            u["expires_at"] = doc.get("expires_at", "")
+            if not u.get("name"):
+                u["name"] = doc.get("name", "")
+            if not u.get("days"):
+                u["days"] = doc.get("days", "")
+    return uids
+
+def save_uid_meta(uid, name, days, owner="main_admin", extend=False):
+    """Save or update UID metadata (expires_at) in MongoDB"""
+    if uid_ownership_col is None:
+        return
+    if extend:
+        doc = uid_ownership_col.find_one({"uid": uid})
+        if doc and doc.get("expires_at"):
+            try:
+                old_exp = datetime.fromisoformat(doc["expires_at"])
+                new_exp = max(old_exp, datetime.utcnow()) + timedelta(days=days)
+            except Exception:
+                new_exp = datetime.utcnow() + timedelta(days=days)
+        else:
+            new_exp = datetime.utcnow() + timedelta(days=days)
+    else:
+        new_exp = datetime.utcnow() + timedelta(days=days)
+
+    uid_ownership_col.update_one(
+        {"uid": uid},
+        {"$set": {
+            "uid": uid,
+            "name": name,
+            "days": days,
+            "owner": owner,
+            "expires_at": new_exp.isoformat(),
+            "added_at": datetime.utcnow().isoformat()
+        }},
+        upsert=True
+    )
+
+
+# ===== FRONTEND =====
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+# ===== MAIN ADMIN AUTH =====
+@app.route('/admin/verify', methods=['POST'])
+def admin_verify():
+    data = request.json or {}
+    if data.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    return jsonify({"status": "success", "role": "main_admin"}), 200
+
+
+# ===== ADMIN — LIST =====
+@app.route('/admin/list', methods=['GET'])
+def admin_list():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    data, code = sensix("GET", "/api/v1/uids/list")
+    if code != 200:
+        return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
+    uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
+    uids = [u for u in uids if u.get("status", "active") != "removed"]
+    uids = merge_expiry(uids)
+    return jsonify({"status": "success", "total": len(uids), "licenses": uids}), 200
+
+
+# ===== ADMIN — CREATE =====
+@app.route('/admin/create', methods=['POST'])
+def admin_create():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    uid  = body.get("uid", "").strip()
+    days = int(body.get("days", 30))
+    name = body.get("name", "Player").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+    data, code = sensix("POST", "/api/v1/uids/add", json={"uid": uid, "days": days, "name": name})
+    if code in (200, 201):
+        save_uid_meta(uid, name, days, owner="main_admin", extend=False)
+        return jsonify({"status": "success", "message": "UID added", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+# ===== ADMIN — REVOKE =====
+@app.route('/admin/revoke', methods=['POST'])
+def admin_revoke():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    uid = body.get("uid", "").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+    data, code = sensix("POST", "/api/v1/uids/remove", json={"uid": uid})
+    if uid_ownership_col is not None:
+        uid_ownership_col.delete_one({"uid": uid})
+    if code == 200:
+        return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+# ===== ADMIN — UPDATE/RENEW =====
+@app.route('/admin/update', methods=['POST'])
+def admin_update():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    uid  = body.get("uid", "").strip()
+    days = int(body.get("days", 30))
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+    data, code = sensix("POST", f"/api/v1/uids/{uid}/renew", json={"days": days})
+    if code in (200, 201):
+        # Get existing name
+        existing_name = "Player"
+        if uid_ownership_col is not None:
+            doc = uid_ownership_col.find_one({"uid": uid})
+            if doc:
+                existing_name = doc.get("name", "Player")
+        save_uid_meta(uid, existing_name, days, extend=True)
+        return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+# ===== SUB-ADMIN MANAGEMENT =====
+@app.route('/admin/create-subadmin', methods=['POST'])
+def create_subadmin():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if subadmins_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+    note     = body.get("note", "").strip()
+    if not username or not password:
+        return jsonify({"status": "error", "message": "username and password required"}), 400
+    if subadmins_col.find_one({"username": username}):
+        return jsonify({"status": "error", "message": "Username already exists"}), 409
+    subadmins_col.insert_one({
+        "username": username,
+        "password": password,
+        "note": note,
+        "created_at": datetime.utcnow()
+    })
+    return jsonify({"status": "success", "message": f"Sub-admin '{username}' created"}), 200
+
+
+@app.route('/admin/list-subadmins', methods=['GET'])
+def list_subadmins():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if subadmins_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+    result = [
+        {"username": sa["username"], "note": sa.get("note", ""), "active": True}
+        for sa in subadmins_col.find({}, {"_id": 0, "password": 0})
+    ]
+    return jsonify({"status": "success", "subadmins": result}), 200
+
+
+@app.route('/admin/delete-subadmin', methods=['POST'])
+def delete_subadmin():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if subadmins_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+    username = body.get("username", "").strip()
+    result = subadmins_col.delete_one({"username": username})
+    if result.deleted_count == 0:
+        return jsonify({"status": "error", "message": "Sub-admin not found"}), 404
+    return jsonify({"status": "success", "message": f"Sub-admin '{username}' deleted"}), 200
+
+
+# ===== SUB-ADMIN AUTH =====
+def verify_subadmin(username, password):
+    if subadmins_col is None:
+        return False
+    return subadmins_col.find_one({"username": username, "password": password}) is not None
+
+
+@app.route('/subadmin/login', methods=['POST'])
+def subadmin_login():
+    body = request.json or {}
+    if verify_subadmin(body.get("username", ""), body.get("password", "")):
+        return jsonify({"status": "success", "role": "sub_admin", "username": body["username"]}), 200
+    return jsonify({"status": "error", "message": "Invalid credentials"}), 403
+
+
+# ===== SUB-ADMIN — LIST =====
+@app.route('/subadmin/list', methods=['GET'])
+def subadmin_list():
+    username = request.args.get("username", "")
+    password = request.args.get("password", "")
+    if not verify_subadmin(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    data, code = sensix("GET", "/api/v1/uids/list")
+    if code != 200:
+        return jsonify({"status": "error", "message": data.get("error", "Sensix error")}), code
+    all_uids = data if isinstance(data, list) else data.get("uids", data.get("data", []))
+    all_uids = [u for u in all_uids if u.get("status", "active") != "removed"]
+    if uid_ownership_col is not None:
+        owned = set(
+            doc["uid"] for doc in uid_ownership_col.find({"owner": username}, {"uid": 1})
+        )
+        my_uids = [u for u in all_uids if (u.get("uid") or u.get("id") or "") in owned]
+    else:
+        my_uids = all_uids
+    my_uids = merge_expiry(my_uids)
+    return jsonify({"status": "success", "total": len(my_uids), "licenses": my_uids}), 200
+
+
+# ===== SUB-ADMIN — CREATE =====
+@app.route('/subadmin/create', methods=['POST'])
+def subadmin_create():
+    body = request.json or {}
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_subadmin(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    uid  = body.get("uid", "").strip()
+    days = int(body.get("days", 30))
+    name = body.get("name", "Player").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+    data, code = sensix("POST", "/api/v1/uids/add", json={"uid": uid, "days": days, "name": name})
+    if code in (200, 201):
+        save_uid_meta(uid, name, days, owner=username, extend=False)
+        return jsonify({"status": "success", "message": "UID added", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+# ===== SUB-ADMIN — REVOKE =====
+@app.route('/subadmin/revoke', methods=['POST'])
+def subadmin_revoke():
+    body = request.json or {}
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_subadmin(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    uid = body.get("uid", "").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+    if uid_ownership_col is not None:
+        ownership = uid_ownership_col.find_one({"uid": uid})
+        if ownership and ownership.get("owner") != username:
+            return jsonify({"status": "error", "message": "You can only remove UIDs you added"}), 403
+    data, code = sensix("POST", "/api/v1/uids/remove", json={"uid": uid})
+    if uid_ownership_col is not None:
+        uid_ownership_col.delete_one({"uid": uid})
+    if code == 200:
+        return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+# ===== SUB-ADMIN — UPDATE/RENEW =====
+@app.route('/subadmin/update', methods=['POST'])
+def subadmin_update():
+    body = request.json or {}
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_subadmin(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    uid  = body.get("uid", "").strip()
+    days = int(body.get("days", 30))
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+    data, code = sensix("POST", f"/api/v1/uids/{uid}/renew", json={"days": days})
+    if code in (200, 201):
+        existing_name = "Player"
+        if uid_ownership_col is not None:
+            doc = uid_ownership_col.find_one({"uid": uid})
+            if doc:
+                existing_name = doc.get("name", "Player")
+        save_uid_meta(uid, existing_name, days, owner=username, extend=True)
+        return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "Sensix error"))}), code
+
+
+# ===== DB STATUS =====
+@app.route('/admin/db-status', methods=['GET'])
+def db_status():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if subadmins_col is None:
+        return jsonify({"status": "error", "message": "MongoDB NOT connected"}), 500
+    return jsonify({"status": "success", "message": "MongoDB connected OK"}), 200
+
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8002))
+    app.run(host='0.0.0.0', port=port, debug=False)
