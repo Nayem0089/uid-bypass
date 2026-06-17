@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>STREAM CORPORATION | ADMIN PORTAL v5.0</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>STREAM CORPORATION | CREDIT SYSTEM v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -13,10 +13,6 @@
   --glass-surface: rgba(15, 15, 25, 0.65);
   --glass-stroke: rgba(255, 255, 255, 0.08);
   --accent-neon: #ef4444;
-  --accent-glow: #ff5a5a;
-  --green-neon: #22c55e;
-  --orange-neon: #f97316;
-  --blue-neon: #3b82f6;
   --text-primary: #f0f2fc;
   --text-secondary: #9ca3af;
   --text-dim: #6b7280;
@@ -31,7 +27,6 @@ body {
   overflow-x: hidden;
 }
 
-/* PARTICLE CANVAS */
 #particle-canvas {
   position: fixed;
   top: 0; left: 0;
@@ -40,7 +35,6 @@ body {
   z-index: 0;
 }
 
-/* GLASS CORE */
 .sidebar, .card, .stat-card, .auth-box, .table-glass {
   background: var(--glass-surface);
   backdrop-filter: blur(14px);
@@ -51,7 +45,6 @@ body {
   z-index: 1;
 }
 
-/* AUTH GATE */
 #auth-gate {
   min-height: 100vh;
   display: flex;
@@ -70,7 +63,7 @@ body {
   background: rgba(8, 8, 18, 0.82);
   border-radius: 40px;
   border: 1px solid rgba(239, 68, 68, 0.3);
-  box-shadow: 0 0 60px rgba(239,68,68,0.08), 0 0 120px rgba(59,130,246,0.04);
+  box-shadow: 0 0 60px rgba(239,68,68,0.08);
 }
 
 .auth-logo {
@@ -85,13 +78,13 @@ body {
   font-weight: 800;
   margin: 0 auto 22px;
   border: 1px solid rgba(239,68,68,0.6);
-  box-shadow: 0 0 24px rgba(239,68,68,0.35), inset 0 0 20px rgba(239,68,68,0.08);
+  box-shadow: 0 0 24px rgba(239,68,68,0.35);
   animation: logoPulse 3s ease-in-out infinite;
 }
 
 @keyframes logoPulse {
-  0%,100% { box-shadow: 0 0 24px rgba(239,68,68,0.35), inset 0 0 20px rgba(239,68,68,0.08); }
-  50% { box-shadow: 0 0 40px rgba(239,68,68,0.55), inset 0 0 30px rgba(239,68,68,0.15); }
+  0%,100% { box-shadow: 0 0 24px rgba(239,68,68,0.35); }
+  50% { box-shadow: 0 0 40px rgba(239,68,68,0.55); }
 }
 
 .auth-box h2 {
@@ -108,27 +101,11 @@ body {
   background-clip: text;
   color: transparent;
   animation: textShine 4s linear infinite;
-  filter: drop-shadow(0 0 12px rgba(239,68,68,0.5));
 }
 
 @keyframes textShine {
   0% { background-position: 0% center; }
   100% { background-position: 200% center; }
-}
-
-.glow-red { color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.7), 0 0 20px rgba(239,68,68,0.4); }
-.glow-green { color: #22c55e; text-shadow: 0 0 10px rgba(34,197,94,0.7), 0 0 20px rgba(34,197,94,0.4); }
-.glow-orange { color: #f97316; text-shadow: 0 0 10px rgba(249,115,22,0.7), 0 0 20px rgba(249,115,22,0.4); }
-
-.brand-title {
-  font-size: 18px;
-  font-weight: 800;
-  background: linear-gradient(120deg, #fff 0%, #ef4444 50%, #fff 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: textShine 5s linear infinite;
 }
 
 .tab-switch {
@@ -158,7 +135,7 @@ body {
 .tab-btn.active {
   background: linear-gradient(135deg, #ef4444, #b91c1c);
   color: white;
-  box-shadow: 0 4px 14px rgba(239,68,68,0.45), 0 0 20px rgba(239,68,68,0.2);
+  box-shadow: 0 4px 14px rgba(239,68,68,0.45);
 }
 
 .input-glow {
@@ -178,10 +155,8 @@ body {
 .input-glow:focus {
   border-color: rgba(239,68,68,0.6);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(239,68,68,0.15), 0 0 12px rgba(239,68,68,0.1);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
 }
-
-.input-glow option { background: #0f0f1a; }
 
 .btn-glass {
   width: 100%;
@@ -203,7 +178,12 @@ body {
   box-shadow: 0 6px 20px rgba(239,68,68,0.4);
 }
 
-/* LAYOUT */
+.btn-glass:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 #app-layout {
   display: none;
   min-height: 100vh;
@@ -219,9 +199,6 @@ body {
   border-radius: 0 32px 32px 0;
   backdrop-filter: blur(24px);
   background: rgba(5, 5, 12, 0.88);
-  border-left: none;
-  border-top: none;
-  border-bottom: none;
   border-right: 1px solid rgba(239,68,68,0.15);
   display: flex;
   flex-direction: column;
@@ -247,9 +224,20 @@ body {
   justify-content: center;
   font-size: 22px;
   font-weight: 800;
-  box-shadow: 0 0 16px rgba(239,68,68,0.5), inset 0 0 10px rgba(255,255,255,0.1);
+  box-shadow: 0 0 16px rgba(239,68,68,0.5);
   animation: logoPulse 3s ease-in-out infinite;
   flex-shrink: 0;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(120deg, #fff 0%, #ef4444 50%, #fff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: textShine 5s linear infinite;
 }
 
 .nav-section {
@@ -277,12 +265,10 @@ body {
 }
 
 .nav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.04); }
-
 .nav-item.active {
   background: rgba(239,68,68,0.12);
   border-left: 3px solid var(--accent-neon);
   color: white;
-  text-shadow: 0 0 8px rgba(239,68,68,0.3);
 }
 
 .nav-icon { font-size: 18px; width: 20px; text-align: center; }
@@ -328,7 +314,6 @@ body {
 .panel-section { display: none; }
 .panel-section.active { display: block; }
 
-/* PAGE HEADER */
 .page-header {
   margin-bottom: 28px;
 }
@@ -350,7 +335,6 @@ body {
   margin-top: 4px;
 }
 
-/* STATS GRID */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4,1fr);
@@ -376,12 +360,6 @@ body {
   background: linear-gradient(90deg, transparent, rgba(239,68,68,0.5), transparent);
 }
 
-.stat-card:hover {
-  border-color: rgba(239,68,68,0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 20px rgba(239,68,68,0.05);
-}
-
 .stat-number {
   font-size: 40px;
   font-weight: 800;
@@ -400,6 +378,16 @@ body {
   color: #fbbf24; 
   text-shadow: 0 0 16px rgba(251,191,36,0.5), 0 0 30px rgba(251,191,36,0.2);
 }
+.stat-number.credit-zero {
+  color: #ef4444;
+  text-shadow: 0 0 16px rgba(239,68,68,0.5);
+  animation: blinkZero 1s ease-in-out infinite;
+}
+
+@keyframes blinkZero {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
 
 .stat-label {
   font-size: 10px;
@@ -410,7 +398,6 @@ body {
   font-weight: 600;
 }
 
-/* CARD GRID */
 .card-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -428,15 +415,6 @@ body {
   overflow: hidden;
 }
 
-.card::after {
-  content: '';
-  position: absolute;
-  top: -50%; right: -50%;
-  width: 100%; height: 100%;
-  background: radial-gradient(circle, rgba(239,68,68,0.04) 0%, transparent 60%);
-  pointer-events: none;
-}
-
 .card h3 {
   font-size: 14px;
   font-weight: 700;
@@ -445,7 +423,6 @@ body {
   color: rgba(255,255,255,0.9);
 }
 
-/* CHIP GROUP */
 .chip-group {
   display: flex;
   flex-wrap: wrap;
@@ -466,15 +443,12 @@ body {
 }
 
 .chip:hover { border-color: rgba(239,68,68,0.4); color: white; }
-
 .chip.selected {
   background: rgba(239,68,68,0.2);
   border-color: rgba(239,68,68,0.6);
   color: #ff8a8a;
-  box-shadow: 0 0 10px rgba(239,68,68,0.2);
 }
 
-/* TABLE */
 .table-glass {
   border-radius: 24px;
   overflow: hidden;
@@ -508,7 +482,6 @@ td {
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(239,68,68,0.03); }
 
-/* BADGES */
 .badge {
   padding: 5px 12px;
   border-radius: 40px;
@@ -524,30 +497,25 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   background: rgba(34,197,94,0.12);
   color: #4ade80;
   border: 1px solid rgba(34,197,94,0.25);
-  text-shadow: 0 0 8px rgba(34,197,94,0.4);
-  box-shadow: 0 0 8px rgba(34,197,94,0.1);
 }
-
 .badge-expired {
   background: rgba(239,68,68,0.12);
   color: #f87171;
   border: 1px solid rgba(239,68,68,0.25);
-  text-shadow: 0 0 8px rgba(239,68,68,0.4);
 }
-
 .badge-soon {
   background: rgba(249,115,22,0.12);
   color: #fb923c;
   border: 1px solid rgba(249,115,22,0.25);
-  text-shadow: 0 0 8px rgba(249,115,22,0.4);
+}
+.badge-nocredit {
+  background: rgba(239,68,68,0.2);
+  color: #f87171;
+  border: 1px solid rgba(239,68,68,0.4);
+  animation: blinkZero 1.5s ease-in-out infinite;
+  font-weight: 800;
 }
 
-/* EXPIRY COLORS */
-.expiry-critical { color: #f87171; font-weight: 700; text-shadow: 0 0 8px rgba(239,68,68,0.4); }
-.expiry-soon { color: #fb923c; font-weight: 600; text-shadow: 0 0 8px rgba(249,115,22,0.3); }
-.expiry-safe { color: #4ade80; text-shadow: 0 0 6px rgba(34,197,94,0.3); }
-
-/* DAYS REMAINING BADGE */
 .days-remaining {
   display: inline-flex;
   align-items: center;
@@ -557,7 +525,6 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   font-size: 11px;
   font-weight: 700;
   font-family: 'Space Mono', monospace;
-  letter-spacing: 0.3px;
 }
 
 .days-remaining.safe {
@@ -565,14 +532,12 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   border: 1px solid rgba(34,197,94,0.25);
   color: #4ade80;
 }
-
 .days-remaining.warn {
   background: rgba(249,115,22,0.1);
   border: 1px solid rgba(249,115,22,0.3);
   color: #fb923c;
   animation: warnPulse 1.5s ease-in-out infinite;
 }
-
 .days-remaining.crit {
   background: rgba(239,68,68,0.12);
   border: 1px solid rgba(239,68,68,0.35);
@@ -585,7 +550,6 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   50% { opacity: 0.65; }
 }
 
-/* BUTTONS */
 .btn-icon {
   background: none;
   border: 1px solid rgba(239,68,68,0.3);
@@ -601,7 +565,6 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 .btn-icon:hover {
   background: rgba(239,68,68,0.15);
   border-color: rgba(239,68,68,0.6);
-  box-shadow: 0 0 8px rgba(239,68,68,0.2);
 }
 
 .copy-btn {
@@ -630,9 +593,8 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   transition: 0.2s;
 }
 
-.btn-refresh:hover { background: rgba(239,68,68,0.2); box-shadow: 0 0 12px rgba(239,68,68,0.2); }
+.btn-refresh:hover { background: rgba(239,68,68,0.2); }
 
-/* SEARCH WRAP */
 .search-wrap {
   display: flex;
   justify-content: space-between;
@@ -641,7 +603,6 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   gap: 16px;
 }
 
-/* TOAST */
 .toast-gloss {
   position: fixed;
   bottom: 30px;
@@ -656,14 +617,13 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   transform: translateY(100px);
   opacity: 0;
   transition: 0.35s cubic-bezier(0.2,0.9,0.4,1.1);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(239,68,68,0.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   font-weight: 600;
   font-size: 13px;
 }
 
 .toast-gloss.show { transform: translateY(0); opacity: 1; }
 
-/* MODAL */
 .modal-glass {
   position: fixed;
   inset: 0;
@@ -693,14 +653,12 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   font-weight: 800;
   margin-bottom: 16px;
   color: #f87171;
-  text-shadow: 0 0 10px rgba(239,68,68,0.3);
 }
 
 .modal-btns { display: flex; gap: 14px; margin-top: 6px; }
 
 .result-msg { min-height: 20px; margin-top: 8px; font-size: 13px; }
 
-/* UID MONO */
 .uid-mono {
   font-family: 'Space Mono', monospace;
   font-size: 12px;
@@ -708,7 +666,6 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   letter-spacing: 0.3px;
 }
 
-/* Credit badge */
 .credit-badge {
   display: inline-flex;
   align-items: center;
@@ -721,11 +678,6 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   font-weight: 700;
   font-size: 13px;
   font-family: 'Space Mono', monospace;
-  text-shadow: 0 0 12px rgba(251,191,36,0.3);
-}
-
-.credit-badge .coin {
-  font-size: 16px;
 }
 
 .credit-input-group {
@@ -763,21 +715,46 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   color: white;
 }
 
+.no-credit-warning {
+  background: rgba(239,68,68,0.15);
+  border: 2px solid rgba(239,68,68,0.4);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin: 10px 0;
+  animation: blinkZero 1.5s ease-in-out infinite;
+}
+
+.no-credit-warning .icon {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.no-credit-warning .msg {
+  font-size: 16px;
+  font-weight: 800;
+  color: #f87171;
+  letter-spacing: 1px;
+}
+
+.no-credit-warning .sub-msg {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 5px;
+}
 </style>
 </head>
 <body>
 
-<!-- PARTICLE CANVAS -->
 <canvas id="particle-canvas"></canvas>
 
 <!-- AUTH GATE -->
 <div id="auth-gate">
   <div class="auth-box">
-    <div class="auth-logo">
-      <span style="font-weight:800; font-size:28px;">SC</span>
-    </div>
+    <div class="auth-logo"><span style="font-weight:800; font-size:28px;">SC</span></div>
     <h2>STREAM <span class="auth-gradient">CORPORATION</span></h2>
-    <p style="text-align:center; font-size:11px; color:#6b7280; margin-bottom:14px; letter-spacing:1px;">// ADMIN PORTAL v5.0</p>
+    <p style="text-align:center; font-size:11px; color:#6b7280; margin-bottom:14px; letter-spacing:1px;">// CREDIT SYSTEM v2.0</p>
     <div class="tab-switch">
       <button class="tab-btn active" onclick="switchLoginTab('sub')">RESELLER</button>
       <button class="tab-btn" onclick="switchLoginTab('main')">MASTER ADMIN</button>
@@ -800,12 +777,10 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 <div id="app-layout">
   <div class="sidebar">
     <div class="brand">
-      <div class="brand-icon">
-        <span style="font-weight:800; font-size:18px;">SC</span>
-      </div>
+      <div class="brand-icon"><span style="font-weight:800; font-size:18px;">SC</span></div>
       <div>
         <div class="brand-title">STREAM CORP</div>
-        <span style="font-size:10px; color:#6b7280; letter-spacing:1px;">MANAGEMENT PANEL</span>
+        <span style="font-size:10px; color:#6b7280; letter-spacing:1px;">CREDIT SYSTEM</span>
       </div>
     </div>
     <div class="nav-section">
@@ -823,7 +798,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
       <div class="avatar" id="sidebar-avatar">A</div>
       <div>
         <div id="sidebar-user" style="font-weight:700; font-size:14px;">Admin</div>
-        <div id="sidebar-role" style="font-size:11px; color:#ef4444; font-weight:600; text-shadow: 0 0 8px rgba(239,68,68,0.4);">Main Admin</div>
+        <div id="sidebar-role" style="font-size:11px; color:#ef4444; font-weight:600;">Main Admin</div>
         <div id="sidebar-credits" style="font-size:11px; color:#fbbf24; font-weight:600; margin-top:2px;">💰 0 credits</div>
       </div>
     </div>
@@ -832,44 +807,27 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   <div class="main-content">
     <!-- MAIN ADMIN PANEL -->
     <div id="main-panel" class="page">
-
-      <!-- UID VAULT TAB -->
       <div id="main-tab-uids" class="panel-section active">
         <div class="page-header">
           <h1>🎮 UID VAULT</h1>
           <p>MANAGE & MONITOR ACTIVE LICENSES</p>
         </div>
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-number white" id="ms-total">—</div>
-            <div class="stat-label">Total UIDs</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number green" id="ms-active">—</div>
-            <div class="stat-label">Active</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number red" id="ms-expired">—</div>
-            <div class="stat-label">Expired</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number orange" id="ms-soon">—</div>
-            <div class="stat-label">Expiring ≤7d</div>
-          </div>
+          <div class="stat-card"><div class="stat-number white" id="ms-total">—</div><div class="stat-label">Total UIDs</div></div>
+          <div class="stat-card"><div class="stat-number green" id="ms-active">—</div><div class="stat-label">Active</div></div>
+          <div class="stat-card"><div class="stat-number red" id="ms-expired">—</div><div class="stat-label">Expired</div></div>
+          <div class="stat-card"><div class="stat-number orange" id="ms-soon">—</div><div class="stat-label">Expiring ≤7d</div></div>
         </div>
 
         <div class="card-grid-2">
           <div class="card">
             <h3>➕ CREATE UID</h3>
-            <input type="text" id="m-uid" class="input-glow" placeholder="User ID (e.g. 123456789)">
+            <input type="text" id="m-uid" class="input-glow" placeholder="User ID">
             <input type="text" id="m-name" class="input-glow" placeholder="Player Name">
             <select id="m-days" class="input-glow">
-              <option value="1">1 Day</option>
-              <option value="7">7 Days</option>
-              <option value="15">15 Days</option>
-              <option value="30" selected>30 Days</option>
-              <option value="60">60 Days</option>
-              <option value="90">90 Days</option>
+              <option value="1">1 Day</option><option value="7">7 Days</option>
+              <option value="15">15 Days</option><option value="30" selected>30 Days</option>
+              <option value="60">60 Days</option><option value="90">90 Days</option>
               <option value="365">1 Year</option>
             </select>
             <div class="chip-group" id="m-chips"></div>
@@ -883,43 +841,28 @@ tr:hover td { background: rgba(239,68,68,0.03); }
             <div style="border-top:1px solid rgba(255,255,255,0.07); margin:10px 0 18px;"></div>
             <input type="text" id="m-renew-uid" class="input-glow" placeholder="UID to extend">
             <select id="m-renew-days" class="input-glow">
-              <option value="7">+7 Days</option>
-              <option value="15">+15 Days</option>
-              <option value="30" selected>+30 Days</option>
-              <option value="60">+60 Days</option>
+              <option value="7">+7 Days</option><option value="15">+15 Days</option>
+              <option value="30" selected>+30 Days</option><option value="60">+60 Days</option>
             </select>
             <div class="chip-group" id="m-renew-chips"></div>
-            <button class="btn-glass" style="background:linear-gradient(135deg,#78350f,#451a03);" onclick="mainRenewUID()">↻ RENEW / EXTEND</button>
+            <button class="btn-glass" style="background:linear-gradient(135deg,#78350f,#451a03);" onclick="mainRenewUID()">↻ RENEW</button>
             <div class="result-msg" id="m-rm-result"></div>
           </div>
         </div>
 
         <div class="search-wrap">
           <button class="btn-refresh" onclick="mainLoadUIDs()">⟳ REFRESH</button>
-          <input type="text" id="m-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Filter UID or Name">
+          <input type="text" id="m-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Filter">
         </div>
 
         <div class="table-glass">
           <table>
-            <thead>
-              <tr>
-                <th>UID</th>
-                <th>NAME</th>
-                <th>DAYS</th>
-                <th>STATUS</th>
-                <th>EXPIRES</th>
-                <th>DAYS LEFT</th>
-                <th>ACTION</th>
-              </tr>
-            </thead>
-            <tbody id="main-uid-tbody">
-              <tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading nebula data...</td></tr>
-            </tbody>
+            <thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th></tr></thead>
+            <tbody id="main-uid-tbody"><tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- RESELLERS TAB -->
       <div id="main-tab-resellers" class="panel-section">
         <div class="page-header">
           <h1>👥 RESELLERS</h1>
@@ -932,18 +875,16 @@ tr:hover td { background: rgba(239,68,68,0.03); }
             <input type="password" id="new-res-pass" class="input-glow" placeholder="Password">
             <input id="new-res-note" class="input-glow" placeholder="Note (optional)">
             <div class="credit-input-group">
-              <input id="new-res-credits" class="input-glow" type="number" placeholder="Initial Credits" value="100" min="0" style="margin-bottom:0;">
+              <input id="new-res-credits" class="input-glow" type="number" placeholder="Initial Credits" value="100" min="0">
               <button class="btn-small" onclick="createReseller()">✨ CREATE</button>
             </div>
             <div class="result-msg" id="res-create-result"></div>
           </div>
           <div class="card">
             <h3>💰 MANAGE CREDITS</h3>
-            <div style="display:flex; gap:8px; margin-bottom:10px;">
-              <input id="credit-reseller" class="input-glow" placeholder="Reseller Username" style="flex:1; margin-bottom:0;">
-            </div>
+            <input id="credit-reseller" class="input-glow" placeholder="Reseller Username">
             <div class="credit-input-group">
-              <input id="credit-amount" class="input-glow" type="number" placeholder="Credits" value="100" min="1" style="margin-bottom:0;">
+              <input id="credit-amount" class="input-glow" type="number" placeholder="Credits" value="100" min="1">
               <button class="btn-small" onclick="addCredits()">➕ ADD</button>
               <button class="btn-small danger" onclick="removeCredits()">➖ REMOVE</button>
             </div>
@@ -953,15 +894,11 @@ tr:hover td { background: rgba(239,68,68,0.03); }
         <div class="card-grid-2">
           <div class="card" style="grid-column: 1 / -1;">
             <h3>📋 RESELLER LIST</h3>
-            <button class="btn-refresh" style="margin-bottom:16px;" onclick="loadResellers()">⟳ Refresh List</button>
+            <button class="btn-refresh" style="margin-bottom:16px;" onclick="loadResellers()">⟳ Refresh</button>
             <div class="table-glass">
               <table>
-                <thead>
-                  <tr><th>Username</th><th>Note</th><th>Credits</th><th>UID Count</th><th>Action</th></tr>
-                </thead>
-                <tbody id="reseller-tbody">
-                  <tr><td colspan="5" style="text-align:center; color:#6b7280;">—</td></tr>
-                </tbody>
+                <thead><tr><th>Username</th><th>Note</th><th>Credits</th><th>UID Count</th><th>Action</th></tr></thead>
+                <tbody id="reseller-tbody"><tr><td colspan="5" style="text-align:center; color:#6b7280;">—</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -969,43 +906,42 @@ tr:hover td { background: rgba(239,68,68,0.03); }
       </div>
     </div>
 
-    <!-- SUB PANEL (RESELLER) -->
+    <!-- SUB PANEL -->
     <div id="sub-panel" class="page">
       <div class="page-header">
         <h1>🎮 MY UID VAULT</h1>
         <p>RESELLER PANEL</p>
       </div>
       <div class="stats-grid" style="grid-template-columns: repeat(4,1fr);">
-        <div class="stat-card">
-          <div class="stat-number white" id="ss-total">—</div>
-          <div class="stat-label">Total</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number green" id="ss-active">—</div>
-          <div class="stat-label">Active</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number red" id="ss-expired">—</div>
-          <div class="stat-label">Expired</div>
-        </div>
-        <div class="stat-card">
+        <div class="stat-card"><div class="stat-number white" id="ss-total">—</div><div class="stat-label">Total</div></div>
+        <div class="stat-card"><div class="stat-number green" id="ss-active">—</div><div class="stat-label">Active</div></div>
+        <div class="stat-card"><div class="stat-number red" id="ss-expired">—</div><div class="stat-label">Expired</div></div>
+        <div class="stat-card" id="credit-stat-card">
           <div class="stat-number credit-gold" id="ss-credits">—</div>
           <div class="stat-label">💰 Credits</div>
         </div>
       </div>
+
+      <!-- NO CREDIT WARNING -->
+      <div id="no-credit-warning" style="display:none;">
+        <div class="no-credit-warning">
+          <div class="icon">🚫</div>
+          <div class="msg">NO CREDIT FOUND</div>
+          <div class="sub-msg">PLEASE CONTACT MAIN ADMIN</div>
+        </div>
+      </div>
+
       <div class="card-grid-2">
         <div class="card">
-          <h3>➕ ADD UID <span id="sub-credit-display" style="font-size:12px; color:#fbbf24; font-weight:400; margin-left:10px;">(Costs 1 credit)</span></h3>
+          <h3>➕ ADD UID <span id="sub-credit-display" style="font-size:12px; color:#fbbf24; font-weight:400; margin-left:10px;">(💰 0 credits left)</span></h3>
           <input id="s-uid" class="input-glow" placeholder="UID">
           <input id="s-name" class="input-glow" placeholder="Name">
           <select id="s-days" class="input-glow">
-            <option value="1">1 Day</option>
-            <option value="7">7 Days</option>
-            <option value="15">15 Days</option>
-            <option value="30" selected>30 Days</option>
+            <option value="1">1 Day</option><option value="7">7 Days</option>
+            <option value="15">15 Days</option><option value="30" selected>30 Days</option>
             <option value="60">60 Days</option>
           </select>
-          <button class="btn-glass" onclick="subAddUID()">💾 SAVE (1 CREDIT)</button>
+          <button class="btn-glass" id="sub-add-btn" onclick="subAddUID()">💾 SAVE (1 CREDIT)</button>
           <div class="result-msg" id="s-add-result"></div>
         </div>
         <div class="card">
@@ -1015,26 +951,23 @@ tr:hover td { background: rgba(239,68,68,0.03); }
           <div style="border-top:1px solid rgba(255,255,255,0.07); margin:10px 0 16px;"></div>
           <input id="s-renew-uid" class="input-glow" placeholder="UID to renew">
           <select id="s-renew-days" class="input-glow">
-            <option value="7">+7 Days</option>
-            <option value="15">+15 Days</option>
+            <option value="7">+7 Days</option><option value="15">+15 Days</option>
             <option value="30" selected>+30 Days</option>
           </select>
           <button class="btn-glass" style="background:linear-gradient(135deg,#78350f,#451a03);" onclick="subRenewUID()">↻ RENEW</button>
           <div class="result-msg" id="s-rm-result"></div>
         </div>
       </div>
+
       <div class="search-wrap">
         <button class="btn-refresh" onclick="subLoadUIDs()">⟳ REFRESH</button>
-        <input id="s-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Search UID or Name">
+        <input id="s-search" class="input-glow" style="width:280px; margin:0;" placeholder="🔍 Search">
       </div>
+
       <div class="table-glass">
         <table>
-          <thead>
-            <tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th></tr>
-          </thead>
-          <tbody id="sub-uid-tbody">
-            <tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr>
-          </tbody>
+          <thead><tr><th>UID</th><th>NAME</th><th>DAYS</th><th>STATUS</th><th>EXPIRES</th><th>DAYS LEFT</th><th>ACTION</th></tr></thead>
+          <tbody id="sub-uid-tbody"><tr><td colspan="7" style="text-align:center; color:#6b7280; padding:40px;">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1086,16 +1019,16 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   draw();
 })();
 
-// ===== SESSION & STATE =====
+// ===== SESSION =====
 let SESSION = {role:null, adminKey:null, username:null, password:null};
 let allMainUIDs = [], allSubUIDs = [];
 let pendingUID = null, pendingIsMain = false;
 
-function saveSession(){ try{ localStorage.setItem('rp_s', JSON.stringify(SESSION)); }catch(e){} }
-function loadSession(){ try{ const s=localStorage.getItem('rp_s'); if(s) SESSION=JSON.parse(s); }catch(e){} }
-function clearSession(){ SESSION={role:null,adminKey:null,username:null,password:null}; localStorage.removeItem('rp_s'); }
+function saveSession(){ try{ localStorage.setItem('stream_session', JSON.stringify(SESSION)); }catch(e){} }
+function loadSession(){ try{ const s=localStorage.getItem('stream_session'); if(s) SESSION=JSON.parse(s); }catch(e){} }
+function clearSession(){ SESSION={role:null,adminKey:null,username:null,password:null}; localStorage.removeItem('stream_session'); }
 
-// ===== UI HELPERS =====
+// ===== HELPERS =====
 function showToast(msg, type='success'){
   const t = document.getElementById('toastMsg');
   t.textContent = (type==='success' ? '✨ ' : '⚠️ ') + msg;
@@ -1111,7 +1044,6 @@ function showResult(elId, msg, type){
   setTimeout(() => el.innerHTML = '', 3500);
 }
 
-// ===== DAYS REMAINING CALCULATOR =====
 function calculateRemaining(expiryDateStr){
   if(!expiryDateStr) return null;
   const exp = new Date(expiryDateStr);
@@ -1119,6 +1051,12 @@ function calculateRemaining(expiryDateStr){
   const diffMs = exp - now;
   if(diffMs <= 0) return 0;
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
+function formatExpiry(expiryDateStr){
+  if(!expiryDateStr) return '<span style="color:#6b7280;">—</span>';
+  const d = new Date(expiryDateStr);
+  return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
 }
 
 function renderDaysLeftBadge(remaining){
@@ -1129,10 +1067,37 @@ function renderDaysLeftBadge(remaining){
   return `<span class="days-remaining safe">✓ ${remaining}d</span>`;
 }
 
-function formatExpiry(expiryDateStr){
-  if(!expiryDateStr) return '<span style="color:#6b7280;">—</span>';
-  const d = new Date(expiryDateStr);
-  return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+function renderUIDRow(u, isMain){
+  const uidVal = u.uid || u.id || '?';
+  const name = u.name || u.username || u.player || '—';
+  const days = u.days !== undefined ? u.days : '—';
+  const expRaw = u.expires_at || u.expiry || null;
+
+  let badgeHtml = '';
+  let remaining = null;
+
+  if(expRaw){
+    remaining = calculateRemaining(expRaw);
+    if(remaining <= 0) badgeHtml = '<span class="badge badge-expired">✖ EXPIRED</span>';
+    else if(remaining <= 7) badgeHtml = '<span class="badge badge-soon">⚠ SOON</span>';
+    else badgeHtml = '<span class="badge badge-active">● ACTIVE</span>';
+  } else {
+    badgeHtml = '<span class="badge badge-active">● ACTIVE</span>';
+  }
+
+  const expiryStr = formatExpiry(expRaw);
+  const daysLeftHtml = renderDaysLeftBadge(remaining);
+  const rmFn = isMain ? `openModal('${uidVal}',true)` : `openModal('${uidVal}',false)`;
+
+  return `<tr>
+    <td><span class="uid-mono">${uidVal}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${uidVal}');showToast('Copied!')">📋</button></td>
+    <td style="font-weight:600; color:rgba(255,255,255,0.85);">${name}</td>
+    <td><span style="font-family:'Space Mono',monospace; font-size:13px; color:#9ca3af;">${days}d</span></td>
+    <td>${badgeHtml}</td>
+    <td style="font-size:12px; color:#9ca3af;">${expiryStr}</td>
+    <td>${daysLeftHtml}</td>
+    <td><button class="btn-icon" onclick="${rmFn}">DELETE</button></td>
+  </tr>`;
 }
 
 // ===== AUTH =====
@@ -1146,12 +1111,19 @@ async function doMainLogin(){
   const key = document.getElementById('main-key').value.trim();
   if(!key) return showResult('main-login-err','Enter Master Key','error');
   try{
-    const res = await fetch('/admin/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:key})});
+    const res = await fetch('/admin/verify', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({admin_key: key})
+    });
     const data = await res.json();
     if(!res.ok) return showResult('main-login-err','✗ '+(data.message||'Invalid key'),'error');
     SESSION = {role:'main_admin', adminKey:key, username:null, password:null};
-    saveSession(); enterMainPanel();
-  }catch(e){ showResult('main-login-err','Connection error','error'); }
+    saveSession();
+    enterMainPanel();
+  }catch(e){
+    showResult('main-login-err','Connection error','error');
+  }
 }
 
 async function doSubLogin(){
@@ -1159,12 +1131,19 @@ async function doSubLogin(){
   const p = document.getElementById('sub-pass').value.trim();
   if(!u||!p) return showResult('sub-login-err','Enter credentials','error');
   try{
-    const res = await fetch('/subadmin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})});
+    const res = await fetch('/subadmin/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: u, password: p})
+    });
     const data = await res.json();
     if(!res.ok) return showResult('sub-login-err','✗ '+(data.message||'Invalid credentials'),'error');
     SESSION = {role:'sub_admin', adminKey:null, username:u, password:p};
-    saveSession(); enterSubPanel();
-  }catch(e){ showResult('sub-login-err','Connection error','error'); }
+    saveSession();
+    enterSubPanel();
+  }catch(e){
+    showResult('sub-login-err','Connection error','error');
+  }
 }
 
 function enterMainPanel(){
@@ -1219,75 +1198,35 @@ function doLogout(){
   document.getElementById('sub-panel').classList.remove('active');
 }
 
-// ===== RENDER ROW =====
-function renderUIDRow(u, isMain){
-  const uidVal = u.uid || u.id || u.user_id || '?';
-  const name = u.name || u.username || u.player || '—';
-  const days = u.days !== undefined ? u.days : '—';
-  const expRaw = u.expires_at || u.expiry || u.expire || null;
-
-  let badgeHtml = '';
-  let remaining = null;
-
-  if(expRaw){
-    remaining = calculateRemaining(expRaw);
-    if(remaining <= 0){
-      badgeHtml = '<span class="badge badge-expired">✖ EXPIRED</span>';
-    } else if(remaining <= 7){
-      badgeHtml = '<span class="badge badge-soon">⚠ SOON</span>';
-    } else {
-      badgeHtml = '<span class="badge badge-active">● ACTIVE</span>';
-    }
-  } else {
-    badgeHtml = '<span class="badge badge-active">● ACTIVE</span>';
-  }
-
-  const expiryStr = formatExpiry(expRaw);
-  const daysLeftHtml = renderDaysLeftBadge(remaining);
-  const rmFn = isMain ? `openModal('${uidVal}',true)` : `openModal('${uidVal}',false)`;
-
-  return `<tr>
-    <td><span class="uid-mono">${uidVal}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${uidVal}');showToast('Copied!')">📋</button></td>
-    <td style="font-weight:600; color:rgba(255,255,255,0.85);">${name}</td>
-    <td><span style="font-family:'Space Mono',monospace; font-size:13px; color:#9ca3af;">${days}d</span></td>
-    <td>${badgeHtml}</td>
-    <td style="font-size:12px; color:#9ca3af;">${expiryStr}</td>
-    <td>${daysLeftHtml}</td>
-    <td><button class="btn-icon" onclick="${rmFn}">DELETE</button></td>
-  </tr>`;
-}
-
-// ===== STATS =====
-function calcStats(uids, tId, aId, eId, sId){
-  let active=0, expired=0, soon=0;
-  uids.forEach(u => {
-    const exp = u.expires_at || u.expiry || u.expire || null;
-    if(exp){
-      const diff = calculateRemaining(exp);
-      if(diff <= 0) expired++;
-      else if(diff <= 7) soon++;
-      else active++;
-    } else {
-      active++;
-    }
-  });
-  document.getElementById(tId).textContent = uids.length;
-  document.getElementById(aId).textContent = active;
-  document.getElementById(eId).textContent = expired;
-  if(sId) document.getElementById(sId).textContent = soon;
-}
-
 // ===== CREDIT FUNCTIONS =====
 async function subLoadCredits(){
   try{
     const res = await fetch('/subadmin/credits?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
     const data = await res.json();
     if(res.ok){
-      document.getElementById('ss-credits').textContent = data.credits || 0;
-      updateSidebarCredits(data.credits || 0);
-      document.getElementById('sub-credit-display').textContent = `(💰 ${data.credits || 0} credits left)`;
+      const credits = data.credits || 0;
+      document.getElementById('ss-credits').textContent = credits;
+      document.getElementById('ss-credits').className = 'stat-number ' + (credits === 0 ? 'credit-zero' : 'credit-gold');
+      updateSidebarCredits(credits);
+      document.getElementById('sub-credit-display').textContent = `(💰 ${credits} credits left)`;
+      
+      const warning = document.getElementById('no-credit-warning');
+      const addBtn = document.getElementById('sub-add-btn');
+      if(credits === 0){
+        warning.style.display = 'block';
+        addBtn.disabled = true;
+        addBtn.textContent = '🚫 NO CREDIT - CONTACT ADMIN';
+        document.getElementById('credit-stat-card').querySelector('.stat-number').className = 'stat-number credit-zero';
+      } else {
+        warning.style.display = 'none';
+        addBtn.disabled = false;
+        addBtn.textContent = '💾 SAVE (1 CREDIT)';
+        document.getElementById('credit-stat-card').querySelector('.stat-number').className = 'stat-number credit-gold';
+      }
     }
-  }catch(e){}
+  }catch(e){
+    console.error('Error loading credits:', e);
+  }
 }
 
 async function addCredits(){
@@ -1298,9 +1237,9 @@ async function addCredits(){
   
   try{
     const res = await fetch('/admin/add-credits', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({admin_key:SESSION.adminKey, username, amount})
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({admin_key: SESSION.adminKey, username, amount})
     });
     const data = await res.json();
     if(res.ok){
@@ -1323,9 +1262,9 @@ async function removeCredits(){
   
   try{
     const res = await fetch('/admin/remove-credits', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({admin_key:SESSION.adminKey, username, amount})
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({admin_key: SESSION.adminKey, username, amount})
     });
     const data = await res.json();
     if(res.ok){
@@ -1347,11 +1286,16 @@ async function mainLoadUIDs(){
   try{
     const res = await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey));
     const data = await res.json();
-    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171; text-align:center;">Error: ${data.message}</td></tr>`; return; }
+    if(!res.ok){ 
+      tb.innerHTML=`<tr><td colspan="7" style="color:#f87171; text-align:center;">Error: ${data.message}</td></tr>`; 
+      return; 
+    }
     allMainUIDs = data.licenses || [];
     renderMainTable(allMainUIDs);
     calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
-  }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
+  }catch(e){ 
+    tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; 
+  }
 }
 
 function renderMainTable(uids){
@@ -1364,25 +1308,76 @@ function filterMainTable(){
   renderMainTable(allMainUIDs.filter(u => (u.uid||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q)));
 }
 
+function calcStats(uids, tId, aId, eId, sId){
+  let active=0, expired=0, soon=0;
+  uids.forEach(u => {
+    const exp = u.expires_at || u.expiry || null;
+    if(exp){
+      const diff = calculateRemaining(exp);
+      if(diff <= 0) expired++;
+      else if(diff <= 7) soon++;
+      else active++;
+    } else {
+      active++;
+    }
+  });
+  document.getElementById(tId).textContent = uids.length;
+  document.getElementById(aId).textContent = active;
+  document.getElementById(eId).textContent = expired;
+  if(sId) document.getElementById(sId).textContent = soon;
+}
+
 async function mainAddUID(){
   const uid = document.getElementById('m-uid').value.trim();
   const name = document.getElementById('m-name').value.trim() || 'Player';
-  const days = document.getElementById('m-days').value;
+  const days = parseInt(document.getElementById('m-days').value);
   if(!uid) return showToast('UID required','error');
-  const res = await fetch('/admin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid, name, days:parseInt(days)})});
-  const data = await res.json();
-  if(res.ok){ showToast('UID created!'); showResult('m-add-result','✓ UID added','success'); document.getElementById('m-uid').value=''; document.getElementById('m-name').value=''; mainLoadUIDs(); }
-  else { showToast(data.message,'error'); showResult('m-add-result','✗ '+data.message,'error'); }
+  
+  try{
+    const res = await fetch('/admin/create', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({admin_key: SESSION.adminKey, uid, name, days})
+    });
+    const data = await res.json();
+    if(res.ok){
+      showToast('UID created!');
+      showResult('m-add-result','✓ UID added','success');
+      document.getElementById('m-uid').value = '';
+      document.getElementById('m-name').value = '';
+      mainLoadUIDs();
+    } else {
+      showToast(data.message || 'Failed','error');
+      showResult('m-add-result','✗ '+data.message,'error');
+    }
+  }catch(e){
+    showToast('Connection error','error');
+  }
 }
 
 async function mainRenewUID(){
   const uid = document.getElementById('m-renew-uid').value.trim();
-  const days = document.getElementById('m-renew-days').value;
+  const days = parseInt(document.getElementById('m-renew-days').value);
   if(!uid) return showToast('Enter UID','error');
-  const res = await fetch('/admin/update', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid, days:parseInt(days)})});
-  const data = await res.json();
-  if(res.ok){ showToast(`Renewed +${days} days`); showResult('m-rm-result','✓ Renewed','success'); document.getElementById('m-renew-uid').value=''; mainLoadUIDs(); }
-  else showToast(data.message,'error');
+  
+  try{
+    const res = await fetch('/admin/update', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({admin_key: SESSION.adminKey, uid, days})
+    });
+    const data = await res.json();
+    if(res.ok){
+      showToast(`Renewed +${days} days`);
+      showResult('m-rm-result','✓ Renewed','success');
+      document.getElementById('m-renew-uid').value = '';
+      mainLoadUIDs();
+    } else {
+      showToast(data.message || 'Failed','error');
+    }
+  }catch(e){
+    showToast('Connection error','error');
+  }
 }
 
 function mainRemoveUID(){
@@ -1398,12 +1393,17 @@ async function subLoadUIDs(){
   try{
     const res = await fetch('/subadmin/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
     const data = await res.json();
-    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171;">Error: ${data.message}</td></tr>`; return; }
+    if(!res.ok){ 
+      tb.innerHTML=`<tr><td colspan="7" style="color:#f87171;">Error: ${data.message}</td></tr>`; 
+      return; 
+    }
     allSubUIDs = data.licenses || [];
     renderSubTable(allSubUIDs);
     calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
     subLoadCredits();
-  }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
+  }catch(e){ 
+    tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; 
+  }
 }
 
 function renderSubTable(uids){
@@ -1418,39 +1418,69 @@ function filterSubTable(){
 
 async function subAddUID(){
   // Check credits first
-  const creditRes = await fetch('/subadmin/credits?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
-  const creditData = await creditRes.json();
-  if(!creditRes.ok || creditData.credits < 1){
-    showToast('Insufficient credits! Please contact admin.','error');
-    return showResult('s-add-result','✗ Insufficient credits','error');
+  try{
+    const creditRes = await fetch('/subadmin/credits?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
+    const creditData = await creditRes.json();
+    if(!creditRes.ok || creditData.credits < 1){
+      showToast('NO CREDIT! Contact main admin.','error');
+      showResult('s-add-result','✗ NO CREDIT - Contact Admin','error');
+      return;
+    }
+  }catch(e){
+    showToast('Error checking credits','error');
+    return;
   }
 
   const uid = document.getElementById('s-uid').value.trim();
   const name = document.getElementById('s-name').value.trim() || 'Player';
-  const days = document.getElementById('s-days').value;
+  const days = parseInt(document.getElementById('s-days').value);
   if(!uid) return showToast('UID required','error');
   
-  const res = await fetch('/subadmin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, name, days:parseInt(days)})});
-  if(res.ok){ 
-    showToast('UID added! 1 credit used'); 
-    showResult('s-add-result','✓ Added (1 credit used)','success'); 
-    document.getElementById('s-uid').value=''; 
-    document.getElementById('s-name').value=''; 
-    subLoadUIDs();
-    subLoadCredits();
-  } else { 
-    const data = await res.json(); 
-    showToast(data.message,'error'); 
+  try{
+    const res = await fetch('/subadmin/create', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: SESSION.username, password: SESSION.password, uid, name, days})
+    });
+    const data = await res.json();
+    if(res.ok){
+      showToast('UID added! 1 credit used');
+      showResult('s-add-result','✓ Added (1 credit used)','success');
+      document.getElementById('s-uid').value = '';
+      document.getElementById('s-name').value = '';
+      subLoadUIDs();
+    } else {
+      showToast(data.message || 'Failed','error');
+      showResult('s-add-result','✗ '+data.message,'error');
+    }
+  }catch(e){
+    showToast('Connection error','error');
   }
 }
 
 async function subRenewUID(){
   const uid = document.getElementById('s-renew-uid').value.trim();
-  const days = document.getElementById('s-renew-days').value;
+  const days = parseInt(document.getElementById('s-renew-days').value);
   if(!uid) return showToast('Enter UID','error');
-  const res = await fetch('/subadmin/update', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, days:parseInt(days)})});
-  if(res.ok){ showToast(`Renewed +${days} days`); showResult('s-rm-result','✓ Renewed','success'); document.getElementById('s-renew-uid').value=''; subLoadUIDs(); }
-  else { const data = await res.json(); showToast(data.message,'error'); }
+  
+  try{
+    const res = await fetch('/subadmin/update', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: SESSION.username, password: SESSION.password, uid, days})
+    });
+    const data = await res.json();
+    if(res.ok){
+      showToast(`Renewed +${days} days`);
+      showResult('s-rm-result','✓ Renewed','success');
+      document.getElementById('s-renew-uid').value = '';
+      subLoadUIDs();
+    } else {
+      showToast(data.message || 'Failed','error');
+    }
+  }catch(e){
+    showToast('Connection error','error');
+  }
 }
 
 function subRemoveUID(){
@@ -1475,15 +1505,32 @@ async function confirmDeleteAction(){
   if(!pendingUID) return closeModalAction();
   const uid = pendingUID, isMain = pendingIsMain;
   closeModalAction();
-  let res;
-  if(isMain){
-    res = await fetch('/admin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid})});
-  } else {
-    res = await fetch('/subadmin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid})});
+  
+  try{
+    let res;
+    if(isMain){
+      res = await fetch('/admin/revoke', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({admin_key: SESSION.adminKey, uid})
+      });
+    } else {
+      res = await fetch('/subadmin/revoke', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: SESSION.username, password: SESSION.password, uid})
+      });
+    }
+    const data = await res.json();
+    if(res.ok && data.status === 'success'){
+      showToast('UID revoked');
+      isMain ? mainLoadUIDs() : subLoadUIDs();
+    } else {
+      showToast(data.message || 'Failed','error');
+    }
+  }catch(e){
+    showToast('Connection error','error');
   }
-  const data = await res.json();
-  if(res.ok && data.status==='success'){ showToast('UID revoked'); isMain ? mainLoadUIDs() : subLoadUIDs(); }
-  else showToast(data.message||'Failed','error');
 }
 
 // ===== RESELLER MANAGEMENT =====
@@ -1493,9 +1540,27 @@ async function createReseller(){
   const n = document.getElementById('new-res-note').value.trim();
   const credits = parseInt(document.getElementById('new-res-credits').value) || 100;
   if(!u||!p) return showToast('Fill username/password','error');
-  const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n, credits})});
-  if(res.ok){ showToast(`Reseller created with ${credits} credits`); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); loadResellers(); }
-  else { const d = await res.json(); showToast(d.message,'error'); }
+  
+  try{
+    const res = await fetch('/admin/create-subadmin', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({admin_key: SESSION.adminKey, username: u, password: p, note: n, credits})
+    });
+    const data = await res.json();
+    if(res.ok){
+      showToast(`Reseller created with ${credits} credits`);
+      document.getElementById('new-res-user').value = '';
+      document.getElementById('new-res-pass').value = '';
+      document.getElementById('new-res-note').value = '';
+      showResult('res-create-result','✓ Reseller created','success');
+      loadResellers();
+    } else {
+      showToast(data.message || 'Failed','error');
+    }
+  }catch(e){
+    showToast('Connection error','error');
+  }
 }
 
 async function loadResellers(){
@@ -1504,11 +1569,14 @@ async function loadResellers(){
   try{
     const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
     const data = await res.json();
-    if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="5" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
+    if(!res.ok || !data.subadmins || !data.subadmins.length){
+      tb.innerHTML='<tr><td colspan="5" style="text-align:center; color:#6b7280;">No resellers found</td></tr>';
+      return;
+    }
     tb.innerHTML = data.subadmins.map(s => `<tr>
       <td><span class="badge badge-active">${s.username}</span></td>
       <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
-      <td><span class="credit-badge"><span class="coin">💰</span> ${s.credits || 0}</span></td>
+      <td><span class="credit-badge">💰 ${s.credits || 0}</span></td>
       <td style="font-family:'Space Mono',monospace; font-size:13px; color:#9ca3af;">${s.uid_count || 0}</td>
       <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
     </tr>`).join('');
@@ -1519,15 +1587,25 @@ async function loadResellers(){
 
 async function deleteReseller(uname){
   if(!confirm(`Delete reseller: ${uname}?`)) return;
-  const res = await fetch('/admin/delete-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:uname})});
-  if(res.ok){ showToast('Reseller deleted'); loadResellers(); }
+  try{
+    const res = await fetch('/admin/delete-subadmin', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({admin_key: SESSION.adminKey, username: uname})
+    });
+    if(res.ok){
+      showToast('Reseller deleted');
+      loadResellers();
+    }
+  }catch(e){
+    showToast('Error deleting reseller','error');
+  }
 }
 
 // ===== EVENT LISTENERS =====
 document.getElementById('m-search').addEventListener('input', filterMainTable);
 document.getElementById('s-search').addEventListener('input', filterSubTable);
 
-// ===== CHIPS =====
 function genChips(containerId, selectId, optionsArr){
   const wrap = document.getElementById(containerId);
   if(!wrap) return;
@@ -1552,23 +1630,28 @@ window.onload = () => {
 };
 
 // ===== AUTO-LOGIN =====
-(async function init(){
-  loadSession();
-  if(SESSION.role==='main_admin' && SESSION.adminKey){
-    try{
-      const r = await fetch('/admin/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey})});
-      if(r.ok){ enterMainPanel(); return; }
-    }catch(e){}
-    clearSession();
-  }
-  if(SESSION.role==='sub_admin' && SESSION.username){
-    try{
-      const r = await fetch('/subadmin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password})});
-      if(r.ok){ enterSubPanel(); return; }
-    }catch(e){}
-    clearSession();
-  }
-})();
+loadSession();
+if(SESSION.role === 'main_admin' && SESSION.adminKey){
+  // Try to auto-login main admin
+  fetch('/admin/verify', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({admin_key: SESSION.adminKey})
+  }).then(res => {
+    if(res.ok) enterMainPanel();
+    else clearSession();
+  }).catch(() => clearSession());
+} else if(SESSION.role === 'sub_admin' && SESSION.username){
+  // Try to auto-login sub admin
+  fetch('/subadmin/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username: SESSION.username, password: SESSION.password})
+  }).then(res => {
+    if(res.ok) enterSubPanel();
+    else clearSession();
+  }).catch(() => clearSession());
+}
 </script>
 </body>
 </html>
