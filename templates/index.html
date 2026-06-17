@@ -703,7 +703,7 @@
             <p style="color:#6b7280;">All credit transactions are logged here.</p>
             <div class="table-glass" style="margin-top:16px;">
               <table><thead><tr><th>Reseller</th><th>Change</th><th>Reason</th><th>Date</th></tr></thead>
-              <tbody id="credit-log-tbody"><tr><td colspan="4" style="text-align:center; color:#6b7280; padding:30px;">No logs yet.</td></tr></tbody>
+              <tbody id="credit-log-tbody"><tr><td colspan="4" style="text-align:center; color:#6b7280; padding:30px;">No logs yet.</td></tr></tbody></table>
             </div>
           </div>
         </div>
@@ -1116,38 +1116,14 @@
       }catch(e){}
     }
 
-    // FIXED: giveCredits function now properly works
     async function giveCredits(){
       const username = document.getElementById('credit-reseller').value.trim();
       const amount = parseInt(document.getElementById('credit-amount').value.trim());
-      if(!username || !amount || amount<1) {
-        showToast('Please enter valid username and amount','error');
-        return;
-      }
-      try {
-        const res = await fetch('/admin/give-credits', {
-          method: 'POST', 
-          headers: {'Content-Type': 'application/json'}, 
-          body: JSON.stringify({
-            admin_key: SESSION.adminKey, 
-            username: username, 
-            amount: amount
-          })
-        });
-        const data = await res.json();
-        if(res.ok && data.status === 'success'){ 
-          showToast(`✅ Added ${amount} credits to ${username}`); 
-          showResult('credit-result','✓ Credits added successfully','success'); 
-          document.getElementById('credit-reseller').value = '';
-          loadResellers(); 
-        } else { 
-          showToast(data.message || 'Failed to add credits','error'); 
-          showResult('credit-result','✗ '+ (data.message || 'Failed'),'error');
-        }
-      } catch(e) {
-        showToast('Connection error','error');
-        showResult('credit-result','✗ Connection error','error');
-      }
+      if(!username || !amount || amount<1) return showToast('Enter valid username and amount','error');
+      const res = await fetch('/admin/give-credits', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username, amount})});
+      const data = await res.json();
+      if(res.ok){ showToast(`Added ${amount} credits to ${username}`); showResult('credit-result','✓ Credits added','success'); loadResellers(); }
+      else { showToast(data.message,'error'); showResult('credit-result','✗ '+data.message,'error'); }
     }
 
     // ===== MODAL =====
@@ -1189,19 +1165,15 @@
     async function loadResellers(){
       const tb = document.getElementById('reseller-tbody');
       tb.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
-      try {
-        const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
-        const data = await res.json();
-        if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
-        tb.innerHTML = data.subadmins.map(s => `<tr>
-          <td><span class="badge badge-active">${s.username}</span></td>
-          <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
-          <td><span class="badge badge-credit">💰 ${s.credits || 0}</span></td>
-          <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
-        </tr>`).join('');
-      } catch(e) {
-        tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#6b7280;">Error loading</td></tr>';
-      }
+      const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
+      const data = await res.json();
+      if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
+      tb.innerHTML = data.subadmins.map(s => `<tr>
+        <td><span class="badge badge-active">${s.username}</span></td>
+        <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
+        <td><span class="badge badge-credit">💰 ${s.credits || 0}</span></td>
+        <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
+      </tr>`).join('');
     }
 
     async function deleteReseller(uname){
