@@ -396,6 +396,10 @@ body {
 .stat-number.green { color: #22c55e; text-shadow: 0 0 16px rgba(34,197,94,0.4); }
 .stat-number.red { color: #ef4444; text-shadow: 0 0 16px rgba(239,68,68,0.4); }
 .stat-number.orange { color: #f97316; text-shadow: 0 0 16px rgba(249,115,22,0.4); }
+.stat-number.credit-gold { 
+  color: #fbbf24; 
+  text-shadow: 0 0 16px rgba(251,191,36,0.5), 0 0 30px rgba(251,191,36,0.2);
+}
 
 .stat-label {
   font-size: 10px;
@@ -703,6 +707,62 @@ tr:hover td { background: rgba(239,68,68,0.03); }
   color: rgba(255,255,255,0.85);
   letter-spacing: 0.3px;
 }
+
+/* Credit badge */
+.credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 14px;
+  border-radius: 40px;
+  background: rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.25);
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: 'Space Mono', monospace;
+  text-shadow: 0 0 12px rgba(251,191,36,0.3);
+}
+
+.credit-badge .coin {
+  font-size: 16px;
+}
+
+.credit-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.credit-input-group .input-glow {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.credit-input-group .btn-small {
+  padding: 12px 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  border: none;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.credit-input-group .btn-small:hover {
+  transform: scale(0.96);
+  box-shadow: 0 0 20px rgba(251,191,36,0.3);
+}
+
+.credit-input-group .btn-small.danger {
+  background: linear-gradient(135deg, #ef4444, #7f1d1d);
+  color: white;
+}
+
 </style>
 </head>
 <body>
@@ -764,6 +824,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
       <div>
         <div id="sidebar-user" style="font-weight:700; font-size:14px;">Admin</div>
         <div id="sidebar-role" style="font-size:11px; color:#ef4444; font-weight:600; text-shadow: 0 0 8px rgba(239,68,68,0.4);">Main Admin</div>
+        <div id="sidebar-credits" style="font-size:11px; color:#fbbf24; font-weight:600; margin-top:2px;">💰 0 credits</div>
       </div>
     </div>
   </div>
@@ -862,7 +923,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
       <div id="main-tab-resellers" class="panel-section">
         <div class="page-header">
           <h1>👥 RESELLERS</h1>
-          <p>MANAGE SUB-ADMIN ACCOUNTS</p>
+          <p>MANAGE SUB-ADMIN ACCOUNTS & CREDITS</p>
         </div>
         <div class="card-grid-2">
           <div class="card">
@@ -870,19 +931,36 @@ tr:hover td { background: rgba(239,68,68,0.03); }
             <input id="new-res-user" class="input-glow" placeholder="Username">
             <input type="password" id="new-res-pass" class="input-glow" placeholder="Password">
             <input id="new-res-note" class="input-glow" placeholder="Note (optional)">
-            <button class="btn-glass" onclick="createReseller()">✨ CREATE RESELLER</button>
+            <div class="credit-input-group">
+              <input id="new-res-credits" class="input-glow" type="number" placeholder="Initial Credits" value="100" min="0" style="margin-bottom:0;">
+              <button class="btn-small" onclick="createReseller()">✨ CREATE</button>
+            </div>
             <div class="result-msg" id="res-create-result"></div>
           </div>
           <div class="card">
+            <h3>💰 MANAGE CREDITS</h3>
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
+              <input id="credit-reseller" class="input-glow" placeholder="Reseller Username" style="flex:1; margin-bottom:0;">
+            </div>
+            <div class="credit-input-group">
+              <input id="credit-amount" class="input-glow" type="number" placeholder="Credits" value="100" min="1" style="margin-bottom:0;">
+              <button class="btn-small" onclick="addCredits()">➕ ADD</button>
+              <button class="btn-small danger" onclick="removeCredits()">➖ REMOVE</button>
+            </div>
+            <div class="result-msg" id="credit-result"></div>
+          </div>
+        </div>
+        <div class="card-grid-2">
+          <div class="card" style="grid-column: 1 / -1;">
             <h3>📋 RESELLER LIST</h3>
-            <button class="btn-refresh" style="margin-bottom:16px; width:100%;" onclick="loadResellers()">⟳ Refresh List</button>
+            <button class="btn-refresh" style="margin-bottom:16px;" onclick="loadResellers()">⟳ Refresh List</button>
             <div class="table-glass">
               <table>
                 <thead>
-                  <tr><th>Username</th><th>Note</th><th>Action</th></tr>
+                  <tr><th>Username</th><th>Note</th><th>Credits</th><th>UID Count</th><th>Action</th></tr>
                 </thead>
                 <tbody id="reseller-tbody">
-                  <tr><td colspan="3" style="text-align:center; color:#6b7280;">—</td></tr>
+                  <tr><td colspan="5" style="text-align:center; color:#6b7280;">—</td></tr>
                 </tbody>
               </table>
             </div>
@@ -897,7 +975,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
         <h1>🎮 MY UID VAULT</h1>
         <p>RESELLER PANEL</p>
       </div>
-      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="stats-grid" style="grid-template-columns: repeat(4,1fr);">
         <div class="stat-card">
           <div class="stat-number white" id="ss-total">—</div>
           <div class="stat-label">Total</div>
@@ -910,10 +988,14 @@ tr:hover td { background: rgba(239,68,68,0.03); }
           <div class="stat-number red" id="ss-expired">—</div>
           <div class="stat-label">Expired</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-number credit-gold" id="ss-credits">—</div>
+          <div class="stat-label">💰 Credits</div>
+        </div>
       </div>
       <div class="card-grid-2">
         <div class="card">
-          <h3>➕ ADD UID</h3>
+          <h3>➕ ADD UID <span id="sub-credit-display" style="font-size:12px; color:#fbbf24; font-weight:400; margin-left:10px;">(Costs 1 credit)</span></h3>
           <input id="s-uid" class="input-glow" placeholder="UID">
           <input id="s-name" class="input-glow" placeholder="Name">
           <select id="s-days" class="input-glow">
@@ -923,7 +1005,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
             <option value="30" selected>30 Days</option>
             <option value="60">60 Days</option>
           </select>
-          <button class="btn-glass" onclick="subAddUID()">💾 SAVE</button>
+          <button class="btn-glass" onclick="subAddUID()">💾 SAVE (1 CREDIT)</button>
           <div class="result-msg" id="s-add-result"></div>
         </div>
         <div class="card">
@@ -973,7 +1055,7 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 </div>
 
 <script>
-// ===== PARTICLE SYSTEM (same as before) =====
+// ===== PARTICLE SYSTEM =====
 (function(){
   const canvas = document.getElementById('particle-canvas');
   const ctx = canvas.getContext('2d');
@@ -1101,6 +1183,7 @@ function enterSubPanel(){
   document.getElementById('main-panel').classList.remove('active');
   showHeader('sub_admin', SESSION.username);
   subLoadUIDs();
+  subLoadCredits();
 }
 
 function showHeader(role, uname){
@@ -1113,6 +1196,11 @@ function showHeader(role, uname){
     document.getElementById('sidebar-avatar').textContent = 'A';
   }
   document.getElementById('nav-resellers').style.display = role==='main_admin' ? 'flex' : 'none';
+}
+
+function updateSidebarCredits(credits){
+  const el = document.getElementById('sidebar-credits');
+  if(el) el.innerHTML = `💰 ${credits || 0} credits`;
 }
 
 function switchMainTab(tab){
@@ -1189,6 +1277,69 @@ function calcStats(uids, tId, aId, eId, sId){
   if(sId) document.getElementById(sId).textContent = soon;
 }
 
+// ===== CREDIT FUNCTIONS =====
+async function subLoadCredits(){
+  try{
+    const res = await fetch('/subadmin/credits?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
+    const data = await res.json();
+    if(res.ok){
+      document.getElementById('ss-credits').textContent = data.credits || 0;
+      updateSidebarCredits(data.credits || 0);
+      document.getElementById('sub-credit-display').textContent = `(💰 ${data.credits || 0} credits left)`;
+    }
+  }catch(e){}
+}
+
+async function addCredits(){
+  const username = document.getElementById('credit-reseller').value.trim();
+  const amount = parseInt(document.getElementById('credit-amount').value);
+  if(!username) return showToast('Enter reseller username','error');
+  if(!amount || amount < 1) return showToast('Enter valid amount','error');
+  
+  try{
+    const res = await fetch('/admin/add-credits', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({admin_key:SESSION.adminKey, username, amount})
+    });
+    const data = await res.json();
+    if(res.ok){
+      showToast(`Added ${amount} credits to ${username}`);
+      showResult('credit-result',`✓ Added ${amount} credits`,'success');
+      loadResellers();
+    } else {
+      showToast(data.message || 'Failed','error');
+    }
+  }catch(e){
+    showToast('Connection error','error');
+  }
+}
+
+async function removeCredits(){
+  const username = document.getElementById('credit-reseller').value.trim();
+  const amount = parseInt(document.getElementById('credit-amount').value);
+  if(!username) return showToast('Enter reseller username','error');
+  if(!amount || amount < 1) return showToast('Enter valid amount','error');
+  
+  try{
+    const res = await fetch('/admin/remove-credits', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({admin_key:SESSION.adminKey, username, amount})
+    });
+    const data = await res.json();
+    if(res.ok){
+      showToast(`Removed ${amount} credits from ${username}`);
+      showResult('credit-result',`✓ Removed ${amount} credits`,'success');
+      loadResellers();
+    } else {
+      showToast(data.message || 'Failed','error');
+    }
+  }catch(e){
+    showToast('Connection error','error');
+  }
+}
+
 // ===== MAIN UID FUNCTIONS =====
 async function mainLoadUIDs(){
   const tb = document.getElementById('main-uid-tbody');
@@ -1251,6 +1402,7 @@ async function subLoadUIDs(){
     allSubUIDs = data.licenses || [];
     renderSubTable(allSubUIDs);
     calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
+    subLoadCredits();
   }catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
 }
 
@@ -1265,13 +1417,31 @@ function filterSubTable(){
 }
 
 async function subAddUID(){
+  // Check credits first
+  const creditRes = await fetch('/subadmin/credits?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
+  const creditData = await creditRes.json();
+  if(!creditRes.ok || creditData.credits < 1){
+    showToast('Insufficient credits! Please contact admin.','error');
+    return showResult('s-add-result','✗ Insufficient credits','error');
+  }
+
   const uid = document.getElementById('s-uid').value.trim();
   const name = document.getElementById('s-name').value.trim() || 'Player';
   const days = document.getElementById('s-days').value;
   if(!uid) return showToast('UID required','error');
+  
   const res = await fetch('/subadmin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, name, days:parseInt(days)})});
-  if(res.ok){ showToast('UID added'); showResult('s-add-result','✓ Added','success'); document.getElementById('s-uid').value=''; document.getElementById('s-name').value=''; subLoadUIDs(); }
-  else { const data = await res.json(); showToast(data.message,'error'); }
+  if(res.ok){ 
+    showToast('UID added! 1 credit used'); 
+    showResult('s-add-result','✓ Added (1 credit used)','success'); 
+    document.getElementById('s-uid').value=''; 
+    document.getElementById('s-name').value=''; 
+    subLoadUIDs();
+    subLoadCredits();
+  } else { 
+    const data = await res.json(); 
+    showToast(data.message,'error'); 
+  }
 }
 
 async function subRenewUID(){
@@ -1321,23 +1491,30 @@ async function createReseller(){
   const u = document.getElementById('new-res-user').value.trim();
   const p = document.getElementById('new-res-pass').value.trim();
   const n = document.getElementById('new-res-note').value.trim();
+  const credits = parseInt(document.getElementById('new-res-credits').value) || 100;
   if(!u||!p) return showToast('Fill username/password','error');
-  const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n})});
-  if(res.ok){ showToast('Reseller created'); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); loadResellers(); }
+  const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n, credits})});
+  if(res.ok){ showToast(`Reseller created with ${credits} credits`); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); loadResellers(); }
   else { const d = await res.json(); showToast(d.message,'error'); }
 }
 
 async function loadResellers(){
   const tb = document.getElementById('reseller-tbody');
-  tb.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
-  const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
-  const data = await res.json();
-  if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="3" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
-  tb.innerHTML = data.subadmins.map(s => `<tr>
-    <td><span class="badge badge-active">${s.username}</span></td>
-    <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
-    <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
-  </tr>`).join('');
+  tb.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
+  try{
+    const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
+    const data = await res.json();
+    if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="5" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
+    tb.innerHTML = data.subadmins.map(s => `<tr>
+      <td><span class="badge badge-active">${s.username}</span></td>
+      <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
+      <td><span class="credit-badge"><span class="coin">💰</span> ${s.credits || 0}</span></td>
+      <td style="font-family:'Space Mono',monospace; font-size:13px; color:#9ca3af;">${s.uid_count || 0}</td>
+      <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
+    </tr>`).join('');
+  }catch(e){
+    tb.innerHTML='<tr><td colspan="5" style="text-align:center; color:#f87171;">Error loading resellers</td></tr>';
+  }
 }
 
 async function deleteReseller(uname){
@@ -1394,3 +1571,4 @@ window.onload = () => {
 })();
 </script>
 </body>
+</html>
