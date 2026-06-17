@@ -1116,51 +1116,37 @@
       }catch(e){}
     }
 
-    // FIXED: giveCredits function with proper error handling
+    // FIXED: giveCredits function now properly works
     async function giveCredits(){
       const username = document.getElementById('credit-reseller').value.trim();
       const amount = parseInt(document.getElementById('credit-amount').value.trim());
-      
-      if(!username) {
-        showToast('Please enter a reseller username','error');
+      if(!username || !amount || amount<1) {
+        showToast('Please enter valid username and amount','error');
         return;
       }
-      if(!amount || amount < 1) {
-        showToast('Please enter a valid amount (minimum 1)','error');
-        return;
-      }
-      
       try {
-        const response = await fetch('/admin/give-credits', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+        const res = await fetch('/admin/give-credits', {
+          method: 'POST', 
+          headers: {'Content-Type': 'application/json'}, 
           body: JSON.stringify({
-            admin_key: SESSION.adminKey,
-            username: username,
+            admin_key: SESSION.adminKey, 
+            username: username, 
             amount: amount
           })
         });
-
-        const data = await response.json();
-        
-        if (response.ok && data.status === 'success') {
-          showToast(`✅ Successfully added ${amount} credits to ${username}`);
-          showResult('credit-result', `✓ ${amount} credits added to ${username}`, 'success');
+        const data = await res.json();
+        if(res.ok && data.status === 'success'){ 
+          showToast(`✅ Added ${amount} credits to ${username}`); 
+          showResult('credit-result','✓ Credits added successfully','success'); 
           document.getElementById('credit-reseller').value = '';
-          document.getElementById('credit-amount').value = '100';
-          // Refresh the reseller list to show updated credits
-          await loadResellers();
-        } else {
-          const errorMsg = data.message || 'Failed to add credits';
-          showToast(`❌ ${errorMsg}`, 'error');
-          showResult('credit-result', `✗ ${errorMsg}`, 'error');
+          loadResellers(); 
+        } else { 
+          showToast(data.message || 'Failed to add credits','error'); 
+          showResult('credit-result','✗ '+ (data.message || 'Failed'),'error');
         }
-      } catch (error) {
-        console.error('Credit add error:', error);
-        showToast('❌ Connection error. Please check your network.', 'error');
-        showResult('credit-result', '✗ Connection error. Please try again.', 'error');
+      } catch(e) {
+        showToast('Connection error','error');
+        showResult('credit-result','✗ Connection error','error');
       }
     }
 
@@ -1195,26 +1181,9 @@
       const p = document.getElementById('new-res-pass').value.trim();
       const n = document.getElementById('new-res-note').value.trim();
       if(!u||!p) return showToast('Fill username/password','error');
-      try {
-        const res = await fetch('/admin/create-subadmin', {
-          method:'POST', 
-          headers:{'Content-Type':'application/json'}, 
-          body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n})
-        });
-        if(res.ok){ 
-          showToast('Reseller created'); 
-          document.getElementById('new-res-user').value=''; 
-          document.getElementById('new-res-pass').value=''; 
-          document.getElementById('new-res-note').value=''; 
-          showResult('res-create-result','✓ Reseller created','success'); 
-          loadResellers(); 
-        } else { 
-          const d = await res.json(); 
-          showToast(d.message,'error'); 
-        }
-      } catch(e) {
-        showToast('Connection error','error');
-      }
+      const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n})});
+      if(res.ok){ showToast('Reseller created'); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); loadResellers(); }
+      else { const d = await res.json(); showToast(d.message,'error'); }
     }
 
     async function loadResellers(){
@@ -1223,10 +1192,7 @@
       try {
         const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
         const data = await res.json();
-        if(!res.ok || !data.subadmins || !data.subadmins.length){ 
-          tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; 
-          return; 
-        }
+        if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
         tb.innerHTML = data.subadmins.map(s => `<tr>
           <td><span class="badge badge-active">${s.username}</span></td>
           <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
@@ -1240,16 +1206,8 @@
 
     async function deleteReseller(uname){
       if(!confirm(`Delete reseller: ${uname}?`)) return;
-      try {
-        const res = await fetch('/admin/delete-subadmin', {
-          method:'POST', 
-          headers:{'Content-Type':'application/json'}, 
-          body:JSON.stringify({admin_key:SESSION.adminKey, username:uname})
-        });
-        if(res.ok){ showToast('Reseller deleted'); loadResellers(); }
-      } catch(e) {
-        showToast('Connection error','error');
-      }
+      const res = await fetch('/admin/delete-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:uname})});
+      if(res.ok){ showToast('Reseller deleted'); loadResellers(); }
     }
 
     // ===== EVENT LISTENERS =====
