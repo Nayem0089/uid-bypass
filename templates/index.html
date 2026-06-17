@@ -1091,6 +1091,32 @@ tr:hover td { background: rgba(239,68,68,0.03); }
 </div>
 
 <script>
+// ===== API BASE URL - Change this to your API endpoint =====
+const API_BASE_URL = 'http://localhost:3000'; // Change this to your actual API URL
+
+// ===== API HELPER FUNCTIONS =====
+async function apiCall(endpoint, method = 'GET', data = null) {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const options = {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
+  if (data) {
+    options.body = JSON.stringify(data);
+  }
+  
+  try {
+    const response = await fetch(url, options);
+    const responseData = await response.json();
+    return { ok: response.ok, data: responseData, status: response.status };
+  } catch (error) {
+    console.error('API Error:', error);
+    return { ok: false, data: { message: 'Network error - Please check if the server is running' }, status: 0 };
+  }
+}
+
 // ===== PARTICLE SYSTEM =====
 (function(){
   const canvas = document.getElementById('particle-canvas');
@@ -1182,26 +1208,20 @@ function switchLoginTab(tab){
 async function doMainLogin(){
   const key = document.getElementById('main-key').value.trim();
   if(!key) return showResult('main-login-err','Enter Master Key','error');
-  try{
-    const res = await fetch('/admin/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:key})});
-    const data = await res.json();
-    if(!res.ok) return showResult('main-login-err','✗ '+(data.message||'Invalid key'),'error');
-    SESSION = {role:'main_admin', adminKey:key, username:null, password:null};
-    saveSession(); enterMainPanel();
-  }catch(e){ showResult('main-login-err','Connection error','error'); }
+  const result = await apiCall('/admin/verify', 'POST', {admin_key:key});
+  if(!result.ok) return showResult('main-login-err','✗ '+(result.data.message||'Invalid key'),'error');
+  SESSION = {role:'main_admin', adminKey:key, username:null, password:null};
+  saveSession(); enterMainPanel();
 }
 
 async function doSubLogin(){
   const u = document.getElementById('sub-user').value.trim();
   const p = document.getElementById('sub-pass').value.trim();
   if(!u||!p) return showResult('sub-login-err','Enter credentials','error');
-  try{
-    const res = await fetch('/subadmin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})});
-    const data = await res.json();
-    if(!res.ok) return showResult('sub-login-err','✗ '+(data.message||'Invalid credentials'),'error');
-    SESSION = {role:'sub_admin', adminKey:null, username:u, password:p};
-    saveSession(); enterSubPanel();
-  }catch(e){ showResult('sub-login-err','Connection error','error'); }
+  const result = await apiCall('/subadmin/login', 'POST', {username:u, password:p});
+  if(!result.ok) return showResult('sub-login-err','✗ '+(result.data.message||'Invalid credentials'),'error');
+  SESSION = {role:'sub_admin', adminKey:null, username:u, password:p};
+  saveSession(); enterSubPanel();
 }
 
 function enterMainPanel(){
@@ -1317,10 +1337,9 @@ function calcStats(uids, tId, aId, eId, sId){
 // ===== CREDIT FUNCTIONS =====
 async function subLoadCredits(){
   try{
-    const res = await fetch('/subadmin/credits?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
-    const data = await res.json();
-    if(res.ok){
-      currentCredits = data.credits || 0;
+    const result = await apiCall(`/subadmin/credits?username=${encodeURIComponent(SESSION.username)}&password=${encodeURIComponent(SESSION.password)}`);
+    if(result.ok){
+      currentCredits = result.data.credits || 0;
       const creditEl = document.getElementById('ss-credits');
       const creditStatCard = document.getElementById('credit-stat-card');
       const noCreditWarning = document.getElementById('no-credit-warning');
@@ -1365,23 +1384,19 @@ async function addCredits(){
   if(!username) return showToast('Enter reseller username','error');
   if(!amount || amount < 1) return showToast('Enter valid amount','error');
   
-  try{
-    const res = await fetch('/admin/add-credits', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({admin_key:SESSION.adminKey, username, amount})
-    });
-    const data = await res.json();
-    if(res.ok){
-      showToast(`Added ${amount} credits to ${username}`);
-      showResult('credit-result',`✓ Added ${amount} credits`,'success');
-      loadResellers();
-    } else {
-      showToast(data.message || 'Failed','error');
-      showResult('credit-result',`✗ ${data.message || 'Failed'}`,'error');
-    }
-  } catch(e){
-    showToast('Connection error','error');
+  const result = await apiCall('/admin/add-credits', 'POST', {
+    admin_key: SESSION.adminKey, 
+    username, 
+    amount
+  });
+  
+  if(result.ok){
+    showToast(`Added ${amount} credits to ${username}`);
+    showResult('credit-result',`✓ Added ${amount} credits`,'success');
+    loadResellers();
+  } else {
+    showToast(result.data.message || 'Failed','error');
+    showResult('credit-result',`✗ ${result.data.message || 'Failed'}`,'error');
   }
 }
 
@@ -1391,23 +1406,19 @@ async function removeCredits(){
   if(!username) return showToast('Enter reseller username','error');
   if(!amount || amount < 1) return showToast('Enter valid amount','error');
   
-  try{
-    const res = await fetch('/admin/remove-credits', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({admin_key:SESSION.adminKey, username, amount})
-    });
-    const data = await res.json();
-    if(res.ok){
-      showToast(`Removed ${amount} credits from ${username}`);
-      showResult('credit-result',`✓ Removed ${amount} credits`,'success');
-      loadResellers();
-    } else {
-      showToast(data.message || 'Failed','error');
-      showResult('credit-result',`✗ ${data.message || 'Failed'}`,'error');
-    }
-  } catch(e){
-    showToast('Connection error','error');
+  const result = await apiCall('/admin/remove-credits', 'POST', {
+    admin_key: SESSION.adminKey, 
+    username, 
+    amount
+  });
+  
+  if(result.ok){
+    showToast(`Removed ${amount} credits from ${username}`);
+    showResult('credit-result',`✓ Removed ${amount} credits`,'success');
+    loadResellers();
+  } else {
+    showToast(result.data.message || 'Failed','error');
+    showResult('credit-result',`✗ ${result.data.message || 'Failed'}`,'error');
   }
 }
 
@@ -1415,14 +1426,11 @@ async function removeCredits(){
 async function mainLoadUIDs(){
   const tb = document.getElementById('main-uid-tbody');
   tb.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:30px;">Loading...</td></tr>';
-  try{
-    const res = await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey));
-    const data = await res.json();
-    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171; text-align:center;">Error: ${data.message}</td></tr>`; return; }
-    allMainUIDs = data.licenses || [];
-    renderMainTable(allMainUIDs);
-    calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
-  } catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
+  const result = await apiCall(`/admin/list?admin_key=${encodeURIComponent(SESSION.adminKey)}`);
+  if(!result.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171; text-align:center;">Error: ${result.data.message}</td></tr>`; return; }
+  allMainUIDs = result.data.licenses || [];
+  renderMainTable(allMainUIDs);
+  calcStats(allMainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
 }
 
 function renderMainTable(uids){
@@ -1440,13 +1448,23 @@ async function mainAddUID(){
   const name = document.getElementById('m-name').value.trim() || 'Player';
   const days = document.getElementById('m-days').value;
   if(!uid) return showToast('UID required','error');
-  try {
-    const res = await fetch('/admin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid, name, days:parseInt(days)})});
-    const data = await res.json();
-    if(res.ok){ showToast('UID created!'); showResult('m-add-result','✓ UID added','success'); document.getElementById('m-uid').value=''; document.getElementById('m-name').value=''; mainLoadUIDs(); }
-    else { showToast(data.message,'error'); showResult('m-add-result','✗ '+data.message,'error'); }
-  } catch(e) {
-    showToast('Connection error','error');
+  
+  const result = await apiCall('/admin/create', 'POST', {
+    admin_key: SESSION.adminKey, 
+    uid, 
+    name, 
+    days: parseInt(days)
+  });
+  
+  if(result.ok){ 
+    showToast('UID created!'); 
+    showResult('m-add-result','✓ UID added','success'); 
+    document.getElementById('m-uid').value=''; 
+    document.getElementById('m-name').value=''; 
+    mainLoadUIDs(); 
+  } else { 
+    showToast(result.data.message || 'Failed to create UID','error'); 
+    showResult('m-add-result','✗ '+(result.data.message || 'Failed'),'error'); 
   }
 }
 
@@ -1454,13 +1472,20 @@ async function mainRenewUID(){
   const uid = document.getElementById('m-renew-uid').value.trim();
   const days = document.getElementById('m-renew-days').value;
   if(!uid) return showToast('Enter UID','error');
-  try {
-    const res = await fetch('/admin/update', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid, days:parseInt(days)})});
-    const data = await res.json();
-    if(res.ok){ showToast(`Renewed +${days} days`); showResult('m-rm-result','✓ Renewed','success'); document.getElementById('m-renew-uid').value=''; mainLoadUIDs(); }
-    else showToast(data.message,'error');
-  } catch(e) {
-    showToast('Connection error','error');
+  
+  const result = await apiCall('/admin/update', 'POST', {
+    admin_key: SESSION.adminKey, 
+    uid, 
+    days: parseInt(days)
+  });
+  
+  if(result.ok){ 
+    showToast(`Renewed +${days} days`); 
+    showResult('m-rm-result','✓ Renewed','success'); 
+    document.getElementById('m-renew-uid').value=''; 
+    mainLoadUIDs(); 
+  } else {
+    showToast(result.data.message || 'Failed to renew','error');
   }
 }
 
@@ -1474,15 +1499,18 @@ function mainRemoveUID(){
 async function subLoadUIDs(){
   const tb = document.getElementById('sub-uid-tbody');
   tb.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:30px;">Loading...</td></tr>';
-  try{
-    const res = await fetch('/subadmin/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
-    const data = await res.json();
-    if(!res.ok){ tb.innerHTML=`<tr><td colspan="7" style="color:#f87171;">Error: ${data.message}</td></tr>`; return; }
-    allSubUIDs = data.licenses || [];
-    renderSubTable(allSubUIDs);
-    calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
-    await subLoadCredits();
-  } catch(e){ tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>'; }
+  
+  const result = await apiCall(`/subadmin/list?username=${encodeURIComponent(SESSION.username)}&password=${encodeURIComponent(SESSION.password)}`);
+  
+  if(!result.ok){ 
+    tb.innerHTML=`<tr><td colspan="7" style="color:#f87171;">Error: ${result.data.message}</td></tr>`; 
+    return; 
+  }
+  
+  allSubUIDs = result.data.licenses || [];
+  renderSubTable(allSubUIDs);
+  calcStats(allSubUIDs,'ss-total','ss-active','ss-expired',null);
+  await subLoadCredits();
 }
 
 function renderSubTable(uids){
@@ -1497,9 +1525,8 @@ function filterSubTable(){
 
 async function subAddUID(){
   // Check credits first
-  const creditRes = await fetch('/subadmin/credits?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
-  const creditData = await creditRes.json();
-  if(!creditRes.ok || creditData.credits < 1){
+  const creditResult = await apiCall(`/subadmin/credits?username=${encodeURIComponent(SESSION.username)}&password=${encodeURIComponent(SESSION.password)}`);
+  if(!creditResult.ok || creditResult.data.credits < 1){
     showToast('Insufficient credits! Please contact admin.','error');
     showResult('s-add-result','✗ Insufficient credits - Contact Main Admin','error');
     return;
@@ -1510,22 +1537,24 @@ async function subAddUID(){
   const days = document.getElementById('s-days').value;
   if(!uid) return showToast('UID required','error');
   
-  try {
-    const res = await fetch('/subadmin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, name, days:parseInt(days)})});
-    const data = await res.json();
-    if(res.ok){ 
-      showToast('UID added! 1 credit used'); 
-      showResult('s-add-result','✓ Added (1 credit used)','success'); 
-      document.getElementById('s-uid').value=''; 
-      document.getElementById('s-name').value=''; 
-      await subLoadUIDs();
-      await subLoadCredits();
-    } else { 
-      showToast(data.message || 'Failed to add UID','error'); 
-      showResult('s-add-result','✗ '+ (data.message || 'Failed'),'error');
-    }
-  } catch(e) {
-    showToast('Connection error','error');
+  const result = await apiCall('/subadmin/create', 'POST', {
+    username: SESSION.username, 
+    password: SESSION.password, 
+    uid, 
+    name, 
+    days: parseInt(days)
+  });
+  
+  if(result.ok){ 
+    showToast('UID added! 1 credit used'); 
+    showResult('s-add-result','✓ Added (1 credit used)','success'); 
+    document.getElementById('s-uid').value=''; 
+    document.getElementById('s-name').value=''; 
+    await subLoadUIDs();
+    await subLoadCredits();
+  } else { 
+    showToast(result.data.message || 'Failed to add UID','error'); 
+    showResult('s-add-result','✗ '+ (result.data.message || 'Failed'),'error');
   }
 }
 
@@ -1533,13 +1562,21 @@ async function subRenewUID(){
   const uid = document.getElementById('s-renew-uid').value.trim();
   const days = document.getElementById('s-renew-days').value;
   if(!uid) return showToast('Enter UID','error');
-  try {
-    const res = await fetch('/subadmin/update', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, days:parseInt(days)})});
-    const data = await res.json();
-    if(res.ok){ showToast(`Renewed +${days} days`); showResult('s-rm-result','✓ Renewed','success'); document.getElementById('s-renew-uid').value=''; await subLoadUIDs(); }
-    else { showToast(data.message || 'Failed to renew','error'); }
-  } catch(e) {
-    showToast('Connection error','error');
+  
+  const result = await apiCall('/subadmin/update', 'POST', {
+    username: SESSION.username, 
+    password: SESSION.password, 
+    uid, 
+    days: parseInt(days)
+  });
+  
+  if(result.ok){ 
+    showToast(`Renewed +${days} days`); 
+    showResult('s-rm-result','✓ Renewed','success'); 
+    document.getElementById('s-renew-uid').value=''; 
+    await subLoadUIDs(); 
+  } else { 
+    showToast(result.data.message || 'Failed to renew','error'); 
   }
 }
 
@@ -1565,18 +1602,19 @@ async function confirmDeleteAction(){
   if(!pendingUID) return closeModalAction();
   const uid = pendingUID, isMain = pendingIsMain;
   closeModalAction();
-  try {
-    let res;
-    if(isMain){
-      res = await fetch('/admin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid})});
-    } else {
-      res = await fetch('/subadmin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid})});
-    }
-    const data = await res.json();
-    if(res.ok && data.status==='success'){ showToast('UID revoked'); isMain ? await mainLoadUIDs() : await subLoadUIDs(); }
-    else showToast(data.message||'Failed','error');
-  } catch(e) {
-    showToast('Connection error','error');
+  
+  let result;
+  if(isMain){
+    result = await apiCall('/admin/revoke', 'POST', {admin_key: SESSION.adminKey, uid});
+  } else {
+    result = await apiCall('/subadmin/revoke', 'POST', {username: SESSION.username, password: SESSION.password, uid});
+  }
+  
+  if(result.ok && result.data.status==='success'){ 
+    showToast('UID revoked'); 
+    isMain ? await mainLoadUIDs() : await subLoadUIDs(); 
+  } else {
+    showToast(result.data.message||'Failed','error');
   }
 }
 
@@ -1587,43 +1625,61 @@ async function createReseller(){
   const n = document.getElementById('new-res-note').value.trim();
   const credits = parseInt(document.getElementById('new-res-credits').value) || 100;
   if(!u||!p) return showToast('Fill username/password','error');
-  try {
-    const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n, credits})});
-    const data = await res.json();
-    if(res.ok){ showToast(`Reseller created with ${credits} credits`); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); await loadResellers(); }
-    else { showToast(data.message || 'Failed to create','error'); showResult('res-create-result','✗ '+ (data.message || 'Failed'),'error'); }
-  } catch(e) {
-    showToast('Connection error','error');
+  
+  const result = await apiCall('/admin/create-subadmin', 'POST', {
+    admin_key: SESSION.adminKey, 
+    username: u, 
+    password: p, 
+    note: n, 
+    credits
+  });
+  
+  if(result.ok){ 
+    showToast(`Reseller created with ${credits} credits`); 
+    document.getElementById('new-res-user').value=''; 
+    document.getElementById('new-res-pass').value=''; 
+    document.getElementById('new-res-note').value=''; 
+    showResult('res-create-result','✓ Reseller created','success'); 
+    await loadResellers(); 
+  } else { 
+    showToast(result.data.message || 'Failed to create','error'); 
+    showResult('res-create-result','✗ '+ (result.data.message || 'Failed'),'error'); 
   }
 }
 
 async function loadResellers(){
   const tb = document.getElementById('reseller-tbody');
   tb.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
-  try{
-    const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
-    const data = await res.json();
-    if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="5" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
-    tb.innerHTML = data.subadmins.map(s => `<tr>
-      <td><span class="badge badge-active">${s.username}</span></td>
-      <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
-      <td><span class="credit-badge"><span class="coin">💰</span> ${s.credits || 0}</span></td>
-      <td style="font-family:'Space Mono',monospace; font-size:13px; color:#9ca3af;">${s.uid_count || 0}</td>
-      <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
-    </tr>`).join('');
-  } catch(e){
-    tb.innerHTML='<tr><td colspan="5" style="text-align:center; color:#f87171;">Error loading resellers</td></tr>';
+  
+  const result = await apiCall(`/admin/list-subadmins?admin_key=${encodeURIComponent(SESSION.adminKey)}`);
+  
+  if(!result.ok || !result.data.subadmins || !result.data.subadmins.length){ 
+    tb.innerHTML='<tr><td colspan="5" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; 
+    return; 
   }
+  
+  tb.innerHTML = result.data.subadmins.map(s => `<tr>
+    <td><span class="badge badge-active">${s.username}</span></td>
+    <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
+    <td><span class="credit-badge"><span class="coin">💰</span> ${s.credits || 0}</span></td>
+    <td style="font-family:'Space Mono',monospace; font-size:13px; color:#9ca3af;">${s.uid_count || 0}</td>
+    <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
+  </tr>`).join('');
 }
 
 async function deleteReseller(uname){
   if(!confirm(`Delete reseller: ${uname}?`)) return;
-  try {
-    const res = await fetch('/admin/delete-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:uname})});
-    if(res.ok){ showToast('Reseller deleted'); await loadResellers(); }
-    else showToast('Failed to delete','error');
-  } catch(e) {
-    showToast('Connection error','error');
+  
+  const result = await apiCall('/admin/delete-subadmin', 'POST', {
+    admin_key: SESSION.adminKey, 
+    username: uname
+  });
+  
+  if(result.ok){ 
+    showToast('Reseller deleted'); 
+    await loadResellers(); 
+  } else {
+    showToast(result.data.message || 'Failed to delete','error');
   }
 }
 
@@ -1659,17 +1715,13 @@ window.onload = () => {
 (async function init(){
   loadSession();
   if(SESSION.role==='main_admin' && SESSION.adminKey){
-    try{
-      const r = await fetch('/admin/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey})});
-      if(r.ok){ enterMainPanel(); return; }
-    } catch(e){}
+    const result = await apiCall('/admin/verify', 'POST', {admin_key: SESSION.adminKey});
+    if(result.ok){ enterMainPanel(); return; }
     clearSession();
   }
   if(SESSION.role==='sub_admin' && SESSION.username){
-    try{
-      const r = await fetch('/subadmin/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password})});
-      if(r.ok){ enterSubPanel(); return; }
-    } catch(e){}
+    const result = await apiCall('/subadmin/login', 'POST', {username: SESSION.username, password: SESSION.password});
+    if(result.ok){ enterSubPanel(); return; }
     clearSession();
   }
 })();
