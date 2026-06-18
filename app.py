@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 # CONFIG
 SENSIX_BASE    = os.environ.get("SENSIX_BASE",    "http://new.sensix.shop:2005")
-SENSIX_APIKEY  = os.environ.get("SENSIX_APIKEY",  "SENSIX-6E1D04F888A3CC09C952D58EE63971C919D777C43EB90B5E")
+SENSIX_APIKEY  = os.environ.get("SENSIX_APIKEY",  "SENSIX-B09BB8CDC3627617B9DD8CF0D7F9674A6F11E82311F89930")
 ADMIN_KEY      = os.environ.get("ADMIN_KEY",      "changeme_admin_key")
 SELF_URL       = os.environ.get("SELF_URL",       "")
 
