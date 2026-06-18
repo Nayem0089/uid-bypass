@@ -558,6 +558,30 @@
       display: inline-block;
       backdrop-filter: blur(4px);
     }
+    .credit-input-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .credit-input-group .input-glow {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    .credit-input-group .btn-glass {
+      flex: 0 0 auto;
+      width: auto;
+      padding: 14px 24px;
+    }
+    .copy-btn {
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      margin-left: 5px;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    .copy-btn:hover { color: #9ca3af; }
   </style>
 </head>
 <body>
@@ -673,6 +697,10 @@
               <input id="new-res-user" class="input-glow" placeholder="Username">
               <input type="password" id="new-res-pass" class="input-glow" placeholder="Password">
               <input id="new-res-note" class="input-glow" placeholder="Note (optional)">
+              <div style="margin: 10px 0 16px;">
+                <label style="color:#9ca3af; font-size:12px; font-weight:600;">Initial Credits</label>
+                <input type="number" id="new-res-credits" class="input-glow" placeholder="Initial credits" value="10" min="0">
+              </div>
               <button class="btn-glass" onclick="createReseller()">✨ CREATE RESELLER</button>
               <div class="result-msg" id="res-create-result"></div>
             </div>
@@ -695,7 +723,7 @@
             </div>
           </div>
         </div>
-        <!-- CREDIT MGMT TAB (placeholder) -->
+        <!-- CREDIT MGMT TAB -->
         <div id="main-tab-credit" class="panel-section">
           <div class="page-header"><h1>💰 CREDIT MANAGEMENT</h1><p>GLOBAL CREDIT SETTINGS</p></div>
           <div class="card">
@@ -717,7 +745,7 @@
         </div>
         <div style="display:flex; gap:20px; align-items:center; margin-bottom:16px; flex-wrap:wrap;">
           <span class="badge badge-credit" style="font-size:16px; padding:10px 20px;">💰 CREDITS: <span id="sub-credit-display">0</span></span>
-          <span id="sub-credit-warning" class="credit-warning" style="display:none;">⚠️ NO CREDIT FOUND — PLZ CONNECT MAIN ADMIN</span>
+          <span id="sub-credit-warning" class="credit-warning" style="display:none;">⚠️ NO CREDIT FOUND — CONTACT MAIN ADMIN</span>
         </div>
         <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
           <div class="stat-card"><div class="stat-number white" id="ss-total">—</div><div class="stat-label">Total</div></div>
@@ -889,6 +917,7 @@
       document.getElementById('main-panel').classList.add('active');
       document.getElementById('sub-panel').classList.remove('active');
       document.getElementById('nav-credit').style.display = 'flex';
+      document.getElementById('nav-resellers').style.display = 'flex';
       showHeader('main_admin', null);
       mainLoadUIDs(); loadResellers();
     }
@@ -898,6 +927,8 @@
       document.getElementById('app-layout').style.display = 'flex';
       document.getElementById('sub-panel').classList.add('active');
       document.getElementById('main-panel').classList.remove('active');
+      document.getElementById('nav-resellers').style.display = 'none';
+      document.getElementById('nav-credit').style.display = 'none';
       showHeader('sub_admin', SESSION.username);
       subLoadUIDs(); subLoadCredits();
     }
@@ -911,8 +942,6 @@
         document.getElementById('sidebar-user').textContent = 'ADMINISTRATOR';
         document.getElementById('sidebar-avatar').textContent = 'A';
       }
-      document.getElementById('nav-resellers').style.display = role==='main_admin' ? 'flex' : 'none';
-      document.getElementById('nav-credit').style.display = role==='main_admin' ? 'flex' : 'none';
       if(role==='sub_admin'){
         document.getElementById('sidebar-credit').style.display = 'block';
       } else {
@@ -922,10 +951,13 @@
 
     function switchMainTab(tab){
       document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      document.getElementById('nav-'+tab).classList.add('active');
+      const navBtn = document.getElementById('nav-'+tab);
+      if(navBtn) navBtn.classList.add('active');
       document.querySelectorAll('#main-panel .panel-section').forEach(s => s.classList.remove('active'));
-      document.getElementById('main-tab-'+tab).classList.add('active');
+      const panel = document.getElementById('main-tab-'+tab);
+      if(panel) panel.classList.add('active');
       if(tab==='resellers') loadResellers();
+      if(tab==='credit') loadCreditLogs();
     }
 
     function doLogout(){
@@ -956,7 +988,7 @@
       const daysLeftHtml = renderDaysLeftBadge(remaining);
       const rmFn = isMain ? `openModal('${uidVal}',true)` : `openModal('${uidVal}',false)`;
       return `<tr>
-        <td><span class="uid-mono">${uidVal}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${uidVal}');showToast('Copied!')" style="background:none;border:none;color:#6b7280;cursor:pointer;margin-left:5px;">📋</button></td>
+        <td><span class="uid-mono">${uidVal}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${uidVal}');showToast('Copied!')">📋</button></td>
         <td style="font-weight:600; color:rgba(255,255,255,0.85);">${name}</td>
         <td><span style="font-family:'Space Mono',monospace; font-size:13px; color:#9ca3af;">${days}d</span></td>
         <td>${badgeHtml}</td>
@@ -1060,10 +1092,9 @@
     }
 
     async function subAddUID(){
-      // Check credits first
       await subLoadCredits();
       if(currentSubCredits < 1){
-        showToast('❌ No credit found! Contact Main Admin.','error');
+        showToast('❌ No credits available! Contact Main Admin.','error');
         document.getElementById('sub-credit-warning').style.display = 'inline-block';
         return;
       }
@@ -1071,15 +1102,19 @@
       const name = document.getElementById('s-name').value.trim() || 'Player';
       const days = document.getElementById('s-days').value;
       if(!uid) return showToast('UID required','error');
+      
       const res = await fetch('/subadmin/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid, name, days:parseInt(days)})});
+      const data = await res.json();
+      
       if(res.ok){ 
         showToast('UID added (1 credit used)'); 
         showResult('s-add-result','✓ Added','success'); 
         document.getElementById('s-uid').value=''; document.getElementById('s-name').value=''; 
-        subLoadUIDs(); subLoadCredits(); 
+        subLoadUIDs(); 
+        subLoadCredits(); // Refresh credits after using
       } else { 
-        const data = await res.json(); 
-        showToast(data.message,'error'); 
+        showToast(data.message || 'Failed to add UID','error'); 
+        showResult('s-add-result','✗ '+data.message,'error');
       }
     }
 
@@ -1113,17 +1148,142 @@
             document.getElementById('sub-credit-warning').style.display = 'none';
           }
         }
-      }catch(e){}
+      }catch(e){
+        console.error('Failed to load credits:', e);
+      }
     }
 
     async function giveCredits(){
       const username = document.getElementById('credit-reseller').value.trim();
       const amount = parseInt(document.getElementById('credit-amount').value.trim());
-      if(!username || !amount || amount<1) return showToast('Enter valid username and amount','error');
-      const res = await fetch('/admin/give-credits', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username, amount})});
-      const data = await res.json();
-      if(res.ok){ showToast(`Added ${amount} credits to ${username}`); showResult('credit-result','✓ Credits added','success'); loadResellers(); }
-      else { showToast(data.message,'error'); showResult('credit-result','✗ '+data.message,'error'); }
+      if(!username) return showToast('Enter reseller username','error');
+      if(!amount || amount<1) return showToast('Enter valid amount (minimum 1)','error');
+      
+      try {
+        const res = await fetch('/admin/give-credits', {
+          method:'POST', 
+          headers:{'Content-Type':'application/json'}, 
+          body:JSON.stringify({
+            admin_key:SESSION.adminKey, 
+            username, 
+            amount
+          })
+        });
+        const data = await res.json();
+        if(res.ok){ 
+          showToast(`Added ${amount} credits to ${username}`); 
+          showResult('credit-result','✓ Credits added successfully','success'); 
+          document.getElementById('credit-reseller').value = '';
+          loadResellers(); 
+        } else { 
+          showToast(data.message || 'Failed to add credits','error'); 
+          showResult('credit-result','✗ '+data.message,'error');
+        }
+      } catch(e) {
+        showToast('Connection error','error');
+      }
+    }
+
+    async function loadCreditLogs(){
+      const tb = document.getElementById('credit-log-tbody');
+      tb.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
+      try {
+        const res = await fetch('/admin/credit-logs?admin_key='+encodeURIComponent(SESSION.adminKey));
+        const data = await res.json();
+        if(!res.ok || !data.logs || !data.logs.length) {
+          tb.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6b7280; padding:30px;">No logs yet.</td></tr>';
+          return;
+        }
+        tb.innerHTML = data.logs.map(log => `<tr>
+          <td><span class="badge badge-active">${log.username}</span></td>
+          <td><span class="badge ${log.change > 0 ? 'badge-active' : 'badge-expired'}">${log.change > 0 ? '+' : ''}${log.change}</span></td>
+          <td style="color:#9ca3af; font-size:12px;">${log.reason || '—'}</td>
+          <td style="color:#6b7280; font-size:11px;">${new Date(log.date).toLocaleString()}</td>
+        </tr>`).join('');
+      } catch(e) {
+        tb.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#f87171;">Failed to load logs</td></tr>';
+      }
+    }
+
+    // ===== RESELLER MANAGEMENT =====
+    async function createReseller(){
+      const u = document.getElementById('new-res-user').value.trim();
+      const p = document.getElementById('new-res-pass').value.trim();
+      const n = document.getElementById('new-res-note').value.trim();
+      const credits = parseInt(document.getElementById('new-res-credits').value) || 0;
+      
+      if(!u||!p) return showToast('Fill username/password','error');
+      if(credits < 0) return showToast('Credits cannot be negative','error');
+      
+      try {
+        const res = await fetch('/admin/create-subadmin', {
+          method:'POST', 
+          headers:{'Content-Type':'application/json'}, 
+          body:JSON.stringify({
+            admin_key:SESSION.adminKey, 
+            username:u, 
+            password:p, 
+            note:n,
+            initial_credits: credits
+          })
+        });
+        const data = await res.json();
+        if(res.ok){ 
+          showToast(`Reseller created with ${credits} credits`); 
+          document.getElementById('new-res-user').value=''; 
+          document.getElementById('new-res-pass').value=''; 
+          document.getElementById('new-res-note').value=''; 
+          document.getElementById('new-res-credits').value = '10';
+          showResult('res-create-result','✓ Reseller created successfully','success'); 
+          loadResellers(); 
+        } else { 
+          showToast(data.message || 'Failed to create reseller','error');
+          showResult('res-create-result','✗ '+data.message,'error');
+        }
+      } catch(e) {
+        showToast('Connection error','error');
+      }
+    }
+
+    async function loadResellers(){
+      const tb = document.getElementById('reseller-tbody');
+      tb.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
+      try {
+        const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
+        const data = await res.json();
+        if(!res.ok || !data.subadmins || !data.subadmins.length){ 
+          tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; 
+          return; 
+        }
+        tb.innerHTML = data.subadmins.map(s => `<tr>
+          <td><span class="badge badge-active">${s.username}</span></td>
+          <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
+          <td><span class="badge badge-credit">💰 ${s.credits || 0}</span></td>
+          <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
+        </tr>`).join('');
+      } catch(e) {
+        tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#f87171;">Connection error</td></tr>';
+      }
+    }
+
+    async function deleteReseller(uname){
+      if(!confirm(`Delete reseller: ${uname}? This action is irreversible.`)) return;
+      try {
+        const res = await fetch('/admin/delete-subadmin', {
+          method:'POST', 
+          headers:{'Content-Type':'application/json'}, 
+          body:JSON.stringify({admin_key:SESSION.adminKey, username:uname})
+        });
+        if(res.ok){ 
+          showToast('Reseller deleted'); 
+          loadResellers(); 
+        } else {
+          const data = await res.json();
+          showToast(data.message || 'Failed to delete reseller','error');
+        }
+      } catch(e) {
+        showToast('Connection error','error');
+      }
     }
 
     // ===== MODAL =====
@@ -1140,46 +1300,23 @@
       if(!pendingUID) return closeModalAction();
       const uid = pendingUID, isMain = pendingIsMain;
       closeModalAction();
-      let res;
-      if(isMain){
-        res = await fetch('/admin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid})});
-      } else {
-        res = await fetch('/subadmin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid})});
+      try {
+        let res;
+        if(isMain){
+          res = await fetch('/admin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, uid})});
+        } else {
+          res = await fetch('/subadmin/revoke', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:SESSION.username, password:SESSION.password, uid})});
+        }
+        const data = await res.json();
+        if(res.ok && data.status==='success'){ 
+          showToast('UID revoked'); 
+          isMain ? mainLoadUIDs() : subLoadUIDs(); 
+        } else {
+          showToast(data.message||'Failed to delete UID','error');
+        }
+      } catch(e) {
+        showToast('Connection error','error');
       }
-      const data = await res.json();
-      if(res.ok && data.status==='success'){ showToast('UID revoked'); isMain ? mainLoadUIDs() : subLoadUIDs(); }
-      else showToast(data.message||'Failed','error');
-    }
-
-    // ===== RESELLER MANAGEMENT =====
-    async function createReseller(){
-      const u = document.getElementById('new-res-user').value.trim();
-      const p = document.getElementById('new-res-pass').value.trim();
-      const n = document.getElementById('new-res-note').value.trim();
-      if(!u||!p) return showToast('Fill username/password','error');
-      const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n})});
-      if(res.ok){ showToast('Reseller created'); document.getElementById('new-res-user').value=''; document.getElementById('new-res-pass').value=''; document.getElementById('new-res-note').value=''; showResult('res-create-result','✓ Reseller created','success'); loadResellers(); }
-      else { const d = await res.json(); showToast(d.message,'error'); }
-    }
-
-    async function loadResellers(){
-      const tb = document.getElementById('reseller-tbody');
-      tb.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6b7280;">Loading...</td></tr>';
-      const res = await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
-      const data = await res.json();
-      if(!res.ok || !data.subadmins || !data.subadmins.length){ tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#6b7280;">No resellers found</td></tr>'; return; }
-      tb.innerHTML = data.subadmins.map(s => `<tr>
-        <td><span class="badge badge-active">${s.username}</span></td>
-        <td style="color:#9ca3af; font-size:12px;">${s.note||'—'}</td>
-        <td><span class="badge badge-credit">💰 ${s.credits || 0}</span></td>
-        <td><button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button></td>
-      </tr>`).join('');
-    }
-
-    async function deleteReseller(uname){
-      if(!confirm(`Delete reseller: ${uname}?`)) return;
-      const res = await fetch('/admin/delete-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:uname})});
-      if(res.ok){ showToast('Reseller deleted'); loadResellers(); }
     }
 
     // ===== EVENT LISTENERS =====
