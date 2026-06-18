@@ -278,7 +278,6 @@
     .result-msg { min-height: 20px; margin-top: 8px; font-size: 13px; }
     .uid-mono { font-family: 'Space Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.85); letter-spacing: 0.3px; }
     .credit-warning { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 60px; padding: 8px 18px; color: #f87171; font-weight: 700; font-size: 12px; display: inline-block; backdrop-filter: blur(4px); }
-    /* Credit log badge */
     .log-add { color: #4ade80; font-weight: 700; font-family: 'Space Mono', monospace; }
     .log-sub { color: #f87171; font-weight: 700; font-family: 'Space Mono', monospace; }
     .divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 14px 0; }
@@ -396,7 +395,6 @@
         <div id="main-tab-resellers" class="panel-section">
           <div class="page-header"><h1>👥 RESELLERS</h1><p>MANAGE SUB-ADMIN ACCOUNTS & CREDITS</p></div>
 
-          <!-- ===== FIXED SECTION ===== -->
           <div class="card-grid-2">
             <!-- CREATE RESELLER with initial credits -->
             <div class="card">
@@ -404,7 +402,6 @@
               <input id="new-res-user" class="input-glow" placeholder="Username">
               <input type="password" id="new-res-pass" class="input-glow" placeholder="Password">
               <input id="new-res-note" class="input-glow" placeholder="Note (optional)">
-              <!-- NEW: Initial credit field -->
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
                 <span style="font-size:12px; color:#9ca3af; white-space:nowrap; font-weight:600;">💰 Initial Credits:</span>
                 <input type="number" id="new-res-credits" class="input-glow" style="margin:0; flex:1;" placeholder="0" value="0" min="0">
@@ -413,7 +410,7 @@
               <div class="result-msg" id="res-create-result"></div>
             </div>
 
-            <!-- GIVE CREDITS - fixed -->
+            <!-- GIVE CREDITS -->
             <div class="card">
               <h3>💳 GIVE CREDITS</h3>
               <p style="font-size:12px; color:#6b7280; margin-bottom:14px;">Select a reseller below OR type username manually.</p>
@@ -914,7 +911,6 @@
 
     // ===== GIVE CREDITS (FIXED) =====
     async function giveCredits(){
-      // Try select first, then manual input
       const selectVal = document.getElementById('credit-reseller-select').value;
       const username = document.getElementById('credit-reseller').value.trim() || selectVal;
       const amount = parseInt(document.getElementById('credit-amount').value);
@@ -939,7 +935,6 @@
         if(res.ok){
           showToast(`✅ Added ${amount} credits to ${username}`);
           showResult(resultId, `✓ +${amount} credits → ${username}`, 'success');
-          // Log it locally
           addCreditLog(username, amount, data.new_credits || '?', 'Manual add');
           loadResellers();
           renderCreditLog();
@@ -982,7 +977,6 @@
         <td style="color:#9ca3af; font-size:12px;">${l.reason}</td>
         <td style="color:#6b7280; font-size:11px; font-family:'Space Mono',monospace;">${l.date}</td>
       </tr>`).join('');
-      // Update stats
       const el1 = document.getElementById('cs-log-count');
       if(el1) el1.textContent = creditLog.length;
     }
@@ -1046,13 +1040,11 @@
       const initCredits = parseInt(document.getElementById('new-res-credits').value) || 0;
       if(!u||!p) return showToast('Fill username & password','error');
 
-      // Step 1: Create the reseller account
       try{
         const res = await fetch('/admin/create-subadmin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, password:p, note:n})});
         const data = await res.json();
         if(!res.ok){ showToast(data.message||'Failed to create reseller','error'); showResult('res-create-result','✗ '+(data.message||'Error'),'error'); return; }
 
-        // Step 2: Give initial credits if > 0
         if(initCredits > 0){
           const cres = await fetch('/admin/give-credits', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({admin_key:SESSION.adminKey, username:u, amount:initCredits})});
           const cdata = await cres.json();
@@ -1092,7 +1084,6 @@
             <button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button>
           </td>
         </tr>`).join('');
-        // Update credit stats
         const totalCredits = data.subadmins.reduce((sum, s) => sum + (s.credits||0), 0);
         const el1 = document.getElementById('cs-total-resellers');
         const el2 = document.getElementById('cs-total-credits');
