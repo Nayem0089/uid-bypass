@@ -6,6 +6,7 @@
   <title>STREAM CORP | Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* ─── COMPLETE STYLES ─── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #040408;
@@ -15,7 +16,6 @@
       overflow-x: hidden;
     }
 
-    /* ─── PARTICLE CANVAS ─── */
     #particle-canvas {
       position: fixed;
       top: 0;
@@ -436,7 +436,6 @@
       font-family: 'Space Mono', monospace;
     }
 
-    /* ─── STATS ─── */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -491,7 +490,6 @@
       font-family: 'Space Mono', monospace;
     }
 
-    /* ─── CARDS ─── */
     .card-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -621,7 +619,6 @@
       margin: 0;
     }
 
-    /* ─── TABLE ─── */
     .table-glass {
       border-radius: 18px;
       overflow: hidden;
@@ -662,7 +659,6 @@
       background: rgba(239,68,68,0.02);
     }
 
-    /* ─── BADGES ─── */
     .badge {
       padding: 3px 10px;
       border-radius: 99px;
@@ -779,7 +775,6 @@
       font-size: 11.5px;
     }
 
-    /* ─── TOAST ─── */
     .toast {
       position: fixed;
       bottom: 28px;
@@ -1114,6 +1109,10 @@
   <div id="toast" class="toast"></div>
 
   <script>
+    // ─── API BASE URL ───
+    // ⚠️ এখানে আপনার API URL দিন
+    const API_BASE = 'https://your-api-domain.com/api';
+
     // ─── PARTICLE SYSTEM ───
     (function() {
       const canvas = document.getElementById('particle-canvas');
@@ -1229,6 +1228,38 @@
       localStorage.removeItem('sc_session');
     }
 
+    // ─── API CALLS ───
+    async function apiCall(endpoint, method = 'GET', body = null) {
+      const url = `${API_BASE}${endpoint}`;
+      const options = {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      };
+
+      // Add auth header if session exists
+      if (SESSION.role === 'main_admin' && SESSION.adminKey) {
+        options.headers['X-Admin-Key'] = SESSION.adminKey;
+      }
+      if (SESSION.role === 'sub_admin' && SESSION.username) {
+        options.headers['X-Username'] = SESSION.username;
+        options.headers['X-Password'] = SESSION.password;
+      }
+
+      if (body) {
+        options.body = JSON.stringify(body);
+      }
+
+      try {
+        const response = await fetch(url, options);
+        const data = await response.json();
+        return { success: response.ok, data, status: response.status };
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    }
+
     // ─── AUTH ───
     function switchLoginTab(tab) {
       const resellerBtn = document.getElementById('tab-reseller');
@@ -1263,25 +1294,26 @@
       }, 3500);
     }
 
-    function doMainLogin() {
+    async function doMainLogin() {
       const key = document.getElementById('main-key').value.trim();
       if (!key) return showResult('main-login-err', '✗ Enter Master Key', 'error');
 
       showResult('main-login-err', '⏳ Verifying...', 'success');
 
-      setTimeout(() => {
-        if (key.length >= 4) {
-          showResult('main-login-err', '✓ Access granted!', 'success');
-          SESSION = { role: 'main_admin', adminKey: key, username: null, password: null };
-          saveSession();
-          enterMainPanel();
-        } else {
-          showResult('main-login-err', '✗ Invalid Master Key', 'error');
-        }
-      }, 600);
+      // API Call
+      const result = await apiCall('/admin/verify', 'POST', { admin_key: key });
+
+      if (result.success && result.data.success) {
+        showResult('main-login-err', '✓ Access granted!', 'success');
+        SESSION = { role: 'main_admin', adminKey: key, username: null, password: null };
+        saveSession();
+        enterMainPanel();
+      } else {
+        showResult('main-login-err', '✗ ' + (result.data?.message || 'Invalid Master Key'), 'error');
+      }
     }
 
-    function doSubLogin() {
+    async function doSubLogin() {
       const username = document.getElementById('sub-user').value.trim();
       const password = document.getElementById('sub-pass').value.trim();
 
@@ -1289,16 +1321,17 @@
 
       showResult('sub-login-err', '⏳ Authenticating...', 'success');
 
-      setTimeout(() => {
-        if (username.length >= 3 && password.length >= 3) {
-          showResult('sub-login-err', '✓ Welcome, ' + username + '!', 'success');
-          SESSION = { role: 'sub_admin', adminKey: null, username: username, password: password };
-          saveSession();
-          enterSubPanel(username);
-        } else {
-          showResult('sub-login-err', '✗ Invalid credentials', 'error');
-        }
-      }, 600);
+      // API Call
+      const result = await apiCall('/subadmin/login', 'POST', { username, password });
+
+      if (result.success && result.data.success) {
+        showResult('sub-login-err', '✓ Welcome, ' + username + '!', 'success');
+        SESSION = { role: 'sub_admin', adminKey: null, username, password };
+        saveSession();
+        enterSubPanel(username);
+      } else {
+        showResult('sub-login-err', '✗ ' + (result.data?.message || 'Invalid credentials'), 'error');
+      }
     }
 
     function enterMainPanel() {
@@ -1333,6 +1366,8 @@
         document.getElementById('auth-gate').style.display = 'flex';
         document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
         document.getElementById('tab-uids').style.display = 'block';
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('nav-uids').classList.add('active');
       }
     }
 
@@ -1433,23 +1468,29 @@
     }
 
     // ─── MAIN UID ───
-    function mainLoadUIDs() {
+    async function mainLoadUIDs() {
       const tb = document.getElementById('main-uid-tbody');
       tb.innerHTML =
         `<tr><td colspan="7" style="text-align:center;color:#4b5563;padding:32px;font-family:'Space Mono',monospace;font-size:12px;">Loading…</td></tr>`;
 
-      setTimeout(() => {
-        const sample = [
-          { uid: '123456789', name: 'AlphaPlayer', days: 30, expires_at: new Date(Date.now() + 20 * 86400000).toISOString() },
-          { uid: '987654321', name: 'BetaGamer', days: 15, expires_at: new Date(Date.now() + 3 * 86400000).toISOString() },
-          { uid: '555555555', name: 'GammaUser', days: 7, expires_at: new Date(Date.now() - 2 * 86400000).toISOString() },
-          { uid: '111111111', name: 'DeltaOne', days: 60, expires_at: new Date(Date.now() + 45 * 86400000).toISOString() },
-          { uid: '222222222', name: 'EpsilonTwo', days: 90, expires_at: new Date(Date.now() + 80 * 86400000).toISOString() },
-        ];
-        allMainUIDs = sample;
+      let endpoint = '/admin/list';
+      if (SESSION.role === 'sub_admin') {
+        endpoint = '/subadmin/list?username=' + encodeURIComponent(SESSION.username) + '&password=' + encodeURIComponent(
+        SESSION.password);
+      } else {
+        endpoint = '/admin/list?admin_key=' + encodeURIComponent(SESSION.adminKey);
+      }
+
+      const result = await apiCall(endpoint);
+
+      if (result.success && result.data.licenses) {
+        allMainUIDs = result.data.licenses;
         renderMainTable(allMainUIDs);
         calcStats(allMainUIDs);
-      }, 400);
+      } else {
+        tb.innerHTML =
+          `<tr><td colspan="7" style="text-align:center;color:#f87171;padding:32px;font-family:'Space Mono',monospace;font-size:12px;">Error: ${result.data?.message || 'Failed to load'}</td></tr>`;
+      }
     }
 
     function renderMainTable(uids) {
@@ -1471,26 +1512,60 @@
       renderMainTable(filtered);
     }
 
-    function mainAddUID() {
+    async function mainAddUID() {
       const uid = document.getElementById('m-uid').value.trim();
       const name = document.getElementById('m-name').value.trim() || 'Player';
-      const days = document.getElementById('m-days').value;
+      const days = parseInt(document.getElementById('m-days').value);
       if (!uid) return showToast('UID required', 'error');
-      showToast('UID created!');
-      showSmallResult('m-add-result', '✓ UID added', 'success');
-      document.getElementById('m-uid').value = '';
-      document.getElementById('m-name').value = '';
-      mainLoadUIDs();
+
+      let endpoint, body;
+      if (SESSION.role === 'sub_admin') {
+        endpoint = '/subadmin/create';
+        body = { username: SESSION.username, password: SESSION.password, uid, name, days };
+      } else {
+        endpoint = '/admin/create';
+        body = { admin_key: SESSION.adminKey, uid, name, days };
+      }
+
+      const result = await apiCall(endpoint, 'POST', body);
+
+      if (result.success && result.data.success) {
+        showToast('UID created!');
+        showSmallResult('m-add-result', '✓ UID added', 'success');
+        document.getElementById('m-uid').value = '';
+        document.getElementById('m-name').value = '';
+        mainLoadUIDs();
+      } else {
+        showToast(result.data?.message || 'Failed to create UID', 'error');
+        showSmallResult('m-add-result', '✗ ' + (result.data?.message || 'Error'), 'error');
+      }
     }
 
-    function mainRenewUID() {
+    async function mainRenewUID() {
       const uid = document.getElementById('m-renew-uid').value.trim();
-      const days = document.getElementById('m-renew-days').value;
+      const days = parseInt(document.getElementById('m-renew-days').value);
       if (!uid) return showToast('Enter UID', 'error');
-      showToast(`Renewed +${days} days`);
-      showSmallResult('m-rm-result', '✓ Renewed', 'success');
-      document.getElementById('m-renew-uid').value = '';
-      mainLoadUIDs();
+
+      let endpoint, body;
+      if (SESSION.role === 'sub_admin') {
+        endpoint = '/subadmin/update';
+        body = { username: SESSION.username, password: SESSION.password, uid, days };
+      } else {
+        endpoint = '/admin/update';
+        body = { admin_key: SESSION.adminKey, uid, days };
+      }
+
+      const result = await apiCall(endpoint, 'POST', body);
+
+      if (result.success && result.data.success) {
+        showToast(`Renewed +${days} days`);
+        showSmallResult('m-rm-result', '✓ Renewed', 'success');
+        document.getElementById('m-renew-uid').value = '';
+        mainLoadUIDs();
+      } else {
+        showToast(result.data?.message || 'Failed to renew', 'error');
+        showSmallResult('m-rm-result', '✗ ' + (result.data?.message || 'Error'), 'error');
+      }
     }
 
     function mainRemoveUID() {
@@ -1499,57 +1574,101 @@
       openDeleteModal(uid);
     }
 
-    function openDeleteModal(uid) {
-      if (confirm(`🗑 Remove UID: ${uid}?\nThis action is irreversible.`)) {
+    async function openDeleteModal(uid) {
+      if (!confirm(`🗑 Remove UID: ${uid}?\nThis action is irreversible.`)) return;
+
+      let endpoint, body;
+      if (SESSION.role === 'sub_admin') {
+        endpoint = '/subadmin/revoke';
+        body = { username: SESSION.username, password: SESSION.password, uid };
+      } else {
+        endpoint = '/admin/revoke';
+        body = { admin_key: SESSION.adminKey, uid };
+      }
+
+      const result = await apiCall(endpoint, 'POST', body);
+
+      if (result.success && result.data.success) {
         showToast('UID revoked');
         mainLoadUIDs();
+      } else {
+        showToast(result.data?.message || 'Failed to delete', 'error');
       }
     }
 
     // ─── RESELLERS ───
-    function createReseller() {
+    async function createReseller() {
       const u = document.getElementById('new-res-user').value.trim();
       const p = document.getElementById('new-res-pass').value.trim();
       const n = document.getElementById('new-res-note').value.trim();
       const init = parseInt(document.getElementById('new-res-credits').value) || 0;
       if (!u || !p) return showToast('Fill username & password', 'error');
-      showToast(`Reseller "${u}" created` + (init > 0 ? ` with ${init} credits` : ''));
-      showSmallResult('res-create-result', `✓ Created: ${u}` + (init > 0 ? ` | 💰 ${init} credits assigned` : ''), 'success');
-      document.getElementById('new-res-user').value = '';
-      document.getElementById('new-res-pass').value = '';
-      document.getElementById('new-res-note').value = '';
-      document.getElementById('new-res-credits').value = '0';
-      loadResellers();
+
+      const result = await apiCall('/admin/create-subadmin', 'POST', {
+        admin_key: SESSION.adminKey,
+        username: u,
+        password: p,
+        note: n
+      });
+
+      if (result.success && result.data.success) {
+        // Give initial credits if any
+        if (init > 0) {
+          await apiCall('/admin/give-credits', 'POST', {
+            admin_key: SESSION.adminKey,
+            username: u,
+            amount: init
+          });
+        }
+        showToast(`Reseller "${u}" created` + (init > 0 ? ` with ${init} credits` : ''));
+        showSmallResult('res-create-result', `✓ Created: ${u}` + (init > 0 ? ` | 💰 ${init} credits assigned` : ''),
+        'success');
+        document.getElementById('new-res-user').value = '';
+        document.getElementById('new-res-pass').value = '';
+        document.getElementById('new-res-note').value = '';
+        document.getElementById('new-res-credits').value = '0';
+        loadResellers();
+      } else {
+        showToast(result.data?.message || 'Failed to create reseller', 'error');
+        showSmallResult('res-create-result', '✗ ' + (result.data?.message || 'Error'), 'error');
+      }
     }
 
-    function loadResellers() {
+    async function loadResellers() {
       const tb = document.getElementById('reseller-tbody');
       tb.innerHTML =
         `<tr><td colspan="4" style="text-align:center;color:#4b5563;padding:20px;">Loading…</td></tr>`;
-      setTimeout(() => {
-        const sample = [
-          { username: 'reseller1', note: 'Premium partner', credits: 42 },
-          { username: 'reseller2', note: 'Standard', credits: 15 },
-          { username: 'reseller3', note: '—', credits: 8 },
-        ];
-        tb.innerHTML = sample.map(s => `
+
+      const result = await apiCall('/admin/list-subadmins?admin_key=' + encodeURIComponent(SESSION.adminKey));
+
+      if (result.success && result.data.subadmins) {
+        const resellers = result.data.subadmins;
+        if (!resellers.length) {
+          tb.innerHTML =
+            `<tr><td colspan="4" style="text-align:center;color:#4b5563;padding:24px;font-family:'Space Mono',monospace;font-size:12px;">No resellers found</td></tr>`;
+          return;
+        }
+        tb.innerHTML = resellers.map(s => `
           <tr>
             <td><span class="badge badge-active">${s.username}</span></td>
-            <td style="color:#9ca3af;font-size:11.5px;">${s.note}</td>
-            <td><span class="badge badge-credit">💰 ${s.credits}</span></td>
+            <td style="color:#9ca3af;font-size:11.5px;">${s.note || '—'}</td>
+            <td><span class="badge badge-credit">💰 ${s.credits || 0}</span></td>
             <td>
               <button class="btn-icon" style="border-color:rgba(59,130,246,0.2);color:#60a5fa;" onclick="openQuickCredit('${s.username}')">+ CREDIT</button>
               <button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button>
             </td>
           </tr>
         `).join('');
-        const totalCredits = sample.reduce((sum, s) => sum + s.credits, 0);
+        const totalCredits = resellers.reduce((sum, s) => sum + (s.credits || 0), 0);
         const el1 = document.getElementById('cs-total-resellers');
         const el2 = document.getElementById('cs-total-credits');
-        if (el1) el1.textContent = sample.length;
+        if (el1) el1.textContent = resellers.length;
         if (el2) el2.textContent = totalCredits;
-        populateDropdowns(sample);
-      }, 300);
+        populateDropdowns(resellers);
+      } else {
+        tb.innerHTML =
+          `<tr><td colspan="4" style="text-align:center;color:#f87171;padding:20px;">Error loading resellers</td></tr>`;
+      }
     }
 
     function populateDropdowns(resellers) {
@@ -1562,7 +1681,7 @@
         resellers.forEach(s => {
           const o = document.createElement('option');
           o.value = s.username;
-          o.textContent = `${s.username} (💰 ${s.credits})`;
+          o.textContent = `${s.username} (💰 ${s.credits || 0})`;
           el.appendChild(o);
         });
         if (prev) el.value = prev;
@@ -1579,10 +1698,18 @@
       if (v) document.getElementById('qc-username').value = v;
     }
 
-    function deleteReseller(uname) {
+    async function deleteReseller(uname) {
       if (!confirm(`Delete reseller: ${uname}?`)) return;
-      showToast('Reseller deleted');
-      loadResellers();
+      const result = await apiCall('/admin/delete-subadmin', 'POST', {
+        admin_key: SESSION.adminKey,
+        username: uname
+      });
+      if (result.success && result.data.success) {
+        showToast('Reseller deleted');
+        loadResellers();
+      } else {
+        showToast(result.data?.message || 'Failed to delete', 'error');
+      }
     }
 
     // ─── CREDITS ───
@@ -1604,11 +1731,22 @@
       doGiveCredits(username, amount, 'qc-result');
     }
 
-    function doGiveCredits(username, amount, resultId) {
-      showToast(`✅ Added ${amount} credits to ${username}`);
-      showSmallResult(resultId, `✓ +${amount} credits → ${username}`, 'success');
-      addCreditLog(username, amount, 'Manual add');
-      loadResellers();
+    async function doGiveCredits(username, amount, resultId) {
+      const result = await apiCall('/admin/give-credits', 'POST', {
+        admin_key: SESSION.adminKey,
+        username,
+        amount
+      });
+
+      if (result.success && result.data.success) {
+        showToast(`✅ Added ${amount} credits to ${username}`);
+        showSmallResult(resultId, `✓ +${amount} credits → ${username}`, 'success');
+        addCreditLog(username, amount, result.data.new_credits || '?', 'Manual add');
+        loadResellers();
+      } else {
+        showToast(result.data?.message || 'Failed to add credits', 'error');
+        showSmallResult(resultId, '✗ ' + (result.data?.message || 'Error'), 'error');
+      }
     }
 
     function openQuickCredit(username) {
@@ -1620,11 +1758,11 @@
     }
 
     // ─── CREDIT LOG ───
-    function addCreditLog(username, amount, reason) {
+    function addCreditLog(username, amount, balanceAfter, reason) {
       creditLog.unshift({
         username,
         change: '+' + amount,
-        balanceAfter: '??',
+        balanceAfter: balanceAfter || '??',
         reason: reason || 'Manual',
         date: new Date().toLocaleString('en-GB')
       });
@@ -1697,7 +1835,6 @@
         enterSubPanel(SESSION.username);
         return;
       }
-      // Show login
       document.getElementById('auth-gate').style.display = 'flex';
       document.getElementById('app-layout').style.display = 'none';
     })();
