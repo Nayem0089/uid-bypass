@@ -3,28 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>STREAM CORP | Login</title>
+  <title>STREAM CORP | Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #040408;
       font-family: 'Inter', sans-serif;
       color: #f4f6ff;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(ellipse at 50% 0%, rgba(239,68,68,0.08) 0%, transparent 70%);
-      padding: 20px;
+      overflow-x: hidden;
     }
 
-    /* Particle Canvas */
+    /* ─── PARTICLE CANVAS ─── */
     #particle-canvas {
       position: fixed;
       top: 0;
@@ -36,15 +27,21 @@
       opacity: 0.6;
     }
 
-    /* Login Box */
-    .login-container {
+    /* ─── AUTH GATE ─── */
+    #auth-gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
       position: relative;
       z-index: 1;
-      width: 100%;
-      max-width: 440px;
+      background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(239,68,68,0.07) 0%, transparent 70%);
     }
 
-    .login-box {
+    .auth-box {
+      width: 100%;
+      max-width: 430px;
       background: rgba(8, 8, 16, 0.92);
       border: 1px solid rgba(239,68,68,0.22);
       border-radius: 32px;
@@ -55,7 +52,7 @@
       backdrop-filter: blur(20px);
     }
 
-    .login-box::before {
+    .auth-box::before {
       content: '';
       position: absolute;
       top: 0;
@@ -66,8 +63,7 @@
       background: linear-gradient(90deg, transparent, rgba(239,68,68,0.6), transparent);
     }
 
-    /* Logo */
-    .login-logo {
+    .auth-logo {
       width: 72px;
       height: 72px;
       background: radial-gradient(circle at 35% 35%, rgba(239,68,68,0.3), rgba(0,0,0,0.2));
@@ -89,7 +85,7 @@
       50% { box-shadow: 0 0 36px rgba(239,68,68,0.45), 0 0 80px rgba(239,68,68,0.18); }
     }
 
-    .login-title {
+    .auth-title {
       font-size: 30px;
       font-weight: 900;
       text-align: center;
@@ -97,7 +93,7 @@
       margin-bottom: 2px;
     }
 
-    .login-title .gradient {
+    .auth-gradient {
       background: linear-gradient(110deg, #fff 0%, #ef4444 45%, #ff9b9b 75%, #fff 100%);
       background-size: 220% auto;
       -webkit-background-clip: text;
@@ -111,7 +107,7 @@
       100% { background-position: 220% center; }
     }
 
-    .login-subtitle {
+    .auth-subtitle {
       text-align: center;
       font-size: 10px;
       color: #4b5563;
@@ -121,7 +117,6 @@
       font-family: 'Space Mono', monospace;
     }
 
-    /* Tab Switch */
     .tab-switch {
       display: flex;
       background: rgba(0,0,0,0.5);
@@ -158,19 +153,6 @@
       color: #f4f6ff;
     }
 
-    /* Form */
-    .login-form {
-      display: block;
-    }
-
-    .login-form.hidden {
-      display: none;
-    }
-
-    .input-group {
-      margin-bottom: 14px;
-    }
-
     .input-glow {
       display: block;
       background: rgba(255,255,255,0.03) !important;
@@ -183,6 +165,7 @@
       font-family: 'Inter', sans-serif;
       font-size: 13.5px;
       outline: none;
+      margin-bottom: 14px;
     }
 
     .input-glow::placeholder {
@@ -195,7 +178,7 @@
       box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
     }
 
-    .btn-login {
+    .btn-glass {
       width: 100%;
       background: linear-gradient(135deg, #dc2626, #991b1b);
       border: none;
@@ -213,7 +196,7 @@
       margin-top: 4px;
     }
 
-    .btn-login::after {
+    .btn-glass::after {
       content: '';
       position: absolute;
       top: 0;
@@ -224,16 +207,16 @@
       transition: left 0.4s;
     }
 
-    .btn-login:hover::after {
+    .btn-glass:hover::after {
       left: 100%;
     }
 
-    .btn-login:hover {
+    .btn-glass:hover {
       box-shadow: 0 6px 22px rgba(239,68,68,0.45);
       transform: translateY(-1px);
     }
 
-    .btn-login:active {
+    .btn-glass:active {
       transform: scale(0.985);
     }
 
@@ -254,31 +237,645 @@
       color: #4ade80;
     }
 
-    /* Footer */
-    .login-footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 10px;
+    .login-form.hidden {
+      display: none;
+    }
+
+    /* ─── APP LAYOUT ─── */
+    #app-layout {
+      display: none;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+      padding: 20px;
+    }
+
+    .dashboard {
+      display: flex;
+      gap: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+      align-items: flex-start;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: 240px;
+      background: rgba(8, 8, 16, 0.92);
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+      position: sticky;
+      top: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 10px 16px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(145deg, #ef4444, #7f1d1d);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      box-shadow: 0 0 20px rgba(239,68,68,0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      background: linear-gradient(120deg, #fff 0%, #ef4444 60%, #fff 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: textShine 4s linear infinite;
+    }
+
+    .brand-sub {
+      font-size: 8.5px;
       color: #4b5563;
+      letter-spacing: 1.2px;
       font-family: 'Space Mono', monospace;
-      letter-spacing: 1px;
     }
 
-    .login-footer span {
+    .nav-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #4b5563;
+      padding: 14px 12px 6px;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.18s;
+      border-radius: 14px;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .nav-item:hover {
+      color: #f4f6ff;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .nav-item.active {
+      background: rgba(239,68,68,0.12);
+      color: #fff;
+      box-shadow: inset 3px 0 0 #ef4444;
+    }
+
+    .nav-item .icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .nav-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 8px 10px;
+    }
+
+    .user-profile {
+      margin-top: auto;
+      padding: 14px 12px 6px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(145deg, #ef4444, #991b1b);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 14px;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(239,68,68,0.25);
+    }
+
+    .avatar-name {
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: -0.2px;
+    }
+
+    .avatar-role {
+      font-size: 10px;
       color: #ef4444;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-top: 1px;
     }
 
-    /* Responsive */
-    @media (max-width: 480px) {
-      .login-box {
+    /* ─── MAIN CONTENT ─── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-header {
+      margin-bottom: 22px;
+    }
+
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(110deg, #ffffff 0%, #ef4444 45%, #ffaaaa 70%, #ffffff 100%);
+      background-size: 220% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: textShine 5s linear infinite;
+    }
+
+    .page-header p {
+      color: #4b5563;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      margin-top: 4px;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ─── STATS ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      background: rgba(10, 10, 18, 0.6);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 18px 16px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(239,68,68,0.2);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(239,68,68,0.5), transparent);
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 900;
+      font-family: 'Space Mono', monospace;
+      line-height: 1.1;
+      letter-spacing: -1px;
+    }
+
+    .stat-number.white { color: #fff; }
+    .stat-number.green { color: #22c55e; text-shadow: 0 0 20px rgba(34,197,94,0.2); }
+    .stat-number.red { color: #ef4444; text-shadow: 0 0 20px rgba(239,68,68,0.2); }
+    .stat-number.orange { color: #f97316; text-shadow: 0 0 20px rgba(249,115,22,0.2); }
+
+    .stat-label {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      margin-top: 6px;
+      color: #4b5563;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ─── CARDS ─── */
+    .card-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: rgba(10, 10, 18, 0.6);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 22px 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse 50% 40% at 50% -10%, rgba(239,68,68,0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .card h3 {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 6px 0 14px;
+    }
+
+    .chip {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: #9ca3af;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .chip:hover {
+      border-color: rgba(239,68,68,0.3);
+      color: #f4f6ff;
+      background: rgba(239,68,68,0.06);
+    }
+
+    .chip.selected {
+      background: rgba(239,68,68,0.15);
+      border-color: rgba(239,68,68,0.5);
+      color: #ff8a8a;
+      box-shadow: 0 0 12px rgba(239,68,68,0.12);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #7f1d1d, #450a0a) !important;
+      box-shadow: 0 4px 16px rgba(127,29,29,0.3) !important;
+    }
+
+    .btn-danger:hover {
+      box-shadow: 0 6px 22px rgba(127,29,29,0.5) !important;
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #78350f, #451a03) !important;
+      box-shadow: 0 4px 16px rgba(120,53,15,0.3) !important;
+    }
+
+    .btn-warning:hover {
+      box-shadow: 0 6px 22px rgba(120,53,15,0.5) !important;
+    }
+
+    .btn-refresh {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
+      color: #f87171;
+      padding: 8px 18px;
+      border-radius: 99px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 11.5px;
+      transition: all 0.18s;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .btn-refresh:hover {
+      background: rgba(239,68,68,0.15);
+      box-shadow: 0 0 14px rgba(239,68,68,0.15);
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 14px 0;
+    }
+
+    .search-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 14px 0 16px;
+      gap: 12px;
+    }
+
+    .search-wrap .input-glow {
+      width: 260px;
+      margin: 0;
+    }
+
+    /* ─── TABLE ─── */
+    .table-glass {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(6,6,14,0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.3);
+      color: #4b5563;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      font-size: 12.5px;
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(239,68,68,0.02);
+    }
+
+    /* ─── BADGES ─── */
+    .badge {
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .badge-active {
+      background: rgba(34,197,94,0.1);
+      color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.15);
+    }
+
+    .badge-expired {
+      background: rgba(239,68,68,0.1);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.15);
+    }
+
+    .badge-soon {
+      background: rgba(249,115,22,0.1);
+      color: #fb923c;
+      border: 1px solid rgba(249,115,22,0.15);
+    }
+
+    .badge-credit {
+      background: rgba(59,130,246,0.1);
+      color: #60a5fa;
+      border: 1px solid rgba(59,130,246,0.15);
+    }
+
+    .days-remaining {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 10.5px;
+      font-weight: 700;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .days-remaining.safe {
+      background: rgba(34,197,94,0.06);
+      border: 1px solid rgba(34,197,94,0.15);
+      color: #4ade80;
+    }
+
+    .days-remaining.warn {
+      background: rgba(249,115,22,0.06);
+      border: 1px solid rgba(249,115,22,0.15);
+      color: #fb923c;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .days-remaining.crit {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.15);
+      color: #f87171;
+      animation: pulse 0.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .uid-mono {
+      font-family: 'Space Mono', monospace;
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .btn-icon {
+      background: none;
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 99px;
+      padding: 4px 12px;
+      color: #f87171;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+      transition: all 0.15s;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .btn-icon:hover {
+      background: rgba(239,68,68,0.1);
+      border-color: rgba(239,68,68,0.4);
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: #4b5563;
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: 4px;
+      transition: color 0.15s;
+    }
+
+    .copy-btn:hover {
+      color: #9ca3af;
+    }
+
+    .result-msg-small {
+      min-height: 18px;
+      margin-top: 6px;
+      font-size: 11.5px;
+    }
+
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: rgba(5,4,12,0.95);
+      backdrop-filter: blur(20px);
+      padding: 12px 22px;
+      border-radius: 99px;
+      border: 1px solid rgba(239,68,68,0.25);
+      border-left: 3px solid #ef4444;
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: 0.3s cubic-bezier(0.2,0.9,0.4,1.1);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+      font-weight: 700;
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      .dashboard {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        gap: 4px;
+      }
+      .brand {
+        border-bottom: none;
+        padding: 0 10px 0 0;
+      }
+      .nav-section {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 2px;
+        flex: 1;
+      }
+      .nav-label {
+        display: none;
+      }
+      .nav-item {
+        padding: 8px 12px;
+        font-size: 12px;
+        width: auto;
+      }
+      .user-profile {
+        margin-top: 0;
+        border-top: none;
+        padding: 0 0 0 12px;
+      }
+      .main {
+        padding-left: 0;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .card-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #app-layout {
+        padding: 12px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .search-wrap {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-wrap .input-glow {
+        width: 100%;
+      }
+      .auth-box {
         padding: 30px 20px 28px;
       }
-      .login-logo {
+      .auth-logo {
         width: 60px;
         height: 60px;
         font-size: 22px;
       }
-      .login-title {
+      .auth-title {
         font-size: 24px;
       }
       .tab-btn {
@@ -290,51 +887,231 @@
 </head>
 <body>
 
-  <!-- Particle Canvas -->
+  <!-- ─── PARTICLE CANVAS ─── -->
   <canvas id="particle-canvas"></canvas>
 
-  <!-- Login Container -->
-  <div class="login-container">
-    <div class="login-box">
-      <!-- Logo -->
-      <div class="login-logo">SC</div>
-
-      <!-- Title -->
-      <h2 class="login-title">STREAM <span class="gradient">CORP</span></h2>
-      <p class="login-subtitle">// Admin Portal v6.0</p>
-
-      <!-- Tab Switch -->
+  <!-- ─── AUTH GATE ─── -->
+  <div id="auth-gate">
+    <div class="auth-box">
+      <div class="auth-logo">SC</div>
+      <h2 class="auth-title">STREAM <span class="auth-gradient">CORP</span></h2>
+      <p class="auth-subtitle">// Admin Portal v6.0</p>
       <div class="tab-switch">
-        <button class="tab-btn active" id="tab-reseller" onclick="switchTab('reseller')">RESELLER</button>
-        <button class="tab-btn" id="tab-master" onclick="switchTab('master')">MASTER ADMIN</button>
+        <button class="tab-btn active" id="tab-reseller" onclick="switchLoginTab('reseller')">RESELLER</button>
+        <button class="tab-btn" id="tab-master" onclick="switchLoginTab('master')">MASTER ADMIN</button>
       </div>
-
-      <!-- Reseller Login Form -->
-      <form id="reseller-form" class="login-form" onsubmit="return false;">
-        <div class="input-group">
-          <input type="text" id="sub-user" class="input-glow" placeholder="Reseller Username" autocomplete="username">
-        </div>
-        <div class="input-group">
-          <input type="password" id="sub-pass" class="input-glow" placeholder="Password" autocomplete="current-password">
-        </div>
-        <button type="button" class="btn-login" onclick="doSubLogin()">⟁ ACCESS PANEL</button>
+      <div id="login-sub">
+        <input type="text" id="sub-user" class="input-glow" placeholder="Reseller Username">
+        <input type="password" id="sub-pass" class="input-glow" placeholder="Password">
+        <button class="btn-glass" onclick="doSubLogin()">⟁ ACCESS PANEL</button>
         <div class="result-msg" id="sub-login-err"></div>
-      </form>
-
-      <!-- Master Admin Login Form -->
-      <form id="master-form" class="login-form hidden" onsubmit="return false;">
-        <div class="input-group">
-          <input type="password" id="main-key" class="input-glow" placeholder="Master Secret Key" autocomplete="current-password">
-        </div>
-        <button type="button" class="btn-login" onclick="doMainLogin()">⛊ UNLOCK SYSTEM</button>
+      </div>
+      <div id="login-main" style="display:none;">
+        <input type="password" id="main-key" class="input-glow" placeholder="Master Secret Key">
+        <button class="btn-glass" onclick="doMainLogin()">⛊ UNLOCK SYSTEM</button>
         <div class="result-msg" id="main-login-err"></div>
-      </form>
-
-      <div class="login-footer">
-        <span>●</span> SECURE CONNECTION <span>●</span>
       </div>
     </div>
   </div>
+
+  <!-- ─── APP LAYOUT ─── -->
+  <div id="app-layout">
+    <div class="dashboard">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-icon">SC</div>
+          <div>
+            <div class="brand-title">STREAM CORP</div>
+            <div class="brand-sub">Management Panel</div>
+          </div>
+        </div>
+        <div class="nav-section">
+          <div class="nav-label">Navigation</div>
+          <button class="nav-item active" id="nav-uids" onclick="switchTab('uids')">
+            <span class="icon">🎮</span> UID Vault
+          </button>
+          <button class="nav-item" id="nav-resellers" onclick="switchTab('resellers')">
+            <span class="icon">👥</span> Resellers
+          </button>
+          <button class="nav-item" id="nav-credit" onclick="switchTab('credit')">
+            <span class="icon">💰</span> Credit Mgmt
+          </button>
+          <hr class="nav-divider">
+          <button class="nav-item" onclick="doLogout()">
+            <span class="icon">🚪</span> Exit
+          </button>
+        </div>
+        <div class="user-profile">
+          <div class="avatar">A</div>
+          <div>
+            <div class="avatar-name" id="sidebar-user">Administrator</div>
+            <div class="avatar-role" id="sidebar-role">MAIN ADMIN</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main">
+
+        <!-- UID VAULT TAB -->
+        <section id="tab-uids" class="tab-content">
+          <div class="page-header">
+            <h1>🎮 UID Vault</h1>
+            <p>Manage &amp; monitor active licenses</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-number white" id="ms-total">0</div><div class="stat-label">Total UIDs</div></div>
+            <div class="stat-card"><div class="stat-number green" id="ms-active">0</div><div class="stat-label">Active</div></div>
+            <div class="stat-card"><div class="stat-number red" id="ms-expired">0</div><div class="stat-label">Expired</div></div>
+            <div class="stat-card"><div class="stat-number orange" id="ms-soon">0</div><div class="stat-label">Expiring ≤7d</div></div>
+          </div>
+
+          <div class="card-grid-2">
+            <div class="card">
+              <h3>➕ Create UID</h3>
+              <input type="text" id="m-uid" class="input-glow" placeholder="User ID (e.g. 123456789)">
+              <input type="text" id="m-name" class="input-glow" placeholder="Player Name">
+              <select id="m-days" class="input-glow">
+                <option value="1">1 Day</option>
+                <option value="7">7 Days</option>
+                <option value="15">15 Days</option>
+                <option value="30" selected>30 Days</option>
+                <option value="60">60 Days</option>
+                <option value="90">90 Days</option>
+                <option value="365">1 Year</option>
+              </select>
+              <div class="chip-group" id="m-chips"></div>
+              <button class="btn-glass" onclick="mainAddUID()">💾 Save &amp; Activate</button>
+              <div class="result-msg-small" id="m-add-result"></div>
+            </div>
+            <div class="card">
+              <h3>⚙️ Manage UID</h3>
+              <input type="text" id="m-rm-uid" class="input-glow" placeholder="UID to remove">
+              <button class="btn-glass btn-danger" onclick="mainRemoveUID()">🗑 Remove UID</button>
+              <hr class="divider">
+              <input type="text" id="m-renew-uid" class="input-glow" placeholder="UID to extend">
+              <select id="m-renew-days" class="input-glow">
+                <option value="7">+7 Days</option>
+                <option value="15">+15 Days</option>
+                <option value="30" selected>+30 Days</option>
+                <option value="60">+60 Days</option>
+              </select>
+              <div class="chip-group" id="m-renew-chips"></div>
+              <button class="btn-glass btn-warning" onclick="mainRenewUID()">↻ Renew / Extend</button>
+              <div class="result-msg-small" id="m-rm-result"></div>
+            </div>
+          </div>
+
+          <div class="search-wrap">
+            <button class="btn-refresh" onclick="mainLoadUIDs()">⟳ Refresh</button>
+            <input type="text" id="m-search" class="input-glow" placeholder="🔍 Filter UID or Name">
+          </div>
+          <div class="table-glass">
+            <table>
+              <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Days Left</th><th>Action</th></tr></thead>
+              <tbody id="main-uid-tbody">
+                <tr><td colspan="7" style="text-align:center; color:#4b5563; padding:36px; font-family:'Space Mono',monospace; font-size:12px;">Loading data…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- RESELLERS TAB -->
+        <section id="tab-resellers" class="tab-content" style="display:none;">
+          <div class="page-header">
+            <h1>👥 Resellers</h1>
+            <p>Manage sub-admin accounts &amp; credits</p>
+          </div>
+          <div class="card-grid-2">
+            <div class="card">
+              <h3>👑 Create Reseller</h3>
+              <input id="new-res-user" class="input-glow" placeholder="Username">
+              <input type="password" id="new-res-pass" class="input-glow" placeholder="Password">
+              <input id="new-res-note" class="input-glow" placeholder="Note (optional)">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                <span style="font-size:11px; color:#4b5563; font-weight:700; font-family:'Space Mono',monospace;">💰 Initial:</span>
+                <input type="number" id="new-res-credits" class="input-glow" style="margin:0; flex:1;" value="0" min="0">
+              </div>
+              <button class="btn-glass" onclick="createReseller()">✨ Create Reseller</button>
+              <div class="result-msg-small" id="res-create-result"></div>
+            </div>
+            <div class="card">
+              <h3>💳 Give Credits</h3>
+              <select id="credit-reseller-select" class="input-glow" onchange="syncCreditSelect()">
+                <option value="">— Select Reseller —</option>
+              </select>
+              <input id="credit-reseller" class="input-glow" placeholder="Or type reseller username">
+              <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+                <input type="number" id="credit-amount" class="input-glow" style="margin:0; flex:1;" value="100" min="1">
+                <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                  <span class="chip" onclick="document.getElementById('credit-amount').value=10">+10</span>
+                  <span class="chip" onclick="document.getElementById('credit-amount').value=50">+50</span>
+                  <span class="chip" onclick="document.getElementById('credit-amount').value=100">+100</span>
+                  <span class="chip" onclick="document.getElementById('credit-amount').value=500">+500</span>
+                </div>
+              </div>
+              <button class="btn-glass" style="background:linear-gradient(135deg,#2563eb,#1e3a8a);" onclick="giveCredits()">💸 Add Credits</button>
+              <div class="result-msg-small" id="credit-result"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:8px;">
+            <h3>📋 Reseller List</h3>
+            <button class="btn-refresh" style="margin-bottom:14px;" onclick="loadResellers()">⟳ Refresh List</button>
+            <div class="table-glass">
+              <table>
+                <thead><tr><th>Username</th><th>Note</th><th>Credits</th><th>Action</th></tr></thead>
+                <tbody id="reseller-tbody"><tr><td colspan="4" style="text-align:center; color:#4b5563; padding:24px;">—</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- CREDIT MGMT TAB -->
+        <section id="tab-credit" class="tab-content" style="display:none;">
+          <div class="page-header">
+            <h1>💰 Credit Management</h1>
+            <p>Global credit overview &amp; transaction log</p>
+          </div>
+          <div class="stats-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:20px;">
+            <div class="stat-card"><div class="stat-number" style="color:#3b82f6;" id="cs-total-resellers">—</div><div class="stat-label">Total Resellers</div></div>
+            <div class="stat-card"><div class="stat-number green" id="cs-total-credits">—</div><div class="stat-label">Credits Distributed</div></div>
+            <div class="stat-card"><div class="stat-number orange" id="cs-log-count">—</div><div class="stat-label">Transactions</div></div>
+          </div>
+          <div class="card" style="margin-bottom:20px;">
+            <h3>⚡ Quick Credit Transfer</h3>
+            <div style="display:flex; gap:10px; align-items:flex-start; flex-wrap:wrap;">
+              <select id="qc-reseller-select" class="input-glow" style="flex:1; min-width:150px; margin:0;" onchange="syncQCSelect()">
+                <option value="">— Select Reseller —</option>
+              </select>
+              <input id="qc-username" class="input-glow" style="flex:1; min-width:120px; margin:0;" placeholder="Or type username">
+              <input type="number" id="qc-amount" class="input-glow" style="width:100px; margin:0;" value="100" min="1">
+              <button class="btn-glass" style="width:auto; padding:12px 20px; background:linear-gradient(135deg,#2563eb,#1e3a8a);" onclick="quickGiveCredits()">💸 Give</button>
+            </div>
+            <div class="result-msg-small" id="qc-result" style="margin-top:8px;"></div>
+          </div>
+          <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <h3 style="margin:0;">📊 Credit Transaction Log</h3>
+              <button class="btn-refresh" onclick="renderCreditLog()">⟳ Refresh</button>
+            </div>
+            <div class="table-glass">
+              <table>
+                <thead><tr><th>Reseller</th><th>Change</th><th>Balance After</th><th>Reason</th><th>Date</th></tr></thead>
+                <tbody id="credit-log-tbody"><tr><td colspan="5" style="text-align:center; color:#4b5563; padding:28px; font-family:'Space Mono',monospace; font-size:12px;">No transactions yet.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ─── TOAST ─── -->
+  <div id="toast" class="toast"></div>
 
   <script>
     // ─── PARTICLE SYSTEM ───
@@ -376,7 +1153,6 @@
       function draw() {
         ctx.clearRect(0, 0, W, H);
 
-        // Connections
         for (let i = 0; i < particles.length; i++) {
           for (let j = i + 1; j < particles.length; j++) {
             const dx = particles[i].x - particles[j].x,
@@ -393,12 +1169,10 @@
           }
         }
 
-        // Particles
         particles.forEach(p => {
           p.pulse += p.pulseSpeed;
           const a = p.alpha * (0.7 + 0.3 * Math.sin(p.pulse));
 
-          // Mouse interaction
           const mdx = p.x - mouse.x,
             mdy = p.y - mouse.y,
             md = Math.sqrt(mdx * mdx + mdy * mdy);
@@ -410,13 +1184,11 @@
             ctx.fill();
           }
 
-          // Main glow
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r * 2.2, 0, Math.PI * 2);
           ctx.fillStyle = p.color + (a * 0.12) + ')';
           ctx.fill();
 
-          // Core
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fillStyle = p.color + a + ')';
@@ -435,32 +1207,50 @@
       draw();
     })();
 
-    // ─── TAB SWITCH ───
-    function switchTab(tab) {
+    // ─── SESSION ───
+    let SESSION = { role: null, adminKey: null, username: null, password: null };
+    let allMainUIDs = [];
+    let creditLog = [];
+    let currentUser = { name: 'Administrator', role: 'MAIN ADMIN' };
+
+    function saveSession() {
+      try { localStorage.setItem('sc_session', JSON.stringify(SESSION)); } catch (e) {}
+    }
+
+    function loadSession() {
+      try {
+        const s = localStorage.getItem('sc_session');
+        if (s) SESSION = JSON.parse(s);
+      } catch (e) {}
+    }
+
+    function clearSession() {
+      SESSION = { role: null, adminKey: null, username: null, password: null };
+      localStorage.removeItem('sc_session');
+    }
+
+    // ─── AUTH ───
+    function switchLoginTab(tab) {
       const resellerBtn = document.getElementById('tab-reseller');
       const masterBtn = document.getElementById('tab-master');
-      const resellerForm = document.getElementById('reseller-form');
-      const masterForm = document.getElementById('master-form');
+      const subForm = document.getElementById('login-sub');
+      const mainForm = document.getElementById('login-main');
 
       if (tab === 'reseller') {
         resellerBtn.classList.add('active');
         masterBtn.classList.remove('active');
-        resellerForm.classList.remove('hidden');
-        masterForm.classList.add('hidden');
-        // Clear errors
-        document.getElementById('sub-login-err').textContent = '';
-        document.getElementById('main-login-err').textContent = '';
+        subForm.style.display = 'block';
+        mainForm.style.display = 'none';
       } else {
         masterBtn.classList.add('active');
         resellerBtn.classList.remove('active');
-        masterForm.classList.remove('hidden');
-        resellerForm.classList.add('hidden');
-        document.getElementById('sub-login-err').textContent = '';
-        document.getElementById('main-login-err').textContent = '';
+        mainForm.style.display = 'block';
+        subForm.style.display = 'none';
       }
+      document.getElementById('sub-login-err').textContent = '';
+      document.getElementById('main-login-err').textContent = '';
     }
 
-    // ─── LOGIN FUNCTIONS ───
     function showResult(elId, msg, type) {
       const el = document.getElementById(elId);
       if (!el) return;
@@ -475,21 +1265,16 @@
 
     function doMainLogin() {
       const key = document.getElementById('main-key').value.trim();
-      if (!key) {
-        return showResult('main-login-err', '✗ Enter Master Key', 'error');
-      }
+      if (!key) return showResult('main-login-err', '✗ Enter Master Key', 'error');
 
-      // Simulate API call
       showResult('main-login-err', '⏳ Verifying...', 'success');
 
       setTimeout(() => {
-        // For demo, accept any key
         if (key.length >= 4) {
-          showResult('main-login-err', '✓ Access granted! Redirecting...', 'success');
-          setTimeout(() => {
-            // Redirect to admin panel (same page with dashboard)
-            window.location.href = 'dashboard.html';
-          }, 800);
+          showResult('main-login-err', '✓ Access granted!', 'success');
+          SESSION = { role: 'main_admin', adminKey: key, username: null, password: null };
+          saveSession();
+          enterMainPanel();
         } else {
           showResult('main-login-err', '✗ Invalid Master Key', 'error');
         }
@@ -500,38 +1285,428 @@
       const username = document.getElementById('sub-user').value.trim();
       const password = document.getElementById('sub-pass').value.trim();
 
-      if (!username || !password) {
-        return showResult('sub-login-err', '✗ Enter credentials', 'error');
-      }
+      if (!username || !password) return showResult('sub-login-err', '✗ Enter credentials', 'error');
 
       showResult('sub-login-err', '⏳ Authenticating...', 'success');
 
       setTimeout(() => {
-        // Demo: accept any username/password
         if (username.length >= 3 && password.length >= 3) {
-          showResult('sub-login-err', '✓ Welcome, ' + username + '! Redirecting...', 'success');
-          setTimeout(() => {
-            window.location.href = 'dashboard.html';
-          }, 800);
+          showResult('sub-login-err', '✓ Welcome, ' + username + '!', 'success');
+          SESSION = { role: 'sub_admin', adminKey: null, username: username, password: password };
+          saveSession();
+          enterSubPanel(username);
         } else {
           showResult('sub-login-err', '✗ Invalid credentials', 'error');
         }
       }, 600);
     }
 
-    // ─── ENTER KEY SUPPORT ───
+    function enterMainPanel() {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('app-layout').style.display = 'block';
+      currentUser = { name: 'Administrator', role: 'MAIN ADMIN' };
+      document.getElementById('sidebar-user').textContent = 'Administrator';
+      document.getElementById('sidebar-role').textContent = 'MAIN ADMIN';
+      document.querySelector('.avatar').textContent = 'A';
+      document.getElementById('nav-resellers').style.display = 'flex';
+      document.getElementById('nav-credit').style.display = 'flex';
+      mainLoadUIDs();
+      loadResellers();
+    }
+
+    function enterSubPanel(username) {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('app-layout').style.display = 'block';
+      currentUser = { name: username, role: 'RESELLER' };
+      document.getElementById('sidebar-user').textContent = username;
+      document.getElementById('sidebar-role').textContent = 'RESELLER';
+      document.querySelector('.avatar').textContent = username[0].toUpperCase();
+      document.getElementById('nav-resellers').style.display = 'none';
+      document.getElementById('nav-credit').style.display = 'none';
+      mainLoadUIDs();
+    }
+
+    function doLogout() {
+      if (confirm('Exit admin panel?')) {
+        clearSession();
+        document.getElementById('app-layout').style.display = 'none';
+        document.getElementById('auth-gate').style.display = 'flex';
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        document.getElementById('tab-uids').style.display = 'block';
+      }
+    }
+
+    // ─── TAB SWITCH ───
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.getElementById('tab-' + tab).style.display = 'block';
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('nav-' + tab).classList.add('active');
+      if (tab === 'uids') mainLoadUIDs();
+      if (tab === 'resellers') loadResellers();
+      if (tab === 'credit') { loadResellers();
+        renderCreditLog(); }
+    }
+
+    // ─── UI HELPERS ───
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = (type === 'success' ? '✨ ' : '⚠️ ') + msg;
+      t.style.borderLeftColor = type === 'success' ? '#22c55e' : '#ef4444';
+      t.className = 'toast show';
+      clearTimeout(t._hide);
+      t._hide = setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function showSmallResult(elId, msg, type) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.innerHTML = `<span style="color:${type === 'success' ? '#4ade80' : '#f87171'}; font-size:11px; font-weight:700; font-family:'Space Mono',monospace;">${msg}</span>`;
+      clearTimeout(el._timeout);
+      el._timeout = setTimeout(() => el.innerHTML = '', 3200);
+    }
+
+    function calculateRemaining(expiryStr) {
+      if (!expiryStr) return null;
+      const exp = new Date(expiryStr),
+        now = new Date();
+      const diff = exp - now;
+      if (diff <= 0) return 0;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function formatExpiry(expiryStr) {
+      if (!expiryStr) return '<span style="color:#4b5563;">—</span>';
+      const d = new Date(expiryStr);
+      return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function renderDaysBadge(remaining) {
+      if (remaining === null) return '';
+      if (remaining <= 0) return `<span class="days-remaining crit">EXPIRED</span>`;
+      if (remaining <= 3) return `<span class="days-remaining crit">⚡ ${remaining}d</span>`;
+      if (remaining <= 7) return `<span class="days-remaining warn">⏳ ${remaining}d</span>`;
+      return `<span class="days-remaining safe">✓ ${remaining}d</span>`;
+    }
+
+    function renderUIDRow(u) {
+      const uid = u.uid || u.id || '?';
+      const name = u.name || u.username || '—';
+      const days = u.days !== undefined ? u.days : '—';
+      const expRaw = u.expires_at || u.expiry || u.expire || null;
+      let badgeHtml = '<span class="badge badge-active">● ACTIVE</span>';
+      let remaining = null;
+      if (expRaw) {
+        remaining = calculateRemaining(expRaw);
+        if (remaining <= 0) badgeHtml = '<span class="badge badge-expired">✖ EXPIRED</span>';
+        else if (remaining <= 7) badgeHtml = '<span class="badge badge-soon">⚠ SOON</span>';
+        else badgeHtml = '<span class="badge badge-active">● ACTIVE</span>';
+      }
+      return `<tr>
+        <td><span class="uid-mono">${uid}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${uid}');showToast('Copied!')">📋</button></td>
+        <td style="font-weight:600;color:rgba(255,255,255,0.85);">${name}</td>
+        <td><span style="font-family:'Space Mono',monospace;font-size:11.5px;color:#9ca3af;">${days}d</span></td>
+        <td>${badgeHtml}</td>
+        <td style="font-size:11.5px;color:#9ca3af;font-family:'Space Mono',monospace;">${formatExpiry(expRaw)}</td>
+        <td>${renderDaysBadge(remaining)}</td>
+        <td><button class="btn-icon" onclick="openDeleteModal('${uid}')">DELETE</button></td>
+      </tr>`;
+    }
+
+    function calcStats(uids) {
+      let active = 0,
+        expired = 0,
+        soon = 0;
+      uids.forEach(u => {
+        const exp = u.expires_at || u.expiry || u.expire || null;
+        if (exp) {
+          const diff = calculateRemaining(exp);
+          if (diff <= 0) expired++;
+          else if (diff <= 7) soon++;
+          else active++;
+        } else active++;
+      });
+      document.getElementById('ms-total').textContent = uids.length;
+      document.getElementById('ms-active').textContent = active;
+      document.getElementById('ms-expired').textContent = expired;
+      document.getElementById('ms-soon').textContent = soon;
+    }
+
+    // ─── MAIN UID ───
+    function mainLoadUIDs() {
+      const tb = document.getElementById('main-uid-tbody');
+      tb.innerHTML =
+        `<tr><td colspan="7" style="text-align:center;color:#4b5563;padding:32px;font-family:'Space Mono',monospace;font-size:12px;">Loading…</td></tr>`;
+
+      setTimeout(() => {
+        const sample = [
+          { uid: '123456789', name: 'AlphaPlayer', days: 30, expires_at: new Date(Date.now() + 20 * 86400000).toISOString() },
+          { uid: '987654321', name: 'BetaGamer', days: 15, expires_at: new Date(Date.now() + 3 * 86400000).toISOString() },
+          { uid: '555555555', name: 'GammaUser', days: 7, expires_at: new Date(Date.now() - 2 * 86400000).toISOString() },
+          { uid: '111111111', name: 'DeltaOne', days: 60, expires_at: new Date(Date.now() + 45 * 86400000).toISOString() },
+          { uid: '222222222', name: 'EpsilonTwo', days: 90, expires_at: new Date(Date.now() + 80 * 86400000).toISOString() },
+        ];
+        allMainUIDs = sample;
+        renderMainTable(allMainUIDs);
+        calcStats(allMainUIDs);
+      }, 400);
+    }
+
+    function renderMainTable(uids) {
+      const tb = document.getElementById('main-uid-tbody');
+      if (!uids.length) {
+        tb.innerHTML =
+          `<tr><td colspan="7" style="text-align:center;color:#4b5563;padding:36px;font-family:'Space Mono',monospace;font-size:12px;">No UIDs found</td></tr>`;
+        return;
+      }
+      tb.innerHTML = uids.map(u => renderUIDRow(u)).join('');
+    }
+
+    function filterMainTable() {
+      const q = document.getElementById('m-search').value.toLowerCase();
+      const filtered = allMainUIDs.filter(u =>
+        (u.uid || '').toLowerCase().includes(q) ||
+        (u.name || '').toLowerCase().includes(q)
+      );
+      renderMainTable(filtered);
+    }
+
+    function mainAddUID() {
+      const uid = document.getElementById('m-uid').value.trim();
+      const name = document.getElementById('m-name').value.trim() || 'Player';
+      const days = document.getElementById('m-days').value;
+      if (!uid) return showToast('UID required', 'error');
+      showToast('UID created!');
+      showSmallResult('m-add-result', '✓ UID added', 'success');
+      document.getElementById('m-uid').value = '';
+      document.getElementById('m-name').value = '';
+      mainLoadUIDs();
+    }
+
+    function mainRenewUID() {
+      const uid = document.getElementById('m-renew-uid').value.trim();
+      const days = document.getElementById('m-renew-days').value;
+      if (!uid) return showToast('Enter UID', 'error');
+      showToast(`Renewed +${days} days`);
+      showSmallResult('m-rm-result', '✓ Renewed', 'success');
+      document.getElementById('m-renew-uid').value = '';
+      mainLoadUIDs();
+    }
+
+    function mainRemoveUID() {
+      const uid = document.getElementById('m-rm-uid').value.trim();
+      if (!uid) return showToast('Enter UID', 'error');
+      openDeleteModal(uid);
+    }
+
+    function openDeleteModal(uid) {
+      if (confirm(`🗑 Remove UID: ${uid}?\nThis action is irreversible.`)) {
+        showToast('UID revoked');
+        mainLoadUIDs();
+      }
+    }
+
+    // ─── RESELLERS ───
+    function createReseller() {
+      const u = document.getElementById('new-res-user').value.trim();
+      const p = document.getElementById('new-res-pass').value.trim();
+      const n = document.getElementById('new-res-note').value.trim();
+      const init = parseInt(document.getElementById('new-res-credits').value) || 0;
+      if (!u || !p) return showToast('Fill username & password', 'error');
+      showToast(`Reseller "${u}" created` + (init > 0 ? ` with ${init} credits` : ''));
+      showSmallResult('res-create-result', `✓ Created: ${u}` + (init > 0 ? ` | 💰 ${init} credits assigned` : ''), 'success');
+      document.getElementById('new-res-user').value = '';
+      document.getElementById('new-res-pass').value = '';
+      document.getElementById('new-res-note').value = '';
+      document.getElementById('new-res-credits').value = '0';
+      loadResellers();
+    }
+
+    function loadResellers() {
+      const tb = document.getElementById('reseller-tbody');
+      tb.innerHTML =
+        `<tr><td colspan="4" style="text-align:center;color:#4b5563;padding:20px;">Loading…</td></tr>`;
+      setTimeout(() => {
+        const sample = [
+          { username: 'reseller1', note: 'Premium partner', credits: 42 },
+          { username: 'reseller2', note: 'Standard', credits: 15 },
+          { username: 'reseller3', note: '—', credits: 8 },
+        ];
+        tb.innerHTML = sample.map(s => `
+          <tr>
+            <td><span class="badge badge-active">${s.username}</span></td>
+            <td style="color:#9ca3af;font-size:11.5px;">${s.note}</td>
+            <td><span class="badge badge-credit">💰 ${s.credits}</span></td>
+            <td>
+              <button class="btn-icon" style="border-color:rgba(59,130,246,0.2);color:#60a5fa;" onclick="openQuickCredit('${s.username}')">+ CREDIT</button>
+              <button class="btn-icon" onclick="deleteReseller('${s.username}')">DELETE</button>
+            </td>
+          </tr>
+        `).join('');
+        const totalCredits = sample.reduce((sum, s) => sum + s.credits, 0);
+        const el1 = document.getElementById('cs-total-resellers');
+        const el2 = document.getElementById('cs-total-credits');
+        if (el1) el1.textContent = sample.length;
+        if (el2) el2.textContent = totalCredits;
+        populateDropdowns(sample);
+      }, 300);
+    }
+
+    function populateDropdowns(resellers) {
+      if (!resellers) return;
+      ['credit-reseller-select', 'qc-reseller-select'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const prev = el.value;
+        el.innerHTML = '<option value="">— Select Reseller —</option>';
+        resellers.forEach(s => {
+          const o = document.createElement('option');
+          o.value = s.username;
+          o.textContent = `${s.username} (💰 ${s.credits})`;
+          el.appendChild(o);
+        });
+        if (prev) el.value = prev;
+      });
+    }
+
+    function syncCreditSelect() {
+      const v = document.getElementById('credit-reseller-select').value;
+      if (v) document.getElementById('credit-reseller').value = v;
+    }
+
+    function syncQCSelect() {
+      const v = document.getElementById('qc-reseller-select').value;
+      if (v) document.getElementById('qc-username').value = v;
+    }
+
+    function deleteReseller(uname) {
+      if (!confirm(`Delete reseller: ${uname}?`)) return;
+      showToast('Reseller deleted');
+      loadResellers();
+    }
+
+    // ─── CREDITS ───
+    function giveCredits() {
+      const username = document.getElementById('credit-reseller').value.trim() ||
+        document.getElementById('credit-reseller-select').value;
+      const amount = parseInt(document.getElementById('credit-amount').value);
+      if (!username) return showToast('Select or enter a reseller', 'error');
+      if (!amount || amount < 1) return showToast('Enter valid amount', 'error');
+      doGiveCredits(username, amount, 'credit-result');
+    }
+
+    function quickGiveCredits() {
+      const username = document.getElementById('qc-username').value.trim() ||
+        document.getElementById('qc-reseller-select').value;
+      const amount = parseInt(document.getElementById('qc-amount').value);
+      if (!username) return showToast('Select or enter a reseller', 'error');
+      if (!amount || amount < 1) return showToast('Enter valid amount', 'error');
+      doGiveCredits(username, amount, 'qc-result');
+    }
+
+    function doGiveCredits(username, amount, resultId) {
+      showToast(`✅ Added ${amount} credits to ${username}`);
+      showSmallResult(resultId, `✓ +${amount} credits → ${username}`, 'success');
+      addCreditLog(username, amount, 'Manual add');
+      loadResellers();
+    }
+
+    function openQuickCredit(username) {
+      const amount = prompt(`💰 Add credits to "${username}"\nEnter amount:`, '100');
+      if (amount === null) return;
+      const num = parseInt(amount);
+      if (!num || num < 1) return showToast('Invalid amount', 'error');
+      doGiveCredits(username, num, 'credit-result');
+    }
+
+    // ─── CREDIT LOG ───
+    function addCreditLog(username, amount, reason) {
+      creditLog.unshift({
+        username,
+        change: '+' + amount,
+        balanceAfter: '??',
+        reason: reason || 'Manual',
+        date: new Date().toLocaleString('en-GB')
+      });
+      if (creditLog.length > 200) creditLog = creditLog.slice(0, 200);
+      renderCreditLog();
+    }
+
+    function renderCreditLog() {
+      const tb = document.getElementById('credit-log-tbody');
+      if (!tb) return;
+      if (!creditLog.length) {
+        tb.innerHTML =
+          `<tr><td colspan="5" style="text-align:center;color:#4b5563;padding:28px;font-family:'Space Mono',monospace;font-size:12px;">No transactions yet.</td></tr>`;
+        return;
+      }
+      tb.innerHTML = creditLog.map(l => `
+        <tr>
+          <td><span class="badge badge-active">${l.username}</span></td>
+          <td><span style="color:#4ade80;font-weight:700;font-family:'Space Mono',monospace;">${l.change}</span></td>
+          <td><span class="badge badge-credit">💰 ${l.balanceAfter}</span></td>
+          <td style="color:#9ca3af;font-size:11.5px;">${l.reason}</td>
+          <td style="color:#4b5563;font-size:10.5px;font-family:'Space Mono',monospace;">${l.date}</td>
+        </tr>
+      `).join('');
+      const el = document.getElementById('cs-log-count');
+      if (el) el.textContent = creditLog.length;
+    }
+
+    // ─── CHIPS ───
+    function genChips(containerId, selectId, options) {
+      const wrap = document.getElementById(containerId);
+      if (!wrap) return;
+      const sel = document.getElementById(selectId);
+      wrap.innerHTML = '';
+      options.forEach(v => {
+        const chip = document.createElement('span');
+        chip.className = 'chip' + (parseInt(sel.value) === v ? ' selected' : '');
+        chip.textContent = v + 'd';
+        chip.onclick = () => {
+          sel.value = v;
+          wrap.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+          chip.classList.add('selected');
+        };
+        wrap.appendChild(chip);
+      });
+    }
+
+    // ─── SEARCH ───
+    document.getElementById('m-search').addEventListener('input', filterMainTable);
+
+    // ─── KEYBOARD SUPPORT ───
     document.getElementById('sub-pass').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') doSubLogin();
     });
-
     document.getElementById('main-key').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') doMainLogin();
     });
-
     document.getElementById('sub-user').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') document.getElementById('sub-pass').focus();
     });
-  </script>
 
+    // ─── AUTO LOGIN ───
+    (function init() {
+      loadSession();
+      if (SESSION.role === 'main_admin' && SESSION.adminKey) {
+        enterMainPanel();
+        return;
+      }
+      if (SESSION.role === 'sub_admin' && SESSION.username) {
+        enterSubPanel(SESSION.username);
+        return;
+      }
+      // Show login
+      document.getElementById('auth-gate').style.display = 'flex';
+      document.getElementById('app-layout').style.display = 'none';
+    })();
+
+    // ─── INIT CHIPS ───
+    window.onload = function() {
+      genChips('m-chips', 'm-days', [1, 7, 15, 30, 60, 90, 365]);
+      genChips('m-renew-chips', 'm-renew-days', [7, 15, 30, 60]);
+    };
+  </script>
 </body>
 </html>
