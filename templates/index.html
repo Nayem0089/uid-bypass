@@ -51,8 +51,53 @@
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
       pointer-events: none; z-index: 0;
-      opacity: 0.65;
+      opacity: 1;
     }
+
+    /* ── ENTRY ANIMATIONS ── */
+    @keyframes slideInLeft {
+      from { opacity:0; transform: translateX(-30px); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+    @keyframes slideInUp {
+      from { opacity:0; transform: translateY(24px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity:0; transform: scale(0.9); }
+      to   { opacity:1; transform: scale(1); }
+    }
+    @keyframes glowPulseRed {
+      0%,100% { box-shadow: 0 0 18px rgba(239,68,68,0.22); }
+      50%      { box-shadow: 0 0 40px rgba(239,68,68,0.55), 0 0 80px rgba(239,68,68,0.18); }
+    }
+    @keyframes borderFlow {
+      0%,100% { border-color: rgba(239,68,68,0.18); }
+      50%      { border-color: rgba(239,68,68,0.45); }
+    }
+    @keyframes floatY {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-7px); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .sidebar    { animation: slideInLeft 0.65s cubic-bezier(0.2,0.9,0.3,1) both; }
+    .auth-box   { animation: scaleIn 0.55s cubic-bezier(0.2,0.9,0.3,1) both; }
+    .stat-card  { animation: slideInUp 0.5s cubic-bezier(0.2,0.9,0.3,1) both; }
+    .stat-card:nth-child(1){ animation-delay:0.04s; }
+    .stat-card:nth-child(2){ animation-delay:0.10s; }
+    .stat-card:nth-child(3){ animation-delay:0.16s; }
+    .stat-card:nth-child(4){ animation-delay:0.22s; }
+    .card       { animation: slideInUp 0.52s cubic-bezier(0.2,0.9,0.3,1) 0.12s both; }
+    .table-glass{ animation: slideInUp 0.52s cubic-bezier(0.2,0.9,0.3,1) 0.22s both; }
+    .page-header{ animation: slideInUp 0.45s cubic-bezier(0.2,0.9,0.3,1) both; }
+    .stat-card:hover { animation: none; border-color:rgba(239,68,68,0.32); transform:translateY(-5px) scale(1.02); box-shadow: 0 10px 36px rgba(239,68,68,0.18); transition: all 0.25s; }
+    .card:hover { border-color:rgba(239,68,68,0.15); box-shadow: 0 8px 28px rgba(239,68,68,0.1); transition: all 0.25s; }
+    .brand-icon { animation: logoPulse 3s ease-in-out infinite, glowPulseRed 4s ease-in-out infinite !important; }
+    .auth-logo  { animation: logoPulse 3s ease-in-out infinite, floatY 4s ease-in-out infinite !important; }
+    .badge-active { animation: borderFlow 3s ease-in-out infinite; }
 
     /* ══════════════════════════════════════════
        AUTH GATE
@@ -819,38 +864,318 @@
   </div>
 
   <script>
-    // ═══ PARTICLE SYSTEM ═══
+    // ═══ PREMIUM PARTICLE SYSTEM ═══
     (function(){
       const canvas = document.getElementById('particle-canvas');
       const ctx = canvas.getContext('2d');
-      let W, H, particles = [], mouse = {x:-999,y:-999};
-      function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+      let W, H;
+      let mouse = { x: -999, y: -999, clicked: false };
+      let particles = [], meteors = [], rings = [], nebulas = [];
+      let frame = 0;
+
+      function resize(){
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        buildNebulas();
+      }
       resize();
       window.addEventListener('resize', resize);
-      window.addEventListener('mousemove', e => { mouse.x=e.clientX; mouse.y=e.clientY; });
-      const COLORS = ['rgba(239,68,68,','rgba(59,130,246,','rgba(139,92,246,','rgba(249,115,22,','rgba(34,197,94,'];
-      function mkP(){ return {x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*0.35,vy:(Math.random()-0.5)*0.35,r:Math.random()*1.4+0.3,alpha:Math.random()*0.45+0.08,color:COLORS[Math.floor(Math.random()*COLORS.length)],pulse:Math.random()*Math.PI*2,pulseSpeed:Math.random()*0.018+0.004}; }
-      for(let i=0;i<100;i++) particles.push(mkP());
-      function draw(){
-        ctx.clearRect(0,0,W,H);
-        for(let i=0;i<particles.length;i++){
-          for(let j=i+1;j<particles.length;j++){
-            const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,d=Math.sqrt(dx*dx+dy*dy);
-            if(d<90){ ctx.beginPath(); ctx.strokeStyle=`rgba(239,68,68,${0.05*(1-d/90)})`; ctx.lineWidth=0.4; ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.stroke(); }
+      window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+      window.addEventListener('click', e => {
+        mouse.x = e.clientX; mouse.y = e.clientY;
+        spawnRing(e.clientX, e.clientY);
+        for(let i=0;i<8;i++) spawnBurst(e.clientX, e.clientY);
+      });
+
+      // ── COLOR PALETTES ──
+      const RED    = [239,68,68];
+      const CRIMSON= [185,28,28];
+      const ROSE   = [251,113,133];
+      const BLUE   = [59,130,246];
+      const VIOLET = [139,92,246];
+      const ORANGE = [249,115,22];
+      const WHITE  = [240,240,255];
+      const PALETTES = [RED, CRIMSON, ROSE, BLUE, VIOLET, ORANGE, WHITE];
+
+      function rndColor(){ return PALETTES[Math.floor(Math.random()*PALETTES.length)]; }
+      function rgba(c, a){ return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+
+      // ── NEBULA BLOBS (static background) ──
+      function buildNebulas(){
+        nebulas = [
+          { x: W*0.1,  y: H*0.2,  r: 320, c: RED,    a: 0.025 },
+          { x: W*0.88, y: H*0.75, r: 280, c: BLUE,   a: 0.020 },
+          { x: W*0.5,  y: H*0.5,  r: 400, c: VIOLET, a: 0.015 },
+          { x: W*0.75, y: H*0.15, r: 200, c: CRIMSON,a: 0.030 },
+          { x: W*0.2,  y: H*0.85, r: 250, c: ORANGE, a: 0.018 },
+        ];
+      }
+
+      // ── PARTICLES ──
+      function mkParticle(){
+        const c = rndColor();
+        const isPrimary = Math.random() < 0.45;
+        return {
+          type: 'star',
+          x: Math.random()*W, y: Math.random()*H,
+          vx: (Math.random()-0.5)*0.45,
+          vy: (Math.random()-0.5)*0.45,
+          r: isPrimary ? Math.random()*2+0.8 : Math.random()*1+0.3,
+          baseR: 0,
+          color: isPrimary ? RED : c,
+          alpha: Math.random()*0.6+0.15,
+          pulse: Math.random()*Math.PI*2,
+          pulseSpeed: Math.random()*0.025+0.006,
+          twinkle: Math.random()*Math.PI*2,
+          twinkleSpeed: Math.random()*0.04+0.01,
+          tail: [],
+          burst: false,
+          life: 1, maxLife: 1,
+        };
+      }
+      function mkBurst(x,y){
+        const angle = Math.random()*Math.PI*2;
+        const speed = Math.random()*4+1;
+        const c = [RED,ROSE,ORANGE,WHITE][Math.floor(Math.random()*4)];
+        return {
+          type:'burst', x, y,
+          vx: Math.cos(angle)*speed,
+          vy: Math.sin(angle)*speed,
+          r: Math.random()*2.5+0.5,
+          color: c,
+          alpha: 1,
+          life: 1, maxLife: 1,
+          fade: 0.025+Math.random()*0.02,
+          pulse:0, pulseSpeed:0.1,
+          twinkle:0, twinkleSpeed:0,
+          tail:[], burst:false,
+        };
+      }
+      function spawnBurst(x,y){ particles.push(mkBurst(x,y)); }
+
+      // ── METEOR / SHOOTING STARS ──
+      function mkMeteor(){
+        const startX = Math.random()*W*1.4 - W*0.2;
+        const startY = -20;
+        const angle  = Math.PI/4 + (Math.random()-0.5)*0.3;
+        const speed  = Math.random()*7+5;
+        const len    = Math.random()*180+80;
+        const c      = Math.random()<0.7 ? RED : [Math.random()<0.5?WHITE:VIOLET][0];
+        return { x:startX, y:startY, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, len, color:c, alpha:0, fadeIn:true, life:1 };
+      }
+
+      // ── RIPPLE RINGS ──
+      function spawnRing(x,y){
+        rings.push({ x, y, r:0, maxR:160, alpha:0.8, color:RED });
+        rings.push({ x, y, r:0, maxR:100, alpha:0.5, color:WHITE, delay:8 });
+      }
+
+      // ── INIT ──
+      for(let i=0;i<130;i++) particles.push(mkParticle());
+      for(let i=0;i<3;i++) meteors.push(mkMeteor());
+
+      // ── DRAW NEBULAS ──
+      function drawNebulas(t){
+        nebulas.forEach((n,i) => {
+          const pulse = Math.sin(t*0.0008 + i*1.2)*0.3+0.7;
+          const grd = ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r*pulse);
+          grd.addColorStop(0, rgba(n.c, n.a*1.8));
+          grd.addColorStop(0.4, rgba(n.c, n.a));
+          grd.addColorStop(1, rgba(n.c, 0));
+          ctx.fillStyle = grd;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r*pulse, 0, Math.PI*2);
+          ctx.fill();
+        });
+      }
+
+      // ── DRAW METEOR ──
+      function drawMeteor(m){
+        if(m.alpha<=0) return;
+        const tailX = m.x - Math.cos(Math.atan2(m.vy,m.vx))*m.len;
+        const tailY = m.y - Math.sin(Math.atan2(m.vy,m.vx))*m.len;
+        const grd = ctx.createLinearGradient(tailX,tailY,m.x,m.y);
+        grd.addColorStop(0, rgba(m.color, 0));
+        grd.addColorStop(0.6, rgba(m.color, m.alpha*0.3));
+        grd.addColorStop(1, rgba(m.color, m.alpha));
+        ctx.strokeStyle = grd;
+        ctx.lineWidth = 1.8;
+        ctx.shadowColor = rgba(m.color, 0.8);
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(m.x, m.y);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        // bright head
+        const hGrd = ctx.createRadialGradient(m.x,m.y,0,m.x,m.y,4);
+        hGrd.addColorStop(0, rgba(WHITE, m.alpha));
+        hGrd.addColorStop(1, rgba(m.color, 0));
+        ctx.fillStyle = hGrd;
+        ctx.beginPath(); ctx.arc(m.x,m.y,4,0,Math.PI*2); ctx.fill();
+      }
+
+      // ── DRAW PARTICLE ──
+      function drawParticle(p, t){
+        p.twinkle += p.twinkleSpeed;
+        p.pulse   += p.pulseSpeed;
+        const twinkAlpha = p.alpha * (0.5 + 0.5*Math.sin(p.twinkle));
+        const radius     = p.r * (0.85 + 0.15*Math.sin(p.pulse));
+
+        // Mouse interaction
+        const dx = p.x - mouse.x, dy = p.y - mouse.y;
+        const dist = Math.sqrt(dx*dx+dy*dy);
+        const ATTRACT_RANGE = 140, REPEL_RANGE = 70;
+
+        if(dist < REPEL_RANGE){
+          const f = (REPEL_RANGE - dist) / REPEL_RANGE;
+          p.vx += (dx/dist)*f*0.6;
+          p.vy += (dy/dist)*f*0.6;
+        } else if(dist < ATTRACT_RANGE){
+          const f = (dist - REPEL_RANGE) / (ATTRACT_RANGE - REPEL_RANGE);
+          p.vx += (-dx/dist)*(1-f)*0.04;
+          p.vy += (-dy/dist)*(1-f)*0.04;
+        }
+
+        // Speed damping
+        const spd = Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+        if(spd > 2.5){ p.vx*=0.94; p.vy*=0.94; }
+
+        // Glow halo
+        const glowR = radius * 3.5;
+        const glowGrd = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,glowR);
+        glowGrd.addColorStop(0, rgba(p.color, twinkAlpha*0.25));
+        glowGrd.addColorStop(1, rgba(p.color, 0));
+        ctx.fillStyle = glowGrd;
+        ctx.beginPath(); ctx.arc(p.x,p.y,glowR,0,Math.PI*2); ctx.fill();
+
+        // Core dot
+        if(p.type==='burst'){
+          p.alpha -= p.fade;
+          p.vx*=0.94; p.vy*=0.94;
+        }
+        ctx.shadowColor = rgba(p.color, 0.9);
+        ctx.shadowBlur  = dist < ATTRACT_RANGE ? 12 : 6;
+        ctx.fillStyle   = rgba(p.color, p.type==='burst' ? p.alpha : twinkAlpha);
+        ctx.beginPath(); ctx.arc(p.x,p.y,radius,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur  = 0;
+
+        // Move
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<-5)p.x=W+5; if(p.x>W+5)p.x=-5;
+        if(p.y<-5)p.y=H+5; if(p.y>H+5)p.y=-5;
+      }
+
+      // ── DRAW CONNECTIONS ──
+      function drawConnections(){
+        const stars = particles.filter(p=>p.type==='star');
+        for(let i=0;i<stars.length;i++){
+          for(let j=i+1;j<stars.length;j++){
+            const dx=stars[i].x-stars[j].x, dy=stars[i].y-stars[j].y;
+            const d=Math.sqrt(dx*dx+dy*dy);
+            if(d<110){
+              const a = 0.07*(1-d/110);
+              const mdx=(stars[i].x+stars[j].x)/2-mouse.x, mdy=(stars[i].y+stars[j].y)/2-mouse.y;
+              const mDist=Math.sqrt(mdx*mdx+mdy*mdy);
+              const boost = mDist < 160 ? 1+(160-mDist)/160*1.5 : 1;
+              const grd = ctx.createLinearGradient(stars[i].x,stars[i].y,stars[j].x,stars[j].y);
+              grd.addColorStop(0, rgba(RED, a*boost));
+              grd.addColorStop(0.5, rgba(VIOLET, a*boost*0.6));
+              grd.addColorStop(1, rgba(RED, a*boost));
+              ctx.strokeStyle = grd;
+              ctx.lineWidth = 0.5 + boost*0.2;
+              ctx.beginPath();
+              ctx.moveTo(stars[i].x,stars[i].y);
+              ctx.lineTo(stars[j].x,stars[j].y);
+              ctx.stroke();
+            }
           }
         }
-        particles.forEach(p => {
-          p.pulse+=p.pulseSpeed;
-          const a=p.alpha*(0.7+0.3*Math.sin(p.pulse));
-          const mdx=p.x-mouse.x,mdy=p.y-mouse.y,md=Math.sqrt(mdx*mdx+mdy*mdy);
-          if(md<100){ const f=(100-md)/100; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(1+f*2.5),0,Math.PI*2); ctx.fillStyle=p.color+(0.1*f)+')'; ctx.fill(); }
-          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=p.color+a+')'; ctx.fill();
-          ctx.beginPath(); ctx.arc(p.x,p.y,p.r*2.2,0,Math.PI*2); ctx.fillStyle=p.color+(a*0.12)+')'; ctx.fill();
-          p.x+=p.vx; if(p.x<0)p.x=W; if(p.x>W)p.x=0; p.y+=p.vy; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      }
+
+      // ── DRAW RINGS ──
+      function drawRings(){
+        rings = rings.filter(r => r.alpha > 0.01);
+        rings.forEach(r => {
+          if(r.delay && r.delay > 0){ r.delay--; return; }
+          ctx.strokeStyle = rgba(r.color, r.alpha);
+          ctx.lineWidth   = 1.5;
+          ctx.shadowColor = rgba(r.color, r.alpha);
+          ctx.shadowBlur  = 12;
+          ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2); ctx.stroke();
+          ctx.shadowBlur = 0;
+          r.r     += (r.maxR - r.r) * 0.08 + 1.5;
+          r.alpha *= 0.93;
         });
+      }
+
+      // ── DRAW SCANLINES ──
+      function drawScanlines(t){
+        const y = (t*0.4) % H;
+        const grd = ctx.createLinearGradient(0,y-60,0,y+60);
+        grd.addColorStop(0, 'rgba(239,68,68,0)');
+        grd.addColorStop(0.5,'rgba(239,68,68,0.018)');
+        grd.addColorStop(1, 'rgba(239,68,68,0)');
+        ctx.fillStyle = grd;
+        ctx.fillRect(0,y-60,W,120);
+      }
+
+      // ── AURORA WAVE ──
+      function drawAurora(t){
+        for(let i=0;i<2;i++){
+          ctx.beginPath();
+          ctx.moveTo(0,H*0.3);
+          const pts = 8;
+          for(let x=0;x<=pts;x++){
+            const px = (x/pts)*W;
+            const py = H*(0.25+0.08*i) + Math.sin(t*0.0006+x*0.7+i*2)*60 + Math.cos(t*0.0004+x*0.5)*30;
+            ctx.lineTo(px,py);
+          }
+          const grd = ctx.createLinearGradient(0,0,W,0);
+          grd.addColorStop(0,'rgba(239,68,68,0)');
+          grd.addColorStop(0.2,`rgba(${i?'139,92,246':'239,68,68'},0.03)`);
+          grd.addColorStop(0.5,`rgba(${i?'59,130,246':'239,68,68'},0.05)`);
+          grd.addColorStop(0.8,`rgba(${i?'139,92,246':'239,68,68'},0.03)`);
+          grd.addColorStop(1,'rgba(239,68,68,0)');
+          ctx.strokeStyle = grd;
+          ctx.lineWidth   = 80;
+          ctx.stroke();
+        }
+      }
+
+      // ── MAIN LOOP ──
+      function draw(t){
+        ctx.clearRect(0,0,W,H);
+
+        drawNebulas(t);
+        drawAurora(t);
+
+        // Meteors
+        meteors.forEach((m,i) => {
+          if(m.fadeIn){ m.alpha = Math.min(m.alpha+0.06, 1); if(m.alpha>=1)m.fadeIn=false; }
+          m.x+=m.vx; m.y+=m.vy;
+          m.alpha -= 0.006;
+          drawMeteor(m);
+          if(m.y > H+50 || m.alpha<=0) meteors[i] = mkMeteor();
+        });
+
+        // Spawn new meteor occasionally
+        if(frame % 220 === 0) meteors.push(mkMeteor());
+        if(meteors.length > 8) meteors.shift();
+
+        drawConnections();
+
+        // Particles
+        particles = particles.filter(p => p.type==='star' || p.alpha > 0.02);
+        particles.forEach(p => drawParticle(p, t));
+
+        drawRings();
+        drawScanlines(t);
+
+        frame++;
         requestAnimationFrame(draw);
       }
-      draw();
+      requestAnimationFrame(draw);
     })();
 
     // ═══ SESSION & STATE ═══
