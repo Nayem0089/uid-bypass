@@ -14,73 +14,26 @@ app = Flask(__name__)
 # CONFIG
 UID_API_BASE   = os.environ.get("UID_API_BASE", "https://uid.syntaxcorporation.online")
 ADMIN_KEY      = os.environ.get("ADMIN_KEY",    "changeme_admin_key")
-SELF_URL       = os.environ.get("SELF_URL",     "").rstrip("/")   # ← trailing slash সরানো হয়েছে
+SELF_URL       = os.environ.get("SELF_URL",     "")
 
 # MONGODB SETUP
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://NAYEM:1122@cluster0.ywmyozb.mongodb.net/?appName=Cluster0")
 
 try:
-    mongo_client = MongoClient(
-        MONGO_URI,
-        serverSelectionTimeoutMS=5000,
-        tls=True,
-        tlsAllowInvalidCertificates=True,
-        connectTimeoutMS=10000,
-        socketTimeoutMS=10000,
-    )
+    mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000, tls=True, tlsAllowInvalidCertificates=True)
     mongo_client.server_info()
-    db                = mongo_client["sensix_panel"]
-    subadmins_col     = db["subadmins"]
-    uid_ownership_col = db["uid_ownership"]
-    credit_log_col    = db["credit_log"]
+    db               = mongo_client["sensix_panel"]
+    subadmins_col    = db["subadmins"]
+    uid_ownership_col= db["uid_ownership"]
+    credit_log_col   = db["credit_log"]
     print("MongoDB connected OK")
 except Exception as e:
     print(f"MongoDB FAILED: {e}")
     mongo_client = db = subadmins_col = uid_ownership_col = credit_log_col = None
 
-
-# ===== KEEP-ALIVE SELF-PING (FIX) =====
-def self_ping():
-    """
-    Render Free Tier ১৫ মিনিট inactivity-তে sleep করে।
-    তাই ৮ মিনিট পর পর ping করা হচ্ছে।
-    SELF_URL env variable অবশ্যই সেট করতে হবে।
-    """
-    # অ্যাপ পুরো start হওয়ার জন্য ৩০ সেকেন্ড অপেক্ষা
-    time.sleep(30)
-    print(f"[SELF-PING] Keep-alive started. Target: {SELF_URL or 'NOT SET — ping disabled!'}")
-
-    while True:
-        if SELF_URL:
-            try:
-                resp = requests.get(SELF_URL + "/ping", timeout=15)
-                print(f"[SELF-PING] OK ({resp.status_code}) — {datetime.utcnow().strftime('%H:%M:%S UTC')}")
-            except requests.exceptions.Timeout:
-                print(f"[SELF-PING] Timeout — {datetime.utcnow().strftime('%H:%M:%S UTC')}")
-            except Exception as e:
-                print(f"[SELF-PING] Failed: {e}")
-        else:
-            print("[SELF-PING] SELF_URL not set — skipping ping. Set it in environment variables!")
-
-        time.sleep(8 * 60)   # ৮ মিনিট (Render 15min limit-এর অনেক আগে)
-
-
-ping_thread = threading.Thread(target=self_ping, daemon=True)
-ping_thread.start()
-
-
-@app.route('/ping')
-def ping():
-    """Keep-alive endpoint — UptimeRobot এবং self-ping দুটোই এটা ব্যবহার করে"""
-    return jsonify({
-        "status": "alive",
-        "time": datetime.utcnow().isoformat(),
-        "db": "connected" if mongo_client else "disconnected"
-    }), 200
-
-
 # ===== NEW API HELPERS =====
 def api_add_uid(uid, days=1):
+    """Add a UID via the new API"""
     url = f"{UID_API_BASE}/uid"
     params = {"add": uid, "days": days}
     try:
@@ -93,6 +46,7 @@ def api_add_uid(uid, days=1):
         return {"error": str(e)}, 503
 
 def api_remove_uid(uid):
+    """Remove a UID via the new API"""
     url = f"{UID_API_BASE}/remove"
     params = {"uid": uid}
     try:
@@ -105,11 +59,29 @@ def api_remove_uid(uid):
         return {"error": str(e)}, 503
 
 def api_list_uids():
+    """List all UIDs — fetched from MongoDB ownership collection"""
     if uid_ownership_col is None:
         return [], 200
     docs = list(uid_ownership_col.find({}, {"_id": 0}))
     return docs, 200
 
+# ===== SELF PING =====
+def self_ping():
+    while True:
+        time.sleep(300)
+        if SELF_URL:
+            try:
+                requests.get(SELF_URL + "/ping", timeout=10)
+                print(f"[SELF-PING] OK — {datetime.utcnow().strftime('%H:%M:%S')}")
+            except Exception as e:
+                print(f"[SELF-PING] Failed: {e}")
+
+ping_thread = threading.Thread(target=self_ping, daemon=True)
+ping_thread.start()
+
+@app.route('/ping')
+def ping():
+    return jsonify({"status": "alive", "time": datetime.utcnow().isoformat()}), 200
 
 # ===== HELPERS =====
 def merge_expiry(uids):
@@ -147,12 +119,12 @@ def save_uid_meta(uid, name, days, owner="main_admin", extend=False):
     uid_ownership_col.update_one(
         {"uid": uid},
         {"$set": {
-            "uid":        uid,
-            "name":       name,
-            "days":       days,
-            "owner":      owner,
+            "uid": uid,
+            "name": name,
+            "days": days,
+            "owner": owner,
             "expires_at": new_exp.isoformat(),
-            "added_at":   datetime.utcnow().isoformat()
+            "added_at": datetime.utcnow().isoformat()
         }},
         upsert=True
     )
@@ -174,23 +146,24 @@ def deduct_credit(username):
     current = doc.get("credits", 0)
     if current < 1:
         return False
-    subadmins_col.update_one({"username": username}, {"$inc": {"credits": -1}})
+    subadmins_col.update_one(
+        {"username": username},
+        {"$inc": {"credits": -1}}
+    )
     if credit_log_col is not None:
         credit_log_col.insert_one({
-            "username":     username,
-            "change":       -1,
+            "username": username,
+            "change": -1,
             "balance_after": current - 1,
-            "reason":       "UID added",
-            "date":         datetime.utcnow().isoformat()
+            "reason": "UID added",
+            "date": datetime.utcnow().isoformat()
         })
     return True
-
 
 # ===== FRONTEND =====
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 # ===== MAIN ADMIN AUTH =====
 @app.route('/admin/verify', methods=['POST'])
@@ -199,7 +172,6 @@ def admin_verify():
     if data.get("admin_key") != ADMIN_KEY:
         return jsonify({"status": "error", "message": "Invalid admin key"}), 403
     return jsonify({"status": "success", "role": "main_admin"}), 200
-
 
 # ===== ADMIN — LIST =====
 @app.route('/admin/list', methods=['GET'])
@@ -211,7 +183,6 @@ def admin_list():
         return jsonify({"status": "error", "message": "Failed to fetch UIDs"}), code
     uids = [u for u in uids if u.get("status", "active") != "removed"]
     return jsonify({"status": "success", "total": len(uids), "licenses": uids}), 200
-
 
 # ===== ADMIN — CREATE =====
 @app.route('/admin/create', methods=['POST'])
@@ -230,7 +201,6 @@ def admin_create():
         return jsonify({"status": "success", "message": "UID added", "data": data}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
 
-
 # ===== ADMIN — REVOKE =====
 @app.route('/admin/revoke', methods=['POST'])
 def admin_revoke():
@@ -247,7 +217,6 @@ def admin_revoke():
         return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
 
-
 # ===== ADMIN — UPDATE/RENEW =====
 @app.route('/admin/update', methods=['POST'])
 def admin_update():
@@ -258,6 +227,7 @@ def admin_update():
     days = int(body.get("days", 1))
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
+    # Remove then re-add with new days (API doesn't have renew endpoint)
     api_remove_uid(uid)
     data, code = api_add_uid(uid, days)
     if code in (200, 201):
@@ -269,7 +239,6 @@ def admin_update():
         save_uid_meta(uid, existing_name, days, extend=True)
         return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
-
 
 # ===== SUB-ADMIN MANAGEMENT =====
 @app.route('/admin/create-subadmin', methods=['POST'])
@@ -291,24 +260,23 @@ def create_subadmin():
         return jsonify({"status": "error", "message": "Username already exists"}), 409
 
     subadmins_col.insert_one({
-        "username":   username,
-        "password":   password,
-        "note":       note,
-        "credits":    initial_credits,
+        "username": username,
+        "password": password,
+        "note":     note,
+        "credits":  initial_credits,
         "created_at": datetime.utcnow()
     })
 
     if initial_credits > 0 and credit_log_col is not None:
         credit_log_col.insert_one({
-            "username":     username,
-            "change":       initial_credits,
+            "username": username,
+            "change": initial_credits,
             "balance_after": initial_credits,
-            "reason":       "Initial credits on account creation",
-            "date":         datetime.utcnow().isoformat()
+            "reason": "Initial credits on account creation",
+            "date": datetime.utcnow().isoformat()
         })
 
     return jsonify({"status": "success", "message": f"Sub-admin '{username}' created", "credits": initial_credits}), 200
-
 
 # ===== GIVE CREDITS =====
 @app.route('/admin/give-credits', methods=['POST'])
@@ -336,15 +304,14 @@ def give_credits():
 
     if credit_log_col is not None:
         credit_log_col.insert_one({
-            "username":     username,
-            "change":       amount,
+            "username": username,
+            "change": amount,
             "balance_after": new_balance,
-            "reason":       "Admin top-up",
-            "date":         datetime.utcnow().isoformat()
+            "reason": "Admin top-up",
+            "date": datetime.utcnow().isoformat()
         })
 
     return jsonify({"status": "success", "message": f"Added {amount} credits to {username}", "new_credits": new_balance}), 200
-
 
 # ===== CREDIT LOG =====
 @app.route('/admin/credit-log', methods=['GET'])
@@ -355,7 +322,6 @@ def get_credit_log():
         return jsonify({"status": "error", "message": "Database not connected"}), 500
     logs = list(credit_log_col.find({}, {"_id": 0}).sort("date", -1).limit(200))
     return jsonify({"status": "success", "logs": logs}), 200
-
 
 # ===== LIST SUBADMINS =====
 @app.route('/admin/list-subadmins', methods=['GET'])
@@ -370,7 +336,6 @@ def list_subadmins():
     ]
     return jsonify({"status": "success", "subadmins": result}), 200
 
-
 @app.route('/admin/delete-subadmin', methods=['POST'])
 def delete_subadmin():
     body = request.json or {}
@@ -383,7 +348,6 @@ def delete_subadmin():
     if result.deleted_count == 0:
         return jsonify({"status": "error", "message": "Sub-admin not found"}), 404
     return jsonify({"status": "success", "message": f"Sub-admin '{username}' deleted"}), 200
-
 
 # ===== SUB-ADMIN AUTH =====
 def verify_subadmin(username, password):
@@ -398,7 +362,6 @@ def subadmin_login():
         return jsonify({"status": "success", "role": "sub_admin", "username": body["username"]}), 200
     return jsonify({"status": "error", "message": "Invalid credentials"}), 403
 
-
 # ===== SUB-ADMIN CREDITS =====
 @app.route('/subadmin/credits', methods=['GET'])
 def subadmin_credits():
@@ -408,7 +371,6 @@ def subadmin_credits():
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
     credits = get_subadmin_credits(username)
     return jsonify({"status": "success", "credits": credits, "username": username}), 200
-
 
 # ===== SUB-ADMIN — LIST =====
 @app.route('/subadmin/list', methods=['GET'])
@@ -425,13 +387,12 @@ def subadmin_list():
     all_uids = [u for u in all_uids if u.get("status", "active") != "removed"]
 
     if uid_ownership_col is not None:
-        owned   = set(doc["uid"] for doc in uid_ownership_col.find({"owner": username}, {"uid": 1}))
+        owned = set(doc["uid"] for doc in uid_ownership_col.find({"owner": username}, {"uid": 1}))
         my_uids = [u for u in all_uids if (u.get("uid") or u.get("id") or "") in owned]
     else:
         my_uids = all_uids
 
     return jsonify({"status": "success", "total": len(my_uids), "licenses": my_uids}), 200
-
 
 # ===== SUB-ADMIN — CREATE =====
 @app.route('/subadmin/create', methods=['POST'])
@@ -461,7 +422,6 @@ def subadmin_create():
 
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
 
-
 # ===== SUB-ADMIN — REVOKE =====
 @app.route('/subadmin/revoke', methods=['POST'])
 def subadmin_revoke():
@@ -487,7 +447,6 @@ def subadmin_revoke():
         return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
 
-
 # ===== SUB-ADMIN — UPDATE/RENEW =====
 @app.route('/subadmin/update', methods=['POST'])
 def subadmin_update():
@@ -502,6 +461,7 @@ def subadmin_update():
     if not uid:
         return jsonify({"status": "error", "message": "uid required"}), 400
 
+    # Remove then re-add with new days
     api_remove_uid(uid)
     data, code = api_add_uid(uid, days)
     if code in (200, 201):
@@ -514,7 +474,6 @@ def subadmin_update():
         return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
 
-
 # ===== DB STATUS =====
 @app.route('/admin/db-status', methods=['GET'])
 def db_status():
@@ -523,7 +482,6 @@ def db_status():
     if subadmins_col is None:
         return jsonify({"status": "error", "message": "MongoDB NOT connected"}), 500
     return jsonify({"status": "success", "message": "MongoDB connected OK"}), 200
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8002))
