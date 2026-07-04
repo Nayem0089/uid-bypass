@@ -26,6 +26,7 @@
       --green: #22c55e;
       --blue: #3b82f6;
       --orange: #f97316;
+      --purple: #a855f7;
     }
     html { scroll-behavior: smooth; }
     body {
@@ -95,7 +96,7 @@
     @keyframes shine { to { background-position: 250% center; } }
     .auth-sub { text-align: center; font-size: 10px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
     .tab-switch {
-      display: grid; grid-template-columns: 1fr 1fr;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
       background: rgba(0,0,0,0.5); border-radius: 50px;
       padding: 5px; margin-bottom: 24px;
       border: 1px solid var(--border); gap: 4px;
@@ -221,8 +222,12 @@
     }
     .user-info { opacity: 0; transform: translateX(-8px); transition: all 0.3s ease 0.05s; pointer-events: none; }
     .user-info .u-name { font-size: 13px; font-weight: 700; }
-    .user-info .u-role { font-size: 10px; color: var(--red); font-weight: 600; letter-spacing: 0.5px; }
+    .user-info .u-role { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
+    .user-info .u-role.role-main { color: var(--red); }
+    .user-info .u-role.role-sub { color: var(--blue); }
+    .user-info .u-role.role-operator { color: var(--purple); }
     .user-info .u-credits { font-size: 11px; color: var(--blue); margin-top: 2px; }
+    .user-info .u-expiry { font-size: 10px; color: var(--orange); margin-top: 2px; }
 
     .main { margin-left: 72px; padding: 28px 32px; min-height: 100vh; position: relative; z-index: 1; }
     .page { display: none; animation: pageIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -262,6 +267,7 @@
     .stat-num.red { color: var(--red); text-shadow: 0 0 20px rgba(239,68,68,0.4); --c: rgba(239,68,68,0.5); }
     .stat-num.orange { color: var(--orange); text-shadow: 0 0 20px rgba(249,115,22,0.4); --c: rgba(249,115,22,0.5); }
     .stat-num.blue { color: var(--blue); text-shadow: 0 0 20px rgba(59,130,246,0.4); --c: rgba(59,130,246,0.5); }
+    .stat-num.purple { color: var(--purple); text-shadow: 0 0 20px rgba(168,85,247,0.4); --c: rgba(168,85,247,0.5); }
     .stat-label { font-size: 10px; letter-spacing: 1.5px; color: var(--dim); text-transform: uppercase; font-weight: 700; margin-top: 8px; }
 
     .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
@@ -291,12 +297,16 @@
     .btn-blue { background: linear-gradient(135deg, #2563eb, #1e3a8a); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
     .btn-blue:hover { box-shadow: 0 8px 24px rgba(37,99,235,0.45); }
     .btn-amber { background: linear-gradient(135deg, #78350f, #451a03); color: white; }
+    .btn-purple { background: linear-gradient(135deg, #7c3aed, #4c1d95); color: white; box-shadow: 0 4px 12px rgba(124,58,237,0.25); }
+    .btn-purple:hover { box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
     .btn-sm { width: auto; padding: 6px 14px; border-radius: 50px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-sm:hover { transform: scale(1.05); }
     .btn-sm-red { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
     .btn-sm-red:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.6); }
     .btn-sm-blue { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; }
     .btn-sm-blue:hover { background: rgba(59,130,246,0.2); }
+    .btn-sm-purple { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); color: #c084fc; }
+    .btn-sm-purple:hover { background: rgba(168,85,247,0.2); }
 
     .table-wrap { border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: rgba(5,5,10,0.6); }
     table { width: 100%; border-collapse: collapse; }
@@ -312,6 +322,7 @@
     .badge-red { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
     .badge-orange { background: rgba(249,115,22,0.12); color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
     .badge-blue { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+    .badge-purple { background: rgba(168,85,247,0.12); color: #c084fc; border: 1px solid rgba(168,85,247,0.25); }
     .badge-white { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.12); }
 
     .dl { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 50px; font-size: 11px; font-weight: 700; font-family: 'Space Mono', monospace; }
@@ -320,7 +331,7 @@
     .dl-crit { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; animation: blink 0.8s ease-in-out infinite; }
     @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-    .toolbar { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; gap: 12px; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; gap: 12px; flex-wrap: wrap; }
     .search { position: relative; }
     .search input { width: 260px; padding-left: 38px; }
     .search::before { content: '🔍'; position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 13px; pointer-events: none; }
@@ -341,10 +352,12 @@
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 1000; }
     .modal-overlay.open { display: flex; }
     .modal { background: rgba(8,8,18,0.98); border-radius: 32px; padding: 32px; width: 400px; max-width: 90vw; border: 1px solid var(--border-red); animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 60px rgba(239,68,68,0.1); }
+    .modal-purple { border-color: rgba(168,85,247,0.35); box-shadow: 0 0 60px rgba(168,85,247,0.1); }
     .modal-blue { border-color: rgba(59,130,246,0.35); box-shadow: 0 0 60px rgba(59,130,246,0.1); }
     @keyframes modalIn { from { opacity: 0; transform: scale(0.85) translateY(20px); } to { opacity: 1; transform: none; } }
     .modal h3 { font-size: 17px; font-weight: 800; margin-bottom: 14px; }
     .modal h3.red { color: #f87171; }
+    .modal h3.purple { color: #c084fc; }
     .modal h3.blue { color: #60a5fa; }
     .modal-body { color: var(--muted); font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
     .modal-btns { display: flex; gap: 12px; }
@@ -360,6 +373,15 @@
     hr.div { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
     .copy-btn { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 12px; margin-left: 4px; transition: color 0.2s; }
     .copy-btn:hover { color: white; }
+
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .status-dot.active { background: var(--green); }
+    .status-dot.expired { background: var(--red); }
+    .status-dot.soon { background: var(--orange); }
+    .status-dot.pending { background: var(--purple); }
+
+    .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .flex-grow { flex: 1; }
   </style>
 </head>
 <body>
@@ -373,7 +395,8 @@
       <div class="auth-sub">// Admin Portal v6.0 — Secure Access</div>
       <div class="tab-switch">
         <button class="tab-btn active" onclick="switchAuthTab('sub')">RESELLER</button>
-        <button class="tab-btn" onclick="switchAuthTab('main')">MASTER ADMIN</button>
+        <button class="tab-btn" onclick="switchAuthTab('main')">MASTER</button>
+        <button class="tab-btn" onclick="switchAuthTab('operator')">OPERATOR</button>
       </div>
       <div id="login-sub">
         <input type="text" id="sub-user" class="field" placeholder="Reseller Username">
@@ -385,6 +408,12 @@
         <input type="password" id="main-key" class="field" placeholder="Master Secret Key">
         <button class="btn-primary" onclick="doMainLogin()">⛊ UNLOCK SYSTEM</button>
         <div class="res-msg" id="err-main"></div>
+      </div>
+      <div id="login-operator" style="display:none;">
+        <input type="text" id="op-user" class="field" placeholder="Operator Username">
+        <input type="password" id="op-pass" class="field" placeholder="Password">
+        <button class="btn-primary" onclick="doOperatorLogin()">⟁ OPERATOR ACCESS</button>
+        <div class="res-msg" id="err-operator"></div>
       </div>
     </div>
   </div>
@@ -408,6 +437,10 @@
           <div class="nav-icon-wrap">👥</div>
           <span class="nav-label">Resellers</span>
         </button>
+        <button class="nav-item" id="nav-operators" style="display:none" onclick="switchTab('operators')">
+          <div class="nav-icon-wrap">🛡️</div>
+          <span class="nav-label">Operators</span>
+        </button>
         <button class="nav-item" id="nav-credit" style="display:none" onclick="switchTab('credit')">
           <div class="nav-icon-wrap">💰</div>
           <span class="nav-label">Credit Mgmt</span>
@@ -428,8 +461,9 @@
           <div class="avatar" id="sidebar-avatar">A</div>
           <div class="user-info">
             <div class="u-name" id="sidebar-uname">Administrator</div>
-            <div class="u-role" id="sidebar-role">Main Admin</div>
+            <div class="u-role role-main" id="sidebar-role">Main Admin</div>
             <div class="u-credits" id="sidebar-credits" style="display:none;">💰 0 credits</div>
+            <div class="u-expiry" id="sidebar-expiry" style="display:none;">⏳ Expires: —</div>
           </div>
         </div>
       </div>
@@ -542,6 +576,60 @@
                 <thead><tr><th>Username</th><th>Note</th><th>Credits</th><th>Action</th></tr></thead>
                 <tbody id="reseller-tbody"><tr><td colspan="4" style="text-align:center; color:var(--dim); padding:30px;">—</td></tr></tbody>
               </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- OPERATORS -->
+        <div id="main-tab-operators" class="panel-section">
+          <div class="page-header">
+            <div class="page-header-icon">🛡️</div>
+            <div><h1>OPERATORS</h1><p>Create limited-time operator accounts</p></div>
+          </div>
+          <div class="card-grid">
+            <div class="card">
+              <h3>🛡️ Create Operator</h3>
+              <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">Operators can only <strong>ADD</strong> UIDs (not remove or renew). Set their account expiry date.</p>
+              <input id="new-op-user" class="field" placeholder="Operator Username">
+              <input type="password" id="new-op-pass" class="field" placeholder="Password">
+              <div style="display:flex; gap:10px; align-items:center; margin-bottom:14px;">
+                <span style="font-size:12px; color:var(--muted); white-space:nowrap; font-weight:600;">⏳ Account Expires:</span>
+                <select id="new-op-expiry" class="field" style="margin:0; flex:1;">
+                  <option value="1">1 Day</option>
+                  <option value="7">7 Days</option>
+                  <option value="14">14 Days</option>
+                  <option value="30" selected>30 Days</option>
+                  <option value="60">60 Days</option>
+                  <option value="90">90 Days</option>
+                  <option value="180">180 Days</option>
+                  <option value="365">1 Year</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+                <span style="font-size:12px; color:var(--muted); white-space:nowrap; font-weight:600;">📝 Max UID Days:</span>
+                <select id="new-op-max-days" class="field" style="margin:0; flex:1;">
+                  <option value="1">1 Day</option>
+                  <option value="7">7 Days</option>
+                  <option value="15">15 Days</option>
+                  <option value="30" selected>30 Days</option>
+                  <option value="60">60 Days</option>
+                  <option value="90">90 Days</option>
+                </select>
+              </div>
+              <button class="btn btn-purple" onclick="createOperator()">✨ Create Operator</button>
+              <div class="res-msg" id="r-op-create"></div>
+            </div>
+            <div class="card">
+              <h3>📋 Operators List</h3>
+              <div style="margin-bottom:16px;">
+                <button class="btn btn-dark" style="width:auto; padding:10px 20px;" onclick="loadOperators()">⟳ Refresh</button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Username</th><th>Expires</th><th>Days Left</th><th>Max UID Days</th><th>UIDs Added</th><th>Action</th></tr></thead>
+                  <tbody id="operator-tbody"><tr><td colspan="6" style="text-align:center; color:var(--dim); padding:30px;">—</td></tr></tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -663,6 +751,44 @@
           </table>
         </div>
       </div>
+
+      <!-- OPERATOR PANEL -->
+      <div id="operator-panel" class="page">
+        <div class="page-header">
+          <div class="page-header-icon">🛡️</div>
+          <div><h1>OPERATOR PANEL</h1><p>Add UIDs — limited access</p></div>
+        </div>
+        <div class="card-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="card">
+            <h3>➕ Add UID <span style="font-size:11px; color:var(--dim); font-weight:400;">(max ${maxDays} days)</span></h3>
+            <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">You can add UIDs. Your account expires on <span id="op-expiry-display">—</span></p>
+            <input id="o-uid" class="field" placeholder="UID">
+            <input id="o-name" class="field" placeholder="Name">
+            <select id="o-days" class="field">
+              <option value="1">1 Day</option>
+              <option value="7">7 Days</option>
+              <option value="15">15 Days</option>
+              <option value="30" selected>30 Days</option>
+            </select>
+            <button class="btn btn-purple" onclick="opAddUID()">💾 Add UID</button>
+            <button class="btn btn-amber" style="margin-top:10px;" onclick="opAddUID24()">⚡ Add 24-Hour UID</button>
+            <div class="res-msg" id="r-op-add"></div>
+          </div>
+          <div class="card">
+            <h3>📊 My UIDs</h3>
+            <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">UIDs you've added (<span id="op-uid-count">0</span>)</p>
+            <div style="margin-bottom:12px;">
+              <button class="btn btn-dark" style="width:auto; padding:10px 20px;" onclick="opLoadUIDs()">⟳ Refresh</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th></tr></thead>
+                <tbody id="operator-uid-tbody"><tr><td colspan="4" style="text-align:center; color:var(--dim); padding:20px;">No UIDs added yet.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -739,11 +865,11 @@
   })();
 
   // ===== STATE =====
-  let SESSION={role:null,adminKey:null,username:null,password:null};
-  let mainUIDs=[],subUIDs=[],pendUID=null,pendIsMain=false,pendQCUser=null,creditLog=[],subCredits=0;
+  let SESSION={role:null,adminKey:null,username:null,password:null,maxDays:30,expiresAt:null};
+  let mainUIDs=[],subUIDs=[],operatorUIDs=[],pendUID=null,pendIsMain=false,pendQCUser=null,creditLog=[],subCredits=0;
   const save=()=>{ try{localStorage.setItem('rp_s',JSON.stringify(SESSION));}catch(e){} };
   const load=()=>{ try{const s=localStorage.getItem('rp_s');if(s)SESSION=JSON.parse(s);}catch(e){} };
-  const clear=()=>{ SESSION={role:null,adminKey:null,username:null,password:null};localStorage.removeItem('rp_s'); };
+  const clear=()=>{ SESSION={role:null,adminKey:null,username:null,password:null,maxDays:30,expiresAt:null};localStorage.removeItem('rp_s'); };
   const saveLog=()=>{ try{localStorage.setItem('sc_log',JSON.stringify(creditLog));}catch(e){} };
   const loadLog=()=>{ try{const s=localStorage.getItem('sc_log');if(s)creditLog=JSON.parse(s);}catch(e){} };
 
@@ -823,9 +949,13 @@
 
   // ===== AUTH =====
   function switchAuthTab(t){
-    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(t==='sub'&&i===0)||(t==='main'&&i===1)));
+    document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+      const isActive = (t==='sub'&&i===0)||(t==='main'&&i===1)||(t==='operator'&&i===2);
+      b.classList.toggle('active',isActive);
+    });
     document.getElementById('login-sub').style.display=t==='sub'?'block':'none';
     document.getElementById('login-main').style.display=t==='main'?'block':'none';
+    document.getElementById('login-operator').style.display=t==='operator'?'block':'none';
   }
   async function doMainLogin(){
     const key=document.getElementById('main-key').value.trim();
@@ -834,7 +964,7 @@
       const r=await fetch('/admin/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:key})});
       const d=await r.json();
       if(!r.ok)return res('err-main','✗ '+(d.message||'Invalid key'),'err');
-      SESSION={role:'main_admin',adminKey:key,username:null,password:null};
+      SESSION={role:'main_admin',adminKey:key,username:null,password:null,maxDays:999,expiresAt:null};
       save(); enterMain();
     }catch(e){res('err-main','Connection error','err');}
   }
@@ -846,37 +976,105 @@
       const r=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
       const d=await r.json();
       if(!r.ok)return res('err-sub','✗ '+(d.message||'Invalid credentials'),'err');
-      SESSION={role:'sub_admin',adminKey:null,username:u,password:p};
+      SESSION={role:'sub_admin',adminKey:null,username:u,password:p,maxDays:999,expiresAt:null};
       save(); enterSub();
     }catch(e){res('err-sub','Connection error','err');}
+  }
+  async function doOperatorLogin(){
+    const u=document.getElementById('op-user').value.trim();
+    const p=document.getElementById('op-pass').value.trim();
+    if(!u||!p)return res('err-operator','Enter credentials','err');
+    try{
+      const r=await fetch('/operator/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+      const d=await r.json();
+      if(!r.ok)return res('err-operator','✗ '+(d.message||'Invalid credentials or account expired'),'err');
+      SESSION={role:'operator',adminKey:null,username:u,password:p,maxDays:d.max_days||30,expiresAt:d.expires_at||null};
+      save(); enterOperator();
+    }catch(e){res('err-operator','Connection error','err');}
   }
   function enterMain(){
     document.getElementById('auth-gate').style.display='none';
     document.getElementById('app-layout').style.display='block';
     document.getElementById('main-panel').classList.add('active');
     document.getElementById('sub-panel').classList.remove('active');
+    document.getElementById('operator-panel').classList.remove('active');
     document.getElementById('nav-resellers').style.display='flex';
+    document.getElementById('nav-operators').style.display='flex';
     document.getElementById('nav-credit').style.display='flex';
     document.getElementById('nav-settings').style.display='flex';
     document.getElementById('sidebar-uname').textContent='ADMINISTRATOR';
     document.getElementById('sidebar-avatar').textContent='A';
     document.getElementById('sidebar-role').textContent='MAIN ADMIN';
+    document.getElementById('sidebar-role').className='u-role role-main';
     document.getElementById('sidebar-credits').style.display='none';
-    mainLoadUIDs(); loadResellers(); loadLog(); renderCreditLog();
+    document.getElementById('sidebar-expiry').style.display='none';
+    mainLoadUIDs(); loadResellers(); loadOperators(); loadLog(); renderCreditLog();
   }
   function enterSub(){
     document.getElementById('auth-gate').style.display='none';
     document.getElementById('app-layout').style.display='block';
     document.getElementById('sub-panel').classList.add('active');
     document.getElementById('main-panel').classList.remove('active');
+    document.getElementById('operator-panel').classList.remove('active');
     document.getElementById('nav-resellers').style.display='none';
+    document.getElementById('nav-operators').style.display='none';
     document.getElementById('nav-credit').style.display='none';
     document.getElementById('nav-settings').style.display='none';
     document.getElementById('sidebar-uname').textContent=SESSION.username;
     document.getElementById('sidebar-avatar').textContent=(SESSION.username[0]||'R').toUpperCase();
     document.getElementById('sidebar-role').textContent='RESELLER';
+    document.getElementById('sidebar-role').className='u-role role-sub';
     document.getElementById('sidebar-credits').style.display='block';
+    document.getElementById('sidebar-expiry').style.display='none';
     subLoadUIDs(); subLoadCredits();
+  }
+  function enterOperator(){
+    document.getElementById('auth-gate').style.display='none';
+    document.getElementById('app-layout').style.display='block';
+    document.getElementById('operator-panel').classList.add('active');
+    document.getElementById('main-panel').classList.remove('active');
+    document.getElementById('sub-panel').classList.remove('active');
+    document.getElementById('nav-resellers').style.display='none';
+    document.getElementById('nav-operators').style.display='none';
+    document.getElementById('nav-credit').style.display='none';
+    document.getElementById('nav-settings').style.display='none';
+    document.getElementById('sidebar-uname').textContent=SESSION.username;
+    document.getElementById('sidebar-avatar').textContent=(SESSION.username[0]||'O').toUpperCase();
+    document.getElementById('sidebar-role').textContent='OPERATOR';
+    document.getElementById('sidebar-role').className='u-role role-operator';
+    document.getElementById('sidebar-credits').style.display='none';
+    document.getElementById('sidebar-expiry').style.display='block';
+    document.getElementById('sidebar-expiry').textContent='⏳ Expires: '+fmtDate(SESSION.expiresAt);
+    // Set max days in UI
+    const daysSel = document.getElementById('o-days');
+    if(daysSel){
+      // Clear existing options
+      daysSel.innerHTML = '';
+      // Add options up to maxDays
+      const options = [1,7,15,30,60,90];
+      options.forEach(v => {
+        if(v <= SESSION.maxDays){
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v + ' Day' + (v>1?'s':'');
+          if(v===30) opt.selected = true;
+          daysSel.appendChild(opt);
+        }
+      });
+      if(daysSel.options.length === 0){
+        const opt = document.createElement('option');
+        opt.value = SESSION.maxDays;
+        opt.textContent = SESSION.maxDays + ' Days (max)';
+        opt.selected = true;
+        daysSel.appendChild(opt);
+      }
+    }
+    // Update display
+    const expiryDisplay = document.getElementById('op-expiry-display');
+    if(expiryDisplay) expiryDisplay.textContent = fmtDate(SESSION.expiresAt);
+    const maxDaysDisplay = document.querySelector('#operator-panel .card h3 span');
+    if(maxDaysDisplay) maxDaysDisplay.textContent = SESSION.maxDays + ' days';
+    opLoadUIDs();
   }
   function switchTab(t){
     document.querySelectorAll('.nav-item[id^="nav-"]').forEach(b=>b.classList.remove('active'));
@@ -884,6 +1082,7 @@
     document.querySelectorAll('#main-panel .panel-section').forEach(s=>s.classList.remove('active'));
     document.getElementById('main-tab-'+t).classList.add('active');
     if(t==='resellers')loadResellers();
+    if(t==='operators')loadOperators();
     if(t==='credit'){loadResellers();renderCreditLog();}
   }
   function doLogout(){
@@ -892,6 +1091,7 @@
     document.getElementById('auth-gate').style.display='flex';
     document.getElementById('main-panel').classList.remove('active');
     document.getElementById('sub-panel').classList.remove('active');
+    document.getElementById('operator-panel').classList.remove('active');
   }
 
   // ===== MAIN UIDs =====
@@ -925,10 +1125,6 @@
     if(r.ok){toast('UID created!');res('r-m-add','✓ UID added','ok');document.getElementById('m-uid').value='';document.getElementById('m-name').value='';mainLoadUIDs();}
     else{toast(d.message,'err');res('r-m-add','✗ '+d.message,'err');}
   }
-  // ✅ NEW: Instant 24-hour UID add (main admin). Sends both days:1 (fallback for
-  // backends that only understand whole days) and hours:24 (for backends that
-  // support exact hour-based expiry) so the license expires exactly 24 hours
-  // from creation, not just "at the end of the calendar day".
   async function mainAddUID24(){
     const uid=document.getElementById('m-uid').value.trim();
     const name=document.getElementById('m-name').value.trim()||'Player';
@@ -997,8 +1193,6 @@
     if(r.ok){toast('UID added (1 credit used)');res('r-s-add','✓ Added','ok');document.getElementById('s-uid').value='';document.getElementById('s-name').value='';subLoadUIDs();subLoadCredits();}
     else{const d=await r.json();toast(d.message,'err');}
   }
-  // ✅ NEW: Instant 24-hour UID add (reseller). Same idea as mainAddUID24 but
-  // goes through the reseller endpoint and still costs 1 credit.
   async function subAddUID24(){
     await subLoadCredits();
     if(subCredits<1){toast('No credit! Contact Main Admin.','err');return;}
@@ -1023,6 +1217,118 @@
     openDelModal(uid,false);
   }
 
+  // ===== OPERATOR FUNCTIONS =====
+  async function createOperator(){
+    const u=document.getElementById('new-op-user').value.trim();
+    const p=document.getElementById('new-op-pass').value.trim();
+    const expiryDays=parseInt(document.getElementById('new-op-expiry').value);
+    const maxDays=parseInt(document.getElementById('new-op-max-days').value);
+    if(!u||!p)return toast('Fill username & password','err');
+    try{
+      const r=await fetch('/admin/create-operator',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:u,password:p,expiry_days:expiryDays,max_days:maxDays})});
+      const d=await r.json();
+      if(!r.ok){toast(d.message||'Failed','err');res('r-op-create','✗ '+(d.message||'Error'),'err');return;}
+      toast(`Operator "${u}" created`);
+      res('r-op-create',`✓ Created: ${u} | expires in ${expiryDays} days | max ${maxDays} days per UID`,'ok');
+      document.getElementById('new-op-user').value='';
+      document.getElementById('new-op-pass').value='';
+      loadOperators();
+    }catch(e){toast('Connection error','err');res('r-op-create','✗ Connection error','err');}
+  }
+
+  async function loadOperators(){
+    const tb=document.getElementById('operator-tbody');
+    if(!tb)return;
+    tb.innerHTML='<tr><td colspan="6" style="text-align:center; color:var(--dim);">Loading...</td></tr>';
+    try{
+      const r=await fetch('/admin/list-operators?admin_key='+encodeURIComponent(SESSION.adminKey));
+      const d=await r.json();
+      if(!r.ok||!d.operators?.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center; color:var(--dim); padding:24px;">No operators found</td></tr>';return;}
+      tb.innerHTML=d.operators.map(s=>{
+        const rem=daysLeft(s.expires_at);
+        let statusBadge = '';
+        if(rem===null) statusBadge = '<span class="badge badge-purple">● Active</span>';
+        else if(rem<=0) statusBadge = '<span class="badge badge-red">✖ Expired</span>';
+        else if(rem<=7) statusBadge = `<span class="badge badge-orange">⚠ ${rem}d left</span>`;
+        else statusBadge = `<span class="badge badge-green">● ${rem}d left</span>`;
+        return `<tr>
+          <td><span class="badge badge-purple">${s.username}</span></td>
+          <td style="font-size:12px; color:var(--muted);">${fmtDate(s.expires_at)}</td>
+          <td>${statusBadge}</td>
+          <td><span class="badge badge-blue">${s.max_days||30}d</span></td>
+          <td><span class="badge badge-white">${s.uids_added||0}</span></td>
+          <td><button class="btn-sm btn-sm-red" onclick="deleteOperator('${s.username}')">Delete</button></td>
+        </tr>`;
+      }).join('');
+    }catch(e){tb.innerHTML='<tr><td colspan="6" style="text-align:center; color:#f87171;">Connection error</td></tr>';}
+  }
+
+  async function deleteOperator(uname){
+    if(!confirm(`Delete operator: ${uname}?`))return;
+    const r=await fetch('/admin/delete-operator',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:uname})});
+    if(r.ok){toast('Operator deleted');loadOperators();}
+    else{const d=await r.json();toast(d.message||'Failed','err');}
+  }
+
+  // ===== OPERATOR PANEL UIDs =====
+  async function opLoadUIDs(){
+    const tb=document.getElementById('operator-uid-tbody');
+    if(!tb)return;
+    tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:var(--dim); padding:20px;">Loading...</td></tr>';
+    try{
+      const r=await fetch('/operator/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
+      const d=await r.json();
+      if(!r.ok){tb.innerHTML=`<tr><td colspan="4" style="color:#f87171; text-align:center;">Error: ${d.message}</td></tr>`;return;}
+      operatorUIDs=d.licenses||[];
+      const countEl=document.getElementById('op-uid-count');
+      if(countEl)countEl.textContent=operatorUIDs.length;
+      tb.innerHTML=operatorUIDs.length?operatorUIDs.map(u=>{
+        const uid=u.uid||u.id||u.user_id||'?';
+        const name=u.name||u.username||u.player||'—';
+        const days=u.days!==undefined?u.days:'—';
+        const expRaw=u.expires_at||u.expiry||u.expire||null;
+        let badge='';
+        const rem=daysLeft(expRaw);
+        if(rem===null) badge='<span class="badge badge-green">● Active</span>';
+        else if(rem<=0) badge='<span class="badge badge-red">✖ Expired</span>';
+        else if(rem<=7) badge='<span class="badge badge-orange">⚠ Soon</span>';
+        else badge='<span class="badge badge-green">● Active</span>';
+        return `<tr>
+          <td><span class="uid-mono">${uid}</span></td>
+          <td style="font-weight:600;">${name}</td>
+          <td style="font-family:'Space Mono',monospace; font-size:12px; color:var(--muted);">${days}d</td>
+          <td>${badge}</td>
+        </tr>`;
+      }).join(''):'<tr><td colspan="4" style="text-align:center; color:var(--dim); padding:20px;">No UIDs added yet.</td></tr>';
+    }catch(e){tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#f87171;">Connection error</td></tr>';}
+  }
+
+  async function opAddUID(){
+    const uid=document.getElementById('o-uid').value.trim();
+    const name=document.getElementById('o-name').value.trim()||'Player';
+    const days=parseInt(document.getElementById('o-days').value);
+    if(!uid)return toast('UID required','err');
+    if(days > SESSION.maxDays)return toast(`Max ${SESSION.maxDays} days allowed`,'err');
+    try{
+      const r=await fetch('/operator/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days})});
+      const d=await r.json();
+      if(r.ok){toast('UID added!');res('r-op-add','✓ UID added','ok');document.getElementById('o-uid').value='';document.getElementById('o-name').value='';opLoadUIDs();}
+      else{toast(d.message,'err');res('r-op-add','✗ '+d.message,'err');}
+    }catch(e){toast('Connection error','err');}
+  }
+
+  async function opAddUID24(){
+    const uid=document.getElementById('o-uid').value.trim();
+    const name=document.getElementById('o-name').value.trim()||'Player';
+    if(!uid)return toast('UID required','err');
+    try{
+      const r=await fetch('/operator/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days:1,hours:24,duration_hours:24})});
+      const d=await r.json();
+      if(r.ok){toast('24-Hour UID added!');res('r-op-add','✓ 24H UID added','ok');document.getElementById('o-uid').value='';document.getElementById('o-name').value='';opLoadUIDs();}
+      else{toast(d.message,'err');res('r-op-add','✗ '+d.message,'err');}
+    }catch(e){toast('Connection error','err');}
+  }
+
   // ===== DELETE MODAL =====
   function openDelModal(uid,isMain){
     pendUID=uid; pendIsMain=isMain;
@@ -1030,7 +1336,6 @@
     openModal('modal-delete');
   }
 
-  // ===== ✅ FIXED: confirmDelete with notification + auto-refresh =====
   async function confirmDelete(){
     if(!pendUID)return closeModal('modal-delete');
     const uid=pendUID, isMain=pendIsMain;
@@ -1044,23 +1349,18 @@
       }
       const d=await r.json();
       if(r.ok && d.status==='success'){
-        // ✅ Success notification
         toast('UID '+uid+' removed successfully!','ok');
-        // ✅ Instant UI update (remove from local array)
         if(isMain){
           mainUIDs=mainUIDs.filter(u=>(u.uid||u.id||'')!==uid);
           renderMainTable(mainUIDs);
           calcStats(mainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
-          // Then sync with server
           setTimeout(()=>mainLoadUIDs(), 600);
         } else {
           subUIDs=subUIDs.filter(u=>(u.uid||u.id||'')!==uid);
           renderSubTable(subUIDs);
           calcStats(subUIDs,'ss-total','ss-active','ss-expired',null);
-          // Then sync with server
           setTimeout(()=>subLoadUIDs(), 600);
         }
-        // Clear input fields
         const mf=document.getElementById('m-rm-uid');
         const sf=document.getElementById('s-rm-uid');
         if(mf)mf.value='';
@@ -1104,7 +1404,6 @@
     await doGiveCredits(username,amount,'r-qc');
   }
 
-  // ===== QUICK CREDIT MODAL =====
   function openQuickCredit(uname){
     pendQCUser=uname;
     document.getElementById('qc-modal-label').innerHTML=`Adding credits to: <span style="color:#60a5fa; font-weight:700;">${uname}</span>`;
@@ -1222,7 +1521,7 @@
     else{const d=await r.json();toast(d.message||'Failed','err');}
   }
 
-  // ===== ✅ NEW: SETTINGS — change master key / create extra admin login =====
+  // ===== SETTINGS =====
   async function changeMasterKey(){
     const cur=document.getElementById('set-current-key').value.trim();
     const n1=document.getElementById('set-new-key').value.trim();
@@ -1293,6 +1592,10 @@
     }
     if(SESSION.role==='sub_admin'&&SESSION.username){
       try{const r=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password})});if(r.ok){enterSub();return;}}catch(e){}
+      clear();
+    }
+    if(SESSION.role==='operator'&&SESSION.username){
+      try{const r=await fetch('/operator/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password})});if(r.ok){enterOperator();return;}}catch(e){}
       clear();
     }
   })();
