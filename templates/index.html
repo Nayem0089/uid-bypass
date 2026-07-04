@@ -412,6 +412,10 @@
           <div class="nav-icon-wrap">💰</div>
           <span class="nav-label">Credit Mgmt</span>
         </button>
+        <button class="nav-item" id="nav-settings" style="display:none" onclick="switchTab('settings')">
+          <div class="nav-icon-wrap">🔐</div>
+          <span class="nav-label">Settings</span>
+        </button>
       </div>
       <div class="nav-items" style="flex:0; margin-bottom:12px;">
         <button class="nav-item nav-exit" onclick="doLogout()">
@@ -459,6 +463,7 @@
               </select>
               <div class="chip-row" id="m-chips"></div>
               <button class="btn btn-red" onclick="mainAddUID()">💾 Save & Activate</button>
+              <button class="btn btn-amber" style="margin-top:10px;" onclick="mainAddUID24()">⚡ Instant 24-Hour Add</button>
               <div class="res-msg" id="r-m-add"></div>
             </div>
             <div class="card">
@@ -577,6 +582,33 @@
             </div>
           </div>
         </div>
+
+        <!-- SETTINGS -->
+        <div id="main-tab-settings" class="panel-section">
+          <div class="page-header">
+            <div class="page-header-icon">🔐</div>
+            <div><h1>SETTINGS</h1><p>Manage master admin login credentials</p></div>
+          </div>
+          <div class="card-grid">
+            <div class="card">
+              <h3>🔑 Change Master Key</h3>
+              <p style="font-size:12px; color:var(--dim); margin-bottom:14px;">Set a new Master Secret Key used to log into the Master Admin tab.</p>
+              <input type="password" id="set-current-key" class="field" placeholder="Current Master Key">
+              <input type="password" id="set-new-key" class="field" placeholder="New Master Key">
+              <input type="password" id="set-new-key2" class="field" placeholder="Confirm New Master Key">
+              <button class="btn btn-red" onclick="changeMasterKey()">💾 Update Master Key</button>
+              <div class="res-msg" id="r-set-key"></div>
+            </div>
+            <div class="card">
+              <h3>👤 Create New Admin Login</h3>
+              <p style="font-size:12px; color:var(--dim); margin-bottom:14px;">Create an additional admin username/password pair for logging in (if your backend supports multi-admin auth).</p>
+              <input id="new-admin-user" class="field" placeholder="New Admin Username">
+              <input type="password" id="new-admin-pass" class="field" placeholder="New Admin Password">
+              <button class="btn btn-blue" onclick="createAdminLogin()">✨ Create Admin Login</button>
+              <div class="res-msg" id="r-new-admin"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- SUB PANEL -->
@@ -604,6 +636,7 @@
               <option value="30" selected>30 Days</option><option value="60">60 Days</option>
             </select>
             <button class="btn btn-red" onclick="subAddUID()">💾 Save (1 credit)</button>
+            <button class="btn btn-amber" style="margin-top:10px;" onclick="subAddUID24()">⚡ Instant 24-Hour Add (1 credit)</button>
             <div class="res-msg" id="r-s-add"></div>
           </div>
           <div class="card">
@@ -824,6 +857,7 @@
     document.getElementById('sub-panel').classList.remove('active');
     document.getElementById('nav-resellers').style.display='flex';
     document.getElementById('nav-credit').style.display='flex';
+    document.getElementById('nav-settings').style.display='flex';
     document.getElementById('sidebar-uname').textContent='ADMINISTRATOR';
     document.getElementById('sidebar-avatar').textContent='A';
     document.getElementById('sidebar-role').textContent='MAIN ADMIN';
@@ -837,6 +871,7 @@
     document.getElementById('main-panel').classList.remove('active');
     document.getElementById('nav-resellers').style.display='none';
     document.getElementById('nav-credit').style.display='none';
+    document.getElementById('nav-settings').style.display='none';
     document.getElementById('sidebar-uname').textContent=SESSION.username;
     document.getElementById('sidebar-avatar').textContent=(SESSION.username[0]||'R').toUpperCase();
     document.getElementById('sidebar-role').textContent='RESELLER';
@@ -888,6 +923,19 @@
     const r=await fetch('/admin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,name,days:parseInt(days)})});
     const d=await r.json();
     if(r.ok){toast('UID created!');res('r-m-add','✓ UID added','ok');document.getElementById('m-uid').value='';document.getElementById('m-name').value='';mainLoadUIDs();}
+    else{toast(d.message,'err');res('r-m-add','✗ '+d.message,'err');}
+  }
+  // ✅ NEW: Instant 24-hour UID add (main admin). Sends both days:1 (fallback for
+  // backends that only understand whole days) and hours:24 (for backends that
+  // support exact hour-based expiry) so the license expires exactly 24 hours
+  // from creation, not just "at the end of the calendar day".
+  async function mainAddUID24(){
+    const uid=document.getElementById('m-uid').value.trim();
+    const name=document.getElementById('m-name').value.trim()||'Player';
+    if(!uid)return toast('UID required','err');
+    const r=await fetch('/admin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,name,days:1,hours:24,duration_hours:24})});
+    const d=await r.json();
+    if(r.ok){toast('24-Hour UID created!');res('r-m-add','✓ 24H UID added','ok');document.getElementById('m-uid').value='';document.getElementById('m-name').value='';mainLoadUIDs();}
     else{toast(d.message,'err');res('r-m-add','✗ '+d.message,'err');}
   }
   async function mainRenewUID(){
@@ -947,6 +995,18 @@
     if(!uid)return toast('UID required','err');
     const r=await fetch('/subadmin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days:parseInt(days)})});
     if(r.ok){toast('UID added (1 credit used)');res('r-s-add','✓ Added','ok');document.getElementById('s-uid').value='';document.getElementById('s-name').value='';subLoadUIDs();subLoadCredits();}
+    else{const d=await r.json();toast(d.message,'err');}
+  }
+  // ✅ NEW: Instant 24-hour UID add (reseller). Same idea as mainAddUID24 but
+  // goes through the reseller endpoint and still costs 1 credit.
+  async function subAddUID24(){
+    await subLoadCredits();
+    if(subCredits<1){toast('No credit! Contact Main Admin.','err');return;}
+    const uid=document.getElementById('s-uid').value.trim();
+    const name=document.getElementById('s-name').value.trim()||'Player';
+    if(!uid)return toast('UID required','err');
+    const r=await fetch('/subadmin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days:1,hours:24,duration_hours:24})});
+    if(r.ok){toast('24-Hour UID added (1 credit used)');res('r-s-add','✓ 24H Added','ok');document.getElementById('s-uid').value='';document.getElementById('s-name').value='';subLoadUIDs();subLoadCredits();}
     else{const d=await r.json();toast(d.message,'err');}
   }
   async function subRenewUID(){
@@ -1160,6 +1220,49 @@
     const r=await fetch('/admin/delete-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:uname})});
     if(r.ok){toast('Reseller deleted');loadResellers();}
     else{const d=await r.json();toast(d.message||'Failed','err');}
+  }
+
+  // ===== ✅ NEW: SETTINGS — change master key / create extra admin login =====
+  async function changeMasterKey(){
+    const cur=document.getElementById('set-current-key').value.trim();
+    const n1=document.getElementById('set-new-key').value.trim();
+    const n2=document.getElementById('set-new-key2').value.trim();
+    if(!cur||!n1||!n2)return res('r-set-key','✗ Fill all fields','err');
+    if(n1!==n2)return res('r-set-key','✗ New keys do not match','err');
+    if(n1.length<6)return res('r-set-key','✗ New key must be at least 6 characters','err');
+    try{
+      const r=await fetch('/admin/change-key',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:cur,new_key:n1})});
+      const d=await r.json();
+      if(r.ok){
+        toast('Master key updated!');
+        res('r-set-key','✓ Master key updated — use it next time you log in','ok');
+        SESSION.adminKey=n1; save();
+        document.getElementById('set-current-key').value='';
+        document.getElementById('set-new-key').value='';
+        document.getElementById('set-new-key2').value='';
+      } else {
+        toast(d.message||'Failed','err');
+        res('r-set-key','✗ '+(d.message||'Backend endpoint /admin/change-key not found'),'err');
+      }
+    }catch(e){ res('r-set-key','✗ Connection error — backend endpoint /admin/change-key needed','err'); }
+  }
+  async function createAdminLogin(){
+    const u=document.getElementById('new-admin-user').value.trim();
+    const p=document.getElementById('new-admin-pass').value.trim();
+    if(!u||!p)return res('r-new-admin','✗ Fill username & password','err');
+    try{
+      const r=await fetch('/admin/create-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:u,password:p})});
+      const d=await r.json();
+      if(r.ok){
+        toast('Admin login created!');
+        res('r-new-admin',`✓ Admin login "${u}" created`,'ok');
+        document.getElementById('new-admin-user').value='';
+        document.getElementById('new-admin-pass').value='';
+      } else {
+        toast(d.message||'Failed','err');
+        res('r-new-admin','✗ '+(d.message||'Backend endpoint /admin/create-admin not found'),'err');
+      }
+    }catch(e){ res('r-new-admin','✗ Connection error — backend endpoint /admin/create-admin needed','err'); }
   }
 
   // ===== CHIPS =====
