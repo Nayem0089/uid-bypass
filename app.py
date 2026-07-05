@@ -31,12 +31,13 @@ try:
     mongo_client.server_info()
     db                = mongo_client["sensix_panel"]
     subadmins_col     = db["subadmins"]
+    fetchers_col      = db["fetchers"]
     uid_ownership_col = db["uid_ownership"]
     credit_log_col    = db["credit_log"]
     print("MongoDB connected OK")
 except Exception as e:
     print(f"MongoDB FAILED: {e}")
-    mongo_client = db = subadmins_col = uid_ownership_col = credit_log_col = None
+    mongo_client = db = subadmins_col = fetchers_col = uid_ownership_col = credit_log_col = None
 
 
 # ===== KEEP-ALIVE SELF-PING (FIX) =====
@@ -184,6 +185,23 @@ def deduct_credit(username):
             "date":         datetime.utcnow().isoformat()
         })
     return True
+
+
+# ===== FETCHER HELPERS (✅ NEW — third user tier) =====
+def verify_fetcher(username, password):
+    """Fetcher login check — same pattern as verify_subadmin."""
+    if fetchers_col is None:
+        return False
+    return fetchers_col.find_one({"username": username, "password": password}) is not None
+
+def get_fetcher_permission_days(username):
+    """Returns the admin-configured permission_days for a fetcher (0 if not found)."""
+    if fetchers_col is None:
+        return 0
+    doc = fetchers_col.find_one({"username": username})
+    if not doc:
+        return 0
+    return int(doc.get("permission_days", 0))
 
 
 # ===== FRONTEND =====
@@ -385,6 +403,107 @@ def delete_subadmin():
     return jsonify({"status": "success", "message": f"Sub-admin '{username}' deleted"}), 200
 
 
+# ===== ✅ NEW: FETCHER MANAGEMENT (Main Admin side) =====
+# A Fetcher is a third user tier: Admin creates them with a username/password
+# AND a permission_days value. Every UID that fetcher ever adds/renews is
+# forced to last exactly permission_days — the fetcher never chooses the days.
+
+@app.route('/admin/create-fetcher', methods=['POST'])
+def create_fetcher():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if fetchers_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    username        = body.get("username", "").strip()
+    password        = body.get("password", "").strip()
+    note            = body.get("note", "").strip()
+    permission_days = int(body.get("permission_days", 30))
+
+    if not username or not password:
+        return jsonify({"status": "error", "message": "username and password required"}), 400
+    if permission_days < 1:
+        return jsonify({"status": "error", "message": "permission_days must be at least 1"}), 400
+    if fetchers_col.find_one({"username": username}):
+        return jsonify({"status": "error", "message": "Username already exists"}), 409
+
+    fetchers_col.insert_one({
+        "username":        username,
+        "password":        password,
+        "note":            note,
+        "permission_days": permission_days,
+        "created_at":      datetime.utcnow()
+    })
+
+    return jsonify({
+        "status": "success",
+        "message": f"Fetcher '{username}' created",
+        "permission_days": permission_days
+    }), 200
+
+
+@app.route('/admin/list-fetchers', methods=['GET'])
+def list_fetchers():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if fetchers_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+    result = [
+        {
+            "username": f["username"],
+            "note": f.get("note", ""),
+            "permission_days": f.get("permission_days", 0)
+        }
+        for f in fetchers_col.find({}, {"_id": 0, "password": 0})
+    ]
+    return jsonify({"status": "success", "fetchers": result}), 200
+
+
+@app.route('/admin/update-fetcher-permission', methods=['POST'])
+def update_fetcher_permission():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if fetchers_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    username        = body.get("username", "").strip()
+    permission_days = int(body.get("permission_days", 0))
+
+    if not username:
+        return jsonify({"status": "error", "message": "username required"}), 400
+    if permission_days < 1:
+        return jsonify({"status": "error", "message": "permission_days must be at least 1"}), 400
+
+    result = fetchers_col.update_one(
+        {"username": username},
+        {"$set": {"permission_days": permission_days}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"status": "error", "message": f"Fetcher '{username}' not found"}), 404
+
+    return jsonify({
+        "status": "success",
+        "message": f"'{username}' permission set to {permission_days} days",
+        "permission_days": permission_days
+    }), 200
+
+
+@app.route('/admin/delete-fetcher', methods=['POST'])
+def delete_fetcher():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if fetchers_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+    username = body.get("username", "").strip()
+    result   = fetchers_col.delete_one({"username": username})
+    if result.deleted_count == 0:
+        return jsonify({"status": "error", "message": "Fetcher not found"}), 404
+    return jsonify({"status": "success", "message": f"Fetcher '{username}' deleted"}), 200
+
+
 # ===== SUB-ADMIN AUTH =====
 def verify_subadmin(username, password):
     if subadmins_col is None:
@@ -512,6 +631,137 @@ def subadmin_update():
                 existing_name = doc.get("name", "Player")
         save_uid_meta(uid, existing_name, days, owner=username, extend=True)
         return jsonify({"status": "success", "message": f"UID {uid} renewed {days}d", "data": data}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
+
+
+# ===== ✅ NEW: FETCHER AUTH & ACTIONS (Fetcher side — third user tier) =====
+# Fetchers never send a "days" value from the frontend for create/update — the
+# server always looks up their own permission_days and uses that, so a fetcher
+# can never grant themselves more or less time than the Admin configured.
+
+@app.route('/fetcher/login', methods=['POST'])
+def fetcher_login():
+    body = request.json or {}
+    if verify_fetcher(body.get("username", ""), body.get("password", "")):
+        return jsonify({"status": "success", "role": "fetcher", "username": body["username"]}), 200
+    return jsonify({"status": "error", "message": "Invalid credentials"}), 403
+
+
+@app.route('/fetcher/permission', methods=['GET'])
+def fetcher_permission():
+    username = request.args.get("username", "")
+    password = request.args.get("password", "")
+    if not verify_fetcher(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    days = get_fetcher_permission_days(username)
+    return jsonify({"status": "success", "permission_days": days, "username": username}), 200
+
+
+@app.route('/fetcher/list', methods=['GET'])
+def fetcher_list():
+    username = request.args.get("username", "")
+    password = request.args.get("password", "")
+    if not verify_fetcher(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    all_uids, code = api_list_uids()
+    if code != 200:
+        return jsonify({"status": "error", "message": "Failed to fetch UIDs"}), code
+
+    all_uids = [u for u in all_uids if u.get("status", "active") != "removed"]
+
+    if uid_ownership_col is not None:
+        owned   = set(doc["uid"] for doc in uid_ownership_col.find({"owner": username}, {"uid": 1}))
+        my_uids = [u for u in all_uids if (u.get("uid") or u.get("id") or "") in owned]
+    else:
+        my_uids = all_uids
+
+    return jsonify({"status": "success", "total": len(my_uids), "licenses": my_uids}), 200
+
+
+@app.route('/fetcher/create', methods=['POST'])
+def fetcher_create():
+    body     = request.json or {}
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_fetcher(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    permission_days = get_fetcher_permission_days(username)
+    if permission_days < 1:
+        return jsonify({"status": "error", "message": "❌ No permission set! Contact Main Admin."}), 402
+
+    uid  = body.get("uid", "").strip()
+    name = body.get("name", "Player").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+
+    # Ignore any "days" the client might send — always use the server-side permission.
+    data, code = api_add_uid(uid, permission_days)
+    if code in (200, 201):
+        save_uid_meta(uid, name, permission_days, owner=username, extend=False)
+        return jsonify({"status": "success", "message": f"UID added ({permission_days}d)", "data": data}), 200
+
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
+
+
+@app.route('/fetcher/revoke', methods=['POST'])
+def fetcher_revoke():
+    body     = request.json or {}
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_fetcher(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    uid = body.get("uid", "").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+
+    if uid_ownership_col is not None:
+        ownership = uid_ownership_col.find_one({"uid": uid})
+        if ownership and ownership.get("owner") != username:
+            return jsonify({"status": "error", "message": "You can only remove UIDs you added"}), 403
+
+    data, code = api_remove_uid(uid)
+    if uid_ownership_col is not None:
+        uid_ownership_col.delete_one({"uid": uid})
+    if code == 200:
+        return jsonify({"status": "success", "message": f"UID {uid} removed"}), 200
+    return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
+
+
+@app.route('/fetcher/update', methods=['POST'])
+def fetcher_update():
+    body     = request.json or {}
+    username = body.get("username", "")
+    password = body.get("password", "")
+    if not verify_fetcher(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    permission_days = get_fetcher_permission_days(username)
+    if permission_days < 1:
+        return jsonify({"status": "error", "message": "❌ No permission set! Contact Main Admin."}), 402
+
+    uid = body.get("uid", "").strip()
+    if not uid:
+        return jsonify({"status": "error", "message": "uid required"}), 400
+
+    if uid_ownership_col is not None:
+        ownership = uid_ownership_col.find_one({"uid": uid})
+        if ownership and ownership.get("owner") != username:
+            return jsonify({"status": "error", "message": "You can only renew UIDs you added"}), 403
+
+    # Ignore any "days" the client might send — always renew by the server-side permission.
+    api_remove_uid(uid)
+    data, code = api_add_uid(uid, permission_days)
+    if code in (200, 201):
+        existing_name = "Player"
+        if uid_ownership_col is not None:
+            doc = uid_ownership_col.find_one({"uid": uid})
+            if doc:
+                existing_name = doc.get("name", "Player")
+        save_uid_meta(uid, existing_name, permission_days, owner=username, extend=True)
+        return jsonify({"status": "success", "message": f"UID {uid} renewed {permission_days}d", "data": data}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
 
 
