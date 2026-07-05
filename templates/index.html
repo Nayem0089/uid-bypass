@@ -95,15 +95,15 @@
     @keyframes shine { to { background-position: 250% center; } }
     .auth-sub { text-align: center; font-size: 10px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
     .tab-switch {
-      display: grid; grid-template-columns: 1fr 1fr;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
       background: rgba(0,0,0,0.5); border-radius: 50px;
       padding: 5px; margin-bottom: 24px;
       border: 1px solid var(--border); gap: 4px;
     }
     .tab-btn {
       background: transparent; border: none;
-      padding: 11px; border-radius: 45px;
-      font-weight: 700; font-size: 11px; letter-spacing: 0.8px;
+      padding: 11px 4px; border-radius: 45px;
+      font-weight: 700; font-size: 10px; letter-spacing: 0.5px;
       color: var(--muted); cursor: pointer;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -291,12 +291,16 @@
     .btn-blue { background: linear-gradient(135deg, #2563eb, #1e3a8a); color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
     .btn-blue:hover { box-shadow: 0 8px 24px rgba(37,99,235,0.45); }
     .btn-amber { background: linear-gradient(135deg, #78350f, #451a03); color: white; }
+    .btn-purple { background: linear-gradient(135deg, #7c3aed, #4c1d95); color: white; box-shadow: 0 4px 12px rgba(124,58,237,0.25); }
+    .btn-purple:hover { box-shadow: 0 8px 24px rgba(124,58,237,0.45); }
     .btn-sm { width: auto; padding: 6px 14px; border-radius: 50px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .btn-sm:hover { transform: scale(1.05); }
     .btn-sm-red { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
     .btn-sm-red:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.6); }
     .btn-sm-blue { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; }
     .btn-sm-blue:hover { background: rgba(59,130,246,0.2); }
+    .btn-sm-purple { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); color: #a78bfa; }
+    .btn-sm-purple:hover { background: rgba(124,58,237,0.2); }
 
     .table-wrap { border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: rgba(5,5,10,0.6); }
     table { width: 100%; border-collapse: collapse; }
@@ -312,6 +316,7 @@
     .badge-red { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
     .badge-orange { background: rgba(249,115,22,0.12); color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
     .badge-blue { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+    .badge-purple { background: rgba(124,58,237,0.12); color: #a78bfa; border: 1px solid rgba(124,58,237,0.25); }
     .badge-white { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.12); }
 
     .dl { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 50px; font-size: 11px; font-weight: 700; font-family: 'Space Mono', monospace; }
@@ -342,16 +347,19 @@
     .modal-overlay.open { display: flex; }
     .modal { background: rgba(8,8,18,0.98); border-radius: 32px; padding: 32px; width: 400px; max-width: 90vw; border: 1px solid var(--border-red); animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 60px rgba(239,68,68,0.1); }
     .modal-blue { border-color: rgba(59,130,246,0.35); box-shadow: 0 0 60px rgba(59,130,246,0.1); }
+    .modal-purple { border-color: rgba(124,58,237,0.35); box-shadow: 0 0 60px rgba(124,58,237,0.1); }
     @keyframes modalIn { from { opacity: 0; transform: scale(0.85) translateY(20px); } to { opacity: 1; transform: none; } }
     .modal h3 { font-size: 17px; font-weight: 800; margin-bottom: 14px; }
     .modal h3.red { color: #f87171; }
     .modal h3.blue { color: #60a5fa; }
+    .modal h3.purple { color: #a78bfa; }
     .modal-body { color: var(--muted); font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
     .modal-btns { display: flex; gap: 12px; }
     .res-msg { min-height: 18px; margin-top: 10px; font-size: 12px; font-weight: 600; }
 
     .credit-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
     .credit-pill { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 50px; padding: 8px 18px; font-size: 15px; font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 8px; }
+    .credit-pill.purple { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.3); color: #a78bfa; }
     .credit-pill .num { font-family: 'Space Mono', monospace; font-size: 20px; }
     .no-credit-warn { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 50px; padding: 7px 16px; color: #f87171; font-weight: 700; font-size: 12px; }
     .log-pos { color: #4ade80; font-family: 'Space Mono', monospace; font-weight: 700; }
@@ -373,6 +381,7 @@
       <div class="auth-sub">// Admin Portal v6.0 — Secure Access</div>
       <div class="tab-switch">
         <button class="tab-btn active" onclick="switchAuthTab('sub')">RESELLER</button>
+        <button class="tab-btn" onclick="switchAuthTab('fetcher')">FETCHER</button>
         <button class="tab-btn" onclick="switchAuthTab('main')">MASTER ADMIN</button>
       </div>
       <div id="login-sub">
@@ -380,6 +389,12 @@
         <input type="password" id="sub-pass" class="field" placeholder="Password">
         <button class="btn-primary" onclick="doSubLogin()">⟁ ACCESS PANEL</button>
         <div class="res-msg" id="err-sub"></div>
+      </div>
+      <div id="login-fetcher" style="display:none;">
+        <input type="text" id="fetcher-user" class="field" placeholder="Fetcher Username">
+        <input type="password" id="fetcher-pass" class="field" placeholder="Password">
+        <button class="btn-primary" onclick="doFetcherLogin()">🎯 ACCESS PANEL</button>
+        <div class="res-msg" id="err-fetcher"></div>
       </div>
       <div id="login-main" style="display:none;">
         <input type="password" id="main-key" class="field" placeholder="Master Secret Key">
@@ -407,6 +422,10 @@
         <button class="nav-item" id="nav-resellers" style="display:none" onclick="switchTab('resellers')">
           <div class="nav-icon-wrap">👥</div>
           <span class="nav-label">Resellers</span>
+        </button>
+        <button class="nav-item" id="nav-fetchers" style="display:none" onclick="switchTab('fetchers')">
+          <div class="nav-icon-wrap">🎯</div>
+          <span class="nav-label">Fetchers</span>
         </button>
         <button class="nav-item" id="nav-credit" style="display:none" onclick="switchTab('credit')">
           <div class="nav-icon-wrap">💰</div>
@@ -546,6 +565,62 @@
           </div>
         </div>
 
+        <!-- FETCHERS -->
+        <div id="main-tab-fetchers" class="panel-section">
+          <div class="page-header">
+            <div class="page-header-icon">🎯</div>
+            <div><h1>FETCHERS</h1><p>Third-tier users with a fixed UID validity permission</p></div>
+          </div>
+          <div class="card-grid">
+            <div class="card">
+              <h3>🎯 Create Fetcher</h3>
+              <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">A Fetcher can log in and add UIDs, but every UID they add is only valid for the permission duration you set below.</p>
+              <input id="new-fet-user" class="field" placeholder="Username">
+              <input type="password" id="new-fet-pass" class="field" placeholder="Password">
+              <input id="new-fet-note" class="field" placeholder="Note (optional)">
+              <select id="new-fet-days" class="field">
+                <option value="1">1 Day Permission</option>
+                <option value="7">7 Days Permission</option>
+                <option value="15">15 Days Permission</option>
+                <option value="30" selected>30 Days Permission</option>
+                <option value="60">60 Days Permission</option>
+                <option value="90">90 Days Permission</option>
+                <option value="365">1 Year Permission</option>
+              </select>
+              <div class="chip-row" id="new-fet-chips"></div>
+              <button class="btn btn-purple" onclick="createFetcher()">✨ Create Fetcher</button>
+              <div class="res-msg" id="r-fet-create"></div>
+            </div>
+            <div class="card">
+              <h3>🔧 Update Permission</h3>
+              <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">Change how many days a fetcher's UIDs are valid for.</p>
+              <select id="fet-sel" class="field" onchange="syncSel('fet-sel','fet-username')">
+                <option value="">— Select Fetcher —</option>
+              </select>
+              <input id="fet-username" class="field" placeholder="Or type fetcher username">
+              <select id="fet-perm-days" class="field">
+                <option value="1">1 Day</option><option value="7">7 Days</option><option value="15">15 Days</option>
+                <option value="30" selected>30 Days</option><option value="60">60 Days</option>
+                <option value="90">90 Days</option><option value="365">1 Year</option>
+              </select>
+              <button class="btn btn-blue" onclick="updateFetcherPermission()">🔧 Update Permission</button>
+              <div class="res-msg" id="r-fet-perm"></div>
+            </div>
+          </div>
+          <div class="card card-wide">
+            <h3>📋 Fetcher List</h3>
+            <div style="margin-bottom:16px;">
+              <button class="btn btn-dark" style="width:auto; padding:10px 20px;" onclick="loadFetchers()">⟳ Refresh</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Username</th><th>Note</th><th>Permission</th><th>Action</th></tr></thead>
+                <tbody id="fetcher-tbody"><tr><td colspan="4" style="text-align:center; color:var(--dim); padding:30px;">—</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- CREDIT MGMT -->
         <div id="main-tab-credit" class="panel-section">
           <div class="page-header">
@@ -663,6 +738,52 @@
           </table>
         </div>
       </div>
+
+      <!-- FETCHER PANEL -->
+      <div id="fetcher-panel" class="page">
+        <div class="page-header">
+          <div class="page-header-icon">🎯</div>
+          <div><h1>MY UID VAULT</h1><p>Fetcher Panel</p></div>
+        </div>
+        <div class="credit-bar">
+          <div class="credit-pill purple">🎯 Permission: <span class="num" id="fetcher-perm-display">0</span> Days / UID</div>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:24px;">
+          <div class="stat-card"><div class="stat-num white" id="fs-total">—</div><div class="stat-label">Total</div></div>
+          <div class="stat-card"><div class="stat-num green" id="fs-active">—</div><div class="stat-label">Active</div></div>
+          <div class="stat-card"><div class="stat-num red" id="fs-expired">—</div><div class="stat-label">Expired</div></div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <h3>➕ Add UID <span style="font-size:11px; color:var(--dim); font-weight:400;">(fixed to your permission)</span></h3>
+            <input id="f-uid" class="field" placeholder="UID">
+            <input id="f-name" class="field" placeholder="Name">
+            <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">Every UID you add will be valid for <b id="f-days-hint">—</b> days — set by the Main Admin.</p>
+            <button class="btn btn-purple" onclick="fetcherAddUID()">💾 Save UID</button>
+            <div class="res-msg" id="r-f-add"></div>
+          </div>
+          <div class="card">
+            <h3>⚙️ Manage</h3>
+            <input id="f-rm-uid" class="field" placeholder="UID to remove">
+            <button class="btn btn-danger" style="margin-bottom:16px;" onclick="fetcherRemoveUID()">🗑 Remove</button>
+            <hr class="div">
+            <input id="f-renew-uid" class="field" placeholder="UID to renew">
+            <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">Renews by your permission duration (<b id="f-renew-days-hint">—</b> days).</p>
+            <button class="btn btn-amber" onclick="fetcherRenewUID()">↻ Renew</button>
+            <div class="res-msg" id="r-f-rm"></div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-dark" style="width:auto; padding:10px 20px;" onclick="fetcherLoadUIDs()">⟳ Refresh</button>
+          <div class="search"><input id="f-search" class="field" style="margin:0;" placeholder="Search UID or Name"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Days Left</th><th>Action</th></tr></thead>
+            <tbody id="fetcher-uid-tbody"><tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -740,7 +861,7 @@
 
   // ===== STATE =====
   let SESSION={role:null,adminKey:null,username:null,password:null};
-  let mainUIDs=[],subUIDs=[],pendUID=null,pendIsMain=false,pendQCUser=null,creditLog=[],subCredits=0;
+  let mainUIDs=[],subUIDs=[],fetcherUIDs=[],pendUID=null,pendIsMain=false,pendIsFetcher=false,pendQCUser=null,creditLog=[],subCredits=0,fetcherPermDays=0;
   const save=()=>{ try{localStorage.setItem('rp_s',JSON.stringify(SESSION));}catch(e){} };
   const load=()=>{ try{const s=localStorage.getItem('rp_s');if(s)SESSION=JSON.parse(s);}catch(e){} };
   const clear=()=>{ SESSION={role:null,adminKey:null,username:null,password:null};localStorage.removeItem('rp_s'); };
@@ -798,7 +919,8 @@
   }
 
   // ===== ROW RENDER =====
-  function uidRow(u,isMain){
+  // tier: 'main' | 'sub' | 'fetcher' — decides which revoke endpoint the row's delete button hits.
+  function uidRow(u,tier){
     const uid=u.uid||u.id||u.user_id||'?';
     const name=u.name||u.username||u.player||'—';
     const days=u.days!==undefined?u.days:'—';
@@ -809,7 +931,7 @@
     else if(rem<=0) badge='<span class="badge badge-red">✖ Expired</span>';
     else if(rem<=7) badge='<span class="badge badge-orange">⚠ Soon</span>';
     else badge='<span class="badge badge-green">● Active</span>';
-    const fn=isMain?`openDelModal('${uid}',true)`:`openDelModal('${uid}',false)`;
+    const fn=`openDelModal('${uid}','${tier}')`;
     return `<tr>
       <td><span class="uid-mono">${uid}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${uid}');toast('Copied!')">📋</button></td>
       <td style="font-weight:600;">${name}</td>
@@ -823,8 +945,9 @@
 
   // ===== AUTH =====
   function switchAuthTab(t){
-    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(t==='sub'&&i===0)||(t==='main'&&i===1)));
+    document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(t==='sub'&&i===0)||(t==='fetcher'&&i===1)||(t==='main'&&i===2)));
     document.getElementById('login-sub').style.display=t==='sub'?'block':'none';
+    document.getElementById('login-fetcher').style.display=t==='fetcher'?'block':'none';
     document.getElementById('login-main').style.display=t==='main'?'block':'none';
   }
   async function doMainLogin(){
@@ -850,26 +973,45 @@
       save(); enterSub();
     }catch(e){res('err-sub','Connection error','err');}
   }
+  // ✅ NEW: Fetcher login (third user tier). Same shape as sub-admin login but
+  // hits the /fetcher/* endpoints, which are backed by a permission_days value
+  // set by the Main Admin instead of a credit balance.
+  async function doFetcherLogin(){
+    const u=document.getElementById('fetcher-user').value.trim();
+    const p=document.getElementById('fetcher-pass').value.trim();
+    if(!u||!p)return res('err-fetcher','Enter credentials','err');
+    try{
+      const r=await fetch('/fetcher/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+      const d=await r.json();
+      if(!r.ok)return res('err-fetcher','✗ '+(d.message||'Invalid credentials'),'err');
+      SESSION={role:'fetcher',adminKey:null,username:u,password:p};
+      save(); enterFetcher();
+    }catch(e){res('err-fetcher','Connection error','err');}
+  }
   function enterMain(){
     document.getElementById('auth-gate').style.display='none';
     document.getElementById('app-layout').style.display='block';
     document.getElementById('main-panel').classList.add('active');
     document.getElementById('sub-panel').classList.remove('active');
+    document.getElementById('fetcher-panel').classList.remove('active');
     document.getElementById('nav-resellers').style.display='flex';
+    document.getElementById('nav-fetchers').style.display='flex';
     document.getElementById('nav-credit').style.display='flex';
     document.getElementById('nav-settings').style.display='flex';
     document.getElementById('sidebar-uname').textContent='ADMINISTRATOR';
     document.getElementById('sidebar-avatar').textContent='A';
     document.getElementById('sidebar-role').textContent='MAIN ADMIN';
     document.getElementById('sidebar-credits').style.display='none';
-    mainLoadUIDs(); loadResellers(); loadLog(); renderCreditLog();
+    mainLoadUIDs(); loadResellers(); loadFetchers(); loadLog(); renderCreditLog();
   }
   function enterSub(){
     document.getElementById('auth-gate').style.display='none';
     document.getElementById('app-layout').style.display='block';
     document.getElementById('sub-panel').classList.add('active');
     document.getElementById('main-panel').classList.remove('active');
+    document.getElementById('fetcher-panel').classList.remove('active');
     document.getElementById('nav-resellers').style.display='none';
+    document.getElementById('nav-fetchers').style.display='none';
     document.getElementById('nav-credit').style.display='none';
     document.getElementById('nav-settings').style.display='none';
     document.getElementById('sidebar-uname').textContent=SESSION.username;
@@ -878,12 +1020,32 @@
     document.getElementById('sidebar-credits').style.display='block';
     subLoadUIDs(); subLoadCredits();
   }
+  // ✅ NEW: Enter the Fetcher panel — pulls the permission_days assigned by the
+  // Main Admin and shows it instead of a credit balance in the sidebar.
+  function enterFetcher(){
+    document.getElementById('auth-gate').style.display='none';
+    document.getElementById('app-layout').style.display='block';
+    document.getElementById('fetcher-panel').classList.add('active');
+    document.getElementById('main-panel').classList.remove('active');
+    document.getElementById('sub-panel').classList.remove('active');
+    document.getElementById('nav-resellers').style.display='none';
+    document.getElementById('nav-fetchers').style.display='none';
+    document.getElementById('nav-credit').style.display='none';
+    document.getElementById('nav-settings').style.display='none';
+    document.getElementById('sidebar-uname').textContent=SESSION.username;
+    document.getElementById('sidebar-avatar').textContent=(SESSION.username[0]||'F').toUpperCase();
+    document.getElementById('sidebar-role').textContent='FETCHER';
+    document.getElementById('sidebar-credits').style.display='block';
+    document.getElementById('sidebar-credits').textContent='🎯 — days permission';
+    fetcherLoadUIDs(); fetcherLoadPermission();
+  }
   function switchTab(t){
     document.querySelectorAll('.nav-item[id^="nav-"]').forEach(b=>b.classList.remove('active'));
     document.getElementById('nav-'+t).classList.add('active');
     document.querySelectorAll('#main-panel .panel-section').forEach(s=>s.classList.remove('active'));
     document.getElementById('main-tab-'+t).classList.add('active');
     if(t==='resellers')loadResellers();
+    if(t==='fetchers')loadFetchers();
     if(t==='credit'){loadResellers();renderCreditLog();}
   }
   function doLogout(){
@@ -892,6 +1054,7 @@
     document.getElementById('auth-gate').style.display='flex';
     document.getElementById('main-panel').classList.remove('active');
     document.getElementById('sub-panel').classList.remove('active');
+    document.getElementById('fetcher-panel').classList.remove('active');
   }
 
   // ===== MAIN UIDs =====
@@ -909,7 +1072,7 @@
   }
   function renderMainTable(uids){
     const tb=document.getElementById('main-uid-tbody');
-    tb.innerHTML=uids.length?uids.map(u=>uidRow(u,true)).join(''):'<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">✨ No UIDs found</td></tr>';
+    tb.innerHTML=uids.length?uids.map(u=>uidRow(u,'main')).join(''):'<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">✨ No UIDs found</td></tr>';
   }
   document.getElementById('m-search').addEventListener('input',e=>{
     const q=e.target.value.toLowerCase();
@@ -950,7 +1113,7 @@
   function mainRemoveUID(){
     const uid=document.getElementById('m-rm-uid').value.trim();
     if(!uid)return toast('Enter UID','err');
-    openDelModal(uid,true);
+    openDelModal(uid,'main');
   }
 
   // ===== SUB UIDs =====
@@ -968,7 +1131,7 @@
   }
   function renderSubTable(uids){
     const tb=document.getElementById('sub-uid-tbody');
-    tb.innerHTML=uids.length?uids.map(u=>uidRow(u,false)).join(''):'<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">No UIDs found</td></tr>';
+    tb.innerHTML=uids.length?uids.map(u=>uidRow(u,'sub')).join(''):'<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">No UIDs found</td></tr>';
   }
   document.getElementById('s-search').addEventListener('input',e=>{
     const q=e.target.value.toLowerCase();
@@ -1020,12 +1183,74 @@
   function subRemoveUID(){
     const uid=document.getElementById('s-rm-uid').value.trim();
     if(!uid)return toast('Enter UID','err');
-    openDelModal(uid,false);
+    openDelModal(uid,'sub');
+  }
+
+  // ===== FETCHER UIDs (✅ NEW SECTION) =====
+  // A Fetcher never picks a day count — every UID they create or renew always
+  // uses fetcherPermDays, which is set on the backend by the Main Admin via
+  // /admin/create-fetcher (initial) or /admin/update-fetcher-permission (later).
+  async function fetcherLoadPermission(){
+    try{
+      const r=await fetch('/fetcher/permission?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
+      const d=await r.json();
+      if(r.ok){
+        fetcherPermDays=d.permission_days||d.days||0;
+        document.getElementById('fetcher-perm-display').textContent=fetcherPermDays;
+        document.getElementById('sidebar-credits').textContent=`🎯 ${fetcherPermDays} days permission`;
+        document.getElementById('f-days-hint').textContent=fetcherPermDays;
+        document.getElementById('f-renew-days-hint').textContent=fetcherPermDays;
+      }
+    }catch(e){}
+  }
+  async function fetcherLoadUIDs(){
+    const tb=document.getElementById('fetcher-uid-tbody');
+    tb.innerHTML='<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:30px;">Loading...</td></tr>';
+    try{
+      const r=await fetch('/fetcher/list?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
+      const d=await r.json();
+      if(!r.ok){tb.innerHTML=`<tr><td colspan="7" style="color:#f87171;">Error: ${d.message}</td></tr>`;return;}
+      fetcherUIDs=d.licenses||[];
+      renderFetcherTable(fetcherUIDs);
+      calcStats(fetcherUIDs,'fs-total','fs-active','fs-expired',null);
+    }catch(e){tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>';}
+  }
+  function renderFetcherTable(uids){
+    const tb=document.getElementById('fetcher-uid-tbody');
+    tb.innerHTML=uids.length?uids.map(u=>uidRow(u,'fetcher')).join(''):'<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">No UIDs found</td></tr>';
+  }
+  document.getElementById('f-search').addEventListener('input',e=>{
+    const q=e.target.value.toLowerCase();
+    renderFetcherTable(fetcherUIDs.filter(u=>(u.uid||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));
+  });
+  async function fetcherAddUID(){
+    await fetcherLoadPermission();
+    if(!fetcherPermDays||fetcherPermDays<1){toast('No permission set! Contact Main Admin.','err');return;}
+    const uid=document.getElementById('f-uid').value.trim();
+    const name=document.getElementById('f-name').value.trim()||'Player';
+    if(!uid)return toast('UID required','err');
+    const r=await fetch('/fetcher/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,name,days:fetcherPermDays})});
+    if(r.ok){toast(`UID added (${fetcherPermDays} days)`);res('r-f-add','✓ Added','ok');document.getElementById('f-uid').value='';document.getElementById('f-name').value='';fetcherLoadUIDs();}
+    else{const d=await r.json();toast(d.message,'err');}
+  }
+  async function fetcherRenewUID(){
+    await fetcherLoadPermission();
+    const uid=document.getElementById('f-renew-uid').value.trim();
+    if(!uid)return toast('Enter UID','err');
+    const r=await fetch('/fetcher/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid,days:fetcherPermDays})});
+    if(r.ok){toast(`Renewed +${fetcherPermDays} days`);res('r-f-rm','✓ Renewed','ok');document.getElementById('f-renew-uid').value='';fetcherLoadUIDs();}
+    else{const d=await r.json();toast(d.message,'err');}
+  }
+  function fetcherRemoveUID(){
+    const uid=document.getElementById('f-rm-uid').value.trim();
+    if(!uid)return toast('Enter UID','err');
+    openDelModal(uid,'fetcher');
   }
 
   // ===== DELETE MODAL =====
-  function openDelModal(uid,isMain){
-    pendUID=uid; pendIsMain=isMain;
+  // tier: 'main' | 'sub' | 'fetcher'
+  function openDelModal(uid,tier){
+    pendUID=uid; pendIsMain=(tier==='main'); pendIsFetcher=(tier==='fetcher');
     document.getElementById('modal-del-body').innerHTML=`Remove UID <span style="font-family:monospace; color:#f87171; font-weight:700;">${uid}</span>?<br><span style="font-size:12px; color:var(--dim);">This action is irreversible.</span>`;
     openModal('modal-delete');
   }
@@ -1033,12 +1258,14 @@
   // ===== ✅ FIXED: confirmDelete with notification + auto-refresh =====
   async function confirmDelete(){
     if(!pendUID)return closeModal('modal-delete');
-    const uid=pendUID, isMain=pendIsMain;
+    const uid=pendUID, isMain=pendIsMain, isFetcher=pendIsFetcher;
     closeModal('modal-delete');
     try{
       let r;
       if(isMain){
         r=await fetch('/admin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid})});
+      } else if(isFetcher){
+        r=await fetch('/fetcher/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid})});
       } else {
         r=await fetch('/subadmin/revoke',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password,uid})});
       }
@@ -1051,27 +1278,32 @@
           mainUIDs=mainUIDs.filter(u=>(u.uid||u.id||'')!==uid);
           renderMainTable(mainUIDs);
           calcStats(mainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
-          // Then sync with server
           setTimeout(()=>mainLoadUIDs(), 600);
+        } else if(isFetcher){
+          fetcherUIDs=fetcherUIDs.filter(u=>(u.uid||u.id||'')!==uid);
+          renderFetcherTable(fetcherUIDs);
+          calcStats(fetcherUIDs,'fs-total','fs-active','fs-expired',null);
+          setTimeout(()=>fetcherLoadUIDs(), 600);
         } else {
           subUIDs=subUIDs.filter(u=>(u.uid||u.id||'')!==uid);
           renderSubTable(subUIDs);
           calcStats(subUIDs,'ss-total','ss-active','ss-expired',null);
-          // Then sync with server
           setTimeout(()=>subLoadUIDs(), 600);
         }
         // Clear input fields
         const mf=document.getElementById('m-rm-uid');
         const sf=document.getElementById('s-rm-uid');
+        const ff=document.getElementById('f-rm-uid');
         if(mf)mf.value='';
         if(sf)sf.value='';
+        if(ff)ff.value='';
       } else {
         toast((d.message||'Remove failed'),'err');
       }
     } catch(e){
       toast('Connection error','err');
     }
-    pendUID=null; pendIsMain=false;
+    pendUID=null; pendIsMain=false; pendIsFetcher=false;
   }
 
   // ===== CREDITS =====
@@ -1222,6 +1454,81 @@
     else{const d=await r.json();toast(d.message||'Failed','err');}
   }
 
+  // ===== ✅ NEW: FETCHERS (third user tier) — create, list, update permission, delete =====
+  async function createFetcher(){
+    const u=document.getElementById('new-fet-user').value.trim();
+    const p=document.getElementById('new-fet-pass').value.trim();
+    const n=document.getElementById('new-fet-note').value.trim();
+    const days=parseInt(document.getElementById('new-fet-days').value)||30;
+    if(!u||!p)return toast('Fill username & password','err');
+    try{
+      const r=await fetch('/admin/create-fetcher',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:u,password:p,note:n,permission_days:days})});
+      const d=await r.json();
+      if(!r.ok){toast(d.message||'Failed','err');res('r-fet-create','✗ '+(d.message||'Backend endpoint /admin/create-fetcher not found'),'err');return;}
+      toast(`Fetcher "${u}" created — ${days} day permission`);
+      res('r-fet-create',`✓ Created: ${u} | 🎯 ${days} days`,'ok');
+      document.getElementById('new-fet-user').value='';
+      document.getElementById('new-fet-pass').value='';
+      document.getElementById('new-fet-note').value='';
+      loadFetchers();
+    }catch(e){toast('Connection error','err');res('r-fet-create','✗ Connection error — backend endpoint /admin/create-fetcher needed','err');}
+  }
+  async function loadFetchers(){
+    const tb=document.getElementById('fetcher-tbody');
+    if(!tb)return;
+    tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:var(--dim);">Loading...</td></tr>';
+    try{
+      const r=await fetch('/admin/list-fetchers?admin_key='+encodeURIComponent(SESSION.adminKey));
+      const d=await r.json();
+      if(!r.ok||!d.fetchers?.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:var(--dim); padding:24px;">No fetchers found</td></tr>';return;}
+      tb.innerHTML=d.fetchers.map(s=>`<tr>
+        <td><span class="badge badge-purple">${s.username}</span></td>
+        <td style="color:var(--muted); font-size:12px;">${s.note||'—'}</td>
+        <td><span class="badge badge-blue">🎯 ${s.permission_days||0}d / UID</span></td>
+        <td>
+          <button class="btn-sm btn-sm-purple" style="margin-right:6px;" onclick="document.getElementById('fet-username').value='${s.username}';document.getElementById('fet-sel').value='${s.username}';"> Select</button>
+          <button class="btn-sm btn-sm-red" onclick="deleteFetcher('${s.username}')">Delete</button>
+        </td>
+      </tr>`).join('');
+      populateFetcherDropdown(d.fetchers);
+    }catch(e){tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#f87171;">Connection error — backend endpoint /admin/list-fetchers needed</td></tr>';}
+  }
+  function populateFetcherDropdown(list){
+    const el=document.getElementById('fet-sel');
+    if(!el||!list)return;
+    const prev=el.value;
+    el.innerHTML='<option value="">— Select Fetcher —</option>';
+    list.forEach(s=>{
+      const o=document.createElement('option');
+      o.value=s.username;
+      o.textContent=`${s.username} (🎯 ${s.permission_days||0}d)`;
+      el.appendChild(o);
+    });
+    if(prev)el.value=prev;
+  }
+  async function updateFetcherPermission(){
+    const sel=document.getElementById('fet-sel').value;
+    const username=document.getElementById('fet-username').value.trim()||sel;
+    const days=parseInt(document.getElementById('fet-perm-days').value);
+    if(!username)return toast('Select or enter a fetcher','err');
+    if(!days||days<1)return toast('Enter valid day count','err');
+    try{
+      const r=await fetch('/admin/update-fetcher-permission',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username,permission_days:days})});
+      const d=await r.json();
+      if(r.ok){
+        toast(`Permission updated → ${username}: ${days}d`);
+        res('r-fet-perm',`✓ ${username} now has ${days} day permission`,'ok');
+        loadFetchers();
+      }else{toast(d.message||'Failed','err');res('r-fet-perm','✗ '+(d.message||'Backend endpoint /admin/update-fetcher-permission not found'),'err');}
+    }catch(e){toast('Connection error','err');res('r-fet-perm','✗ Connection error','err');}
+  }
+  async function deleteFetcher(uname){
+    if(!confirm(`Delete fetcher: ${uname}?`))return;
+    const r=await fetch('/admin/delete-fetcher',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:uname})});
+    if(r.ok){toast('Fetcher deleted');loadFetchers();}
+    else{const d=await r.json();toast(d.message||'Failed','err');}
+  }
+
   // ===== ✅ NEW: SETTINGS — change master key / create extra admin login =====
   async function changeMasterKey(){
     const cur=document.getElementById('set-current-key').value.trim();
@@ -1282,6 +1589,7 @@
   window.onload=()=>{
     mkChips('m-chips','m-days',[1,7,15,30,60,90,365]);
     mkChips('m-renew-chips','m-renew-days',[7,15,30,60]);
+    mkChips('new-fet-chips','new-fet-days',[1,7,15,30,60,90,365]);
   };
 
   // ===== AUTO LOGIN =====
@@ -1293,6 +1601,10 @@
     }
     if(SESSION.role==='sub_admin'&&SESSION.username){
       try{const r=await fetch('/subadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password})});if(r.ok){enterSub();return;}}catch(e){}
+      clear();
+    }
+    if(SESSION.role==='fetcher'&&SESSION.username){
+      try{const r=await fetch('/fetcher/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:SESSION.username,password:SESSION.password})});if(r.ok){enterFetcher();return;}}catch(e){}
       clear();
     }
   })();
