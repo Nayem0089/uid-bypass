@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>STREAM CORP | ADMIN v6.0</title>
+  <title>STREAM CORP | ADMIN v7.0</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -26,6 +26,7 @@
       --green: #22c55e;
       --blue: #3b82f6;
       --orange: #f97316;
+      --purple: #7c3aed;
     }
     html { scroll-behavior: smooth; }
     body {
@@ -368,6 +369,38 @@
     hr.div { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
     .copy-btn { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 12px; margin-left: 4px; transition: color 0.2s; }
     .copy-btn:hover { color: white; }
+
+    /* ============ PREMIUM CARD GRID (Trail + Reseller dashboards) ============ */
+    .premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .premium-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 22px;
+      padding: 22px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative; overflow: hidden;
+    }
+    .premium-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--pc, rgba(239,68,68,0.5)), transparent);
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .premium-card:hover { border-color: var(--border-red); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.35); }
+    .premium-card:hover::before { opacity: 1; }
+    .premium-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 10px; }
+    .premium-avatar-name { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .premium-avatar { width: 42px; height: 42px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #fff; box-shadow: 0 0 14px rgba(0,0,0,0.3); }
+    .premium-uname { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .premium-unote { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .limit-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .mini-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 16px; }
+    .mini-chip { background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 4px 11px; border-radius: 50px; font-size: 10px; font-weight: 700; color: var(--muted); cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .mini-chip:hover { border-color: var(--border-red); color: #fff; transform: scale(1.06); }
+    .mini-chip.on { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.5); color: #ff8a8a; box-shadow: 0 0 8px rgba(239,68,68,0.2); }
+    .mini-chip.blue.on { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.5); color: #93c5fd; box-shadow: 0 0 8px rgba(59,130,246,0.2); }
+    .toggle-switch { width: 42px; height: 23px; border-radius: 99px; background: rgba(255,255,255,0.08); position: relative; cursor: pointer; transition: all 0.3s ease; border: 1px solid var(--border); flex-shrink: 0; }
+    .toggle-switch.on { background: linear-gradient(135deg, var(--green), #16a34a); border-color: transparent; box-shadow: 0 0 12px rgba(34,197,94,0.4); }
+    .toggle-knob { width: 17px; height: 17px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .toggle-switch.on .toggle-knob { left: 21px; }
+    .big-stat-value { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 800; color: #60a5fa; margin-bottom: 16px; line-height: 1; }
+    .premium-card-actions { display: flex; gap: 8px; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -378,10 +411,10 @@
     <div class="auth-box">
       <div class="auth-orb">SC</div>
       <div class="auth-title">STREAM <span>CORPORATION</span></div>
-      <div class="auth-sub">// Admin Portal v6.0 — Secure Access</div>
+      <div class="auth-sub">// Admin Portal v7.0 — Secure Access</div>
       <div class="tab-switch">
         <button class="tab-btn active" onclick="switchAuthTab('sub')">RESELLER</button>
-        <button class="tab-btn" onclick="switchAuthTab('fetcher')">FETCHER</button>
+        <button class="tab-btn" onclick="switchAuthTab('fetcher')">TRAIL</button>
         <button class="tab-btn" onclick="switchAuthTab('main')">MASTER ADMIN</button>
       </div>
       <div id="login-sub">
@@ -391,7 +424,7 @@
         <div class="res-msg" id="err-sub"></div>
       </div>
       <div id="login-fetcher" style="display:none;">
-        <input type="text" id="fetcher-user" class="field" placeholder="Fetcher Username">
+        <input type="text" id="fetcher-user" class="field" placeholder="Trail Username">
         <input type="password" id="fetcher-pass" class="field" placeholder="Password">
         <button class="btn-primary" onclick="doFetcherLogin()">🎯 ACCESS PANEL</button>
         <div class="res-msg" id="err-fetcher"></div>
@@ -425,7 +458,7 @@
         </button>
         <button class="nav-item" id="nav-fetchers" style="display:none" onclick="switchTab('fetchers')">
           <div class="nav-icon-wrap">🎯</div>
-          <span class="nav-label">Fetchers</span>
+          <span class="nav-label">Trail</span>
         </button>
         <button class="nav-item" id="nav-credit" style="display:none" onclick="switchTab('credit')">
           <div class="nav-icon-wrap">💰</div>
@@ -556,25 +589,22 @@
             <div style="margin-bottom:16px;">
               <button class="btn btn-dark" style="width:auto; padding:10px 20px;" onclick="loadResellers()">⟳ Refresh</button>
             </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Username</th><th>Note</th><th>Credits</th><th>Action</th></tr></thead>
-                <tbody id="reseller-tbody"><tr><td colspan="4" style="text-align:center; color:var(--dim); padding:30px;">—</td></tr></tbody>
-              </table>
+            <div class="premium-grid" id="reseller-cards-grid">
+              <div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px;">—</div>
             </div>
           </div>
         </div>
 
-        <!-- FETCHERS -->
+        <!-- TRAIL (formerly Fetchers) -->
         <div id="main-tab-fetchers" class="panel-section">
           <div class="page-header">
             <div class="page-header-icon">🎯</div>
-            <div><h1>FETCHERS</h1><p>Third-tier users with a fixed UID validity permission</p></div>
+            <div><h1>TRAIL</h1><p>Third-tier users with a fixed UID validity permission</p></div>
           </div>
           <div class="card-grid">
             <div class="card">
-              <h3>🎯 Create Fetcher</h3>
-              <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">A Fetcher can log in and add UIDs, but every UID they add is only valid for the permission duration you set below.</p>
+              <h3>🎯 Create Trail User</h3>
+              <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">A Trail user can log in and add UIDs, but every UID they add is only valid for the permission duration you set below.</p>
               <input id="new-fet-user" class="field" placeholder="Username">
               <input type="password" id="new-fet-pass" class="field" placeholder="Password">
               <input id="new-fet-note" class="field" placeholder="Note (optional)">
@@ -588,16 +618,16 @@
                 <option value="365">1 Year Permission</option>
               </select>
               <div class="chip-row" id="new-fet-chips"></div>
-              <button class="btn btn-purple" onclick="createFetcher()">✨ Create Fetcher</button>
+              <button class="btn btn-purple" onclick="createFetcher()">✨ Create Trail User</button>
               <div class="res-msg" id="r-fet-create"></div>
             </div>
             <div class="card">
               <h3>🔧 Update Permission</h3>
-              <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">Change how many days a fetcher's UIDs are valid for.</p>
+              <p style="font-size:12px; color:var(--dim); margin-bottom:12px;">Change how many days a trail user's UIDs are valid for.</p>
               <select id="fet-sel" class="field" onchange="syncSel('fet-sel','fet-username')">
-                <option value="">— Select Fetcher —</option>
+                <option value="">— Select Trail User —</option>
               </select>
-              <input id="fet-username" class="field" placeholder="Or type fetcher username">
+              <input id="fet-username" class="field" placeholder="Or type trail username">
               <select id="fet-perm-days" class="field">
                 <option value="1">1 Day</option><option value="7">7 Days</option><option value="15">15 Days</option>
                 <option value="30" selected>30 Days</option><option value="60">60 Days</option>
@@ -608,15 +638,12 @@
             </div>
           </div>
           <div class="card card-wide">
-            <h3>📋 Fetcher List</h3>
+            <h3>📋 Trail List</h3>
             <div style="margin-bottom:16px;">
               <button class="btn btn-dark" style="width:auto; padding:10px 20px;" onclick="loadFetchers()">⟳ Refresh</button>
             </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Username</th><th>Note</th><th>Permission</th><th>Action</th></tr></thead>
-                <tbody id="fetcher-tbody"><tr><td colspan="4" style="text-align:center; color:var(--dim); padding:30px;">—</td></tr></tbody>
-              </table>
+            <div class="premium-grid" id="fetcher-cards-grid">
+              <div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px;">—</div>
             </div>
           </div>
         </div>
@@ -739,11 +766,11 @@
         </div>
       </div>
 
-      <!-- FETCHER PANEL -->
+      <!-- TRAIL PANEL (formerly Fetcher panel) -->
       <div id="fetcher-panel" class="page">
         <div class="page-header">
           <div class="page-header-icon">🎯</div>
-          <div><h1>MY UID VAULT</h1><p>Fetcher Panel</p></div>
+          <div><h1>MY UID VAULT</h1><p>Trail Panel</p></div>
         </div>
         <div class="credit-bar">
           <div class="credit-pill purple">🎯 Permission: <span class="num" id="fetcher-perm-display">0</span> Days / UID</div>
@@ -862,6 +889,7 @@
   // ===== STATE =====
   let SESSION={role:null,adminKey:null,username:null,password:null};
   let mainUIDs=[],subUIDs=[],fetcherUIDs=[],pendUID=null,pendIsMain=false,pendIsFetcher=false,pendQCUser=null,creditLog=[],subCredits=0,fetcherPermDays=0;
+  let fetActiveState={},resActiveState={}; // decorative-only "Active" toggle state per user (not stored on backend)
   const save=()=>{ try{localStorage.setItem('rp_s',JSON.stringify(SESSION));}catch(e){} };
   const load=()=>{ try{const s=localStorage.getItem('rp_s');if(s)SESSION=JSON.parse(s);}catch(e){} };
   const clear=()=>{ SESSION={role:null,adminKey:null,username:null,password:null};localStorage.removeItem('rp_s'); };
@@ -973,7 +1001,7 @@
       save(); enterSub();
     }catch(e){res('err-sub','Connection error','err');}
   }
-  // ✅ NEW: Fetcher login (third user tier). Same shape as sub-admin login but
+  // Trail login (third user tier). Same shape as sub-admin login but
   // hits the /fetcher/* endpoints, which are backed by a permission_days value
   // set by the Main Admin instead of a credit balance.
   async function doFetcherLogin(){
@@ -1020,7 +1048,7 @@
     document.getElementById('sidebar-credits').style.display='block';
     subLoadUIDs(); subLoadCredits();
   }
-  // ✅ NEW: Enter the Fetcher panel — pulls the permission_days assigned by the
+  // Enter the Trail panel — pulls the permission_days assigned by the
   // Main Admin and shows it instead of a credit balance in the sidebar.
   function enterFetcher(){
     document.getElementById('auth-gate').style.display='none';
@@ -1033,8 +1061,8 @@
     document.getElementById('nav-credit').style.display='none';
     document.getElementById('nav-settings').style.display='none';
     document.getElementById('sidebar-uname').textContent=SESSION.username;
-    document.getElementById('sidebar-avatar').textContent=(SESSION.username[0]||'F').toUpperCase();
-    document.getElementById('sidebar-role').textContent='FETCHER';
+    document.getElementById('sidebar-avatar').textContent=(SESSION.username[0]||'T').toUpperCase();
+    document.getElementById('sidebar-role').textContent='TRAIL';
     document.getElementById('sidebar-credits').style.display='block';
     document.getElementById('sidebar-credits').textContent='🎯 — days permission';
     fetcherLoadUIDs(); fetcherLoadPermission();
@@ -1088,7 +1116,7 @@
     if(r.ok){toast('UID created!');res('r-m-add','✓ UID added','ok');document.getElementById('m-uid').value='';document.getElementById('m-name').value='';mainLoadUIDs();}
     else{toast(d.message,'err');res('r-m-add','✗ '+d.message,'err');}
   }
-  // ✅ NEW: Instant 24-hour UID add (main admin). Sends both days:1 (fallback for
+  // Instant 24-hour UID add (main admin). Sends both days:1 (fallback for
   // backends that only understand whole days) and hours:24 (for backends that
   // support exact hour-based expiry) so the license expires exactly 24 hours
   // from creation, not just "at the end of the calendar day".
@@ -1160,7 +1188,7 @@
     if(r.ok){toast('UID added (1 credit used)');res('r-s-add','✓ Added','ok');document.getElementById('s-uid').value='';document.getElementById('s-name').value='';subLoadUIDs();subLoadCredits();}
     else{const d=await r.json();toast(d.message,'err');}
   }
-  // ✅ NEW: Instant 24-hour UID add (reseller). Same idea as mainAddUID24 but
+  // Instant 24-hour UID add (reseller). Same idea as mainAddUID24 but
   // goes through the reseller endpoint and still costs 1 credit.
   async function subAddUID24(){
     await subLoadCredits();
@@ -1186,8 +1214,8 @@
     openDelModal(uid,'sub');
   }
 
-  // ===== FETCHER UIDs (✅ NEW SECTION) =====
-  // A Fetcher never picks a day count — every UID they create or renew always
+  // ===== TRAIL UIDs (formerly Fetcher UIDs) =====
+  // A Trail user never picks a day count — every UID they create or renew always
   // uses fetcherPermDays, which is set on the backend by the Main Admin via
   // /admin/create-fetcher (initial) or /admin/update-fetcher-permission (later).
   async function fetcherLoadPermission(){
@@ -1255,7 +1283,7 @@
     openModal('modal-delete');
   }
 
-  // ===== ✅ FIXED: confirmDelete with notification + auto-refresh =====
+  // ===== confirmDelete with notification + auto-refresh =====
   async function confirmDelete(){
     if(!pendUID)return closeModal('modal-delete');
     const uid=pendUID, isMain=pendIsMain, isFetcher=pendIsFetcher;
@@ -1271,9 +1299,7 @@
       }
       const d=await r.json();
       if(r.ok && d.status==='success'){
-        // ✅ Success notification
         toast('UID '+uid+' removed successfully!','ok');
-        // ✅ Instant UI update (remove from local array)
         if(isMain){
           mainUIDs=mainUIDs.filter(u=>(u.uid||u.id||'')!==uid);
           renderMainTable(mainUIDs);
@@ -1290,7 +1316,6 @@
           calcStats(subUIDs,'ss-total','ss-active','ss-expired',null);
           setTimeout(()=>subLoadUIDs(), 600);
         }
-        // Clear input fields
         const mf=document.getElementById('m-rm-uid');
         const sf=document.getElementById('s-rm-uid');
         const ff=document.getElementById('f-rm-uid');
@@ -1336,7 +1361,7 @@
     await doGiveCredits(username,amount,'r-qc');
   }
 
-  // ===== QUICK CREDIT MODAL =====
+  // ===== QUICK CREDIT MODAL (from top-of-section trigger, kept for compatibility) =====
   function openQuickCredit(uname){
     pendQCUser=uname;
     document.getElementById('qc-modal-label').innerHTML=`Adding credits to: <span style="color:#60a5fa; font-weight:700;">${uname}</span>`;
@@ -1382,6 +1407,55 @@
   }
 
   // ===== RESELLERS =====
+  function toggleResActive(uname,el){
+    resActiveState[uname]=!(resActiveState[uname]!==false);
+    el.classList.toggle('on');
+  }
+  // Premium card renderer for a single reseller
+  function resellerCard(s){
+    const credits=s.credits||0;
+    const active=resActiveState[s.username]!==false;
+    return `<div class="premium-card" style="--pc:rgba(59,130,246,0.5);">
+      <div class="premium-card-head">
+        <div class="premium-avatar-name">
+          <div class="premium-avatar" style="background:linear-gradient(135deg,var(--red),var(--red-deep));">${(s.username[0]||'R').toUpperCase()}</div>
+          <div style="min-width:0;">
+            <div class="premium-uname">${s.username}</div>
+            <div class="premium-unote">${s.note||'No note'}</div>
+          </div>
+        </div>
+        <div class="toggle-switch ${active?'on':''}" onclick="toggleResActive('${s.username}',this)" title="Active status (visual only)">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+      <div class="limit-label">💰 Credit Balance</div>
+      <div class="big-stat-value">${credits}</div>
+      <div class="limit-label">➕ Quick Add Credits</div>
+      <input type="number" class="field" id="rcard-amt-${s.username}" value="100" min="1" style="margin-bottom:4px;">
+      <div class="mini-chip-row">
+        <span class="mini-chip blue" onclick="document.getElementById('rcard-amt-${s.username}').value=10">+10</span>
+        <span class="mini-chip blue" onclick="document.getElementById('rcard-amt-${s.username}').value=50">+50</span>
+        <span class="mini-chip blue" onclick="document.getElementById('rcard-amt-${s.username}').value=100">+100</span>
+        <span class="mini-chip blue" onclick="document.getElementById('rcard-amt-${s.username}').value=500">+500</span>
+      </div>
+      <div class="premium-card-actions">
+        <button class="btn btn-blue" style="flex:1;" onclick="saveResellerCard('${s.username}')">💸 Add Credits</button>
+        <button class="btn-sm btn-sm-red" onclick="deleteReseller('${s.username}')">Delete</button>
+      </div>
+      <div class="res-msg" id="r-rcard-${s.username}"></div>
+    </div>`;
+  }
+  function renderResellerCards(list){
+    const grid=document.getElementById('reseller-cards-grid');
+    if(!grid)return;
+    if(!list||!list.length){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px;">No resellers found</div>';return;}
+    grid.innerHTML=list.map(resellerCard).join('');
+  }
+  async function saveResellerCard(uname){
+    const amount=parseInt(document.getElementById('rcard-amt-'+uname).value);
+    if(!amount||amount<1)return res('r-rcard-'+uname,'Enter valid amount','err');
+    await doGiveCredits(uname,amount,'r-rcard-'+uname);
+  }
   async function createReseller(){
     const u=document.getElementById('new-res-user').value.trim();
     const p=document.getElementById('new-res-pass').value.trim();
@@ -1407,29 +1481,21 @@
     }catch(e){toast('Connection error','err');res('r-res-create','✗ Connection error','err');}
   }
   async function loadResellers(){
-    const tb=document.getElementById('reseller-tbody');
-    if(!tb)return;
-    tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:var(--dim);">Loading...</td></tr>';
+    const grid=document.getElementById('reseller-cards-grid');
+    if(!grid)return;
+    grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px;">Loading...</div>';
     try{
       const r=await fetch('/admin/list-subadmins?admin_key='+encodeURIComponent(SESSION.adminKey));
       const d=await r.json();
-      if(!r.ok||!d.subadmins?.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:var(--dim); padding:24px;">No resellers found</td></tr>';return;}
-      tb.innerHTML=d.subadmins.map(s=>`<tr>
-        <td><span class="badge badge-green">${s.username}</span></td>
-        <td style="color:var(--muted); font-size:12px;">${s.note||'—'}</td>
-        <td><span class="badge badge-blue">💰 ${s.credits||0}</span></td>
-        <td>
-          <button class="btn-sm btn-sm-blue" style="margin-right:6px;" onclick="openQuickCredit('${s.username}')">+ Credit</button>
-          <button class="btn-sm btn-sm-red" onclick="deleteReseller('${s.username}')">Delete</button>
-        </td>
-      </tr>`).join('');
+      if(!r.ok||!d.subadmins?.length){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:24px;">No resellers found</div>';return;}
+      renderResellerCards(d.subadmins);
       const total=d.subadmins.reduce((s,r)=>s+(r.credits||0),0);
       const e1=document.getElementById('cs-total-resellers');
       const e2=document.getElementById('cs-total-credits');
       if(e1)e1.textContent=d.subadmins.length;
       if(e2)e2.textContent=total;
       populateDropdowns(d.subadmins);
-    }catch(e){tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#f87171;">Connection error</td></tr>';}
+    }catch(e){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:#f87171; padding:30px;">Connection error</div>';}
   }
   function populateDropdowns(list){
     if(!list)return;
@@ -1454,7 +1520,64 @@
     else{const d=await r.json();toast(d.message||'Failed','err');}
   }
 
-  // ===== ✅ NEW: FETCHERS (third user tier) — create, list, update permission, delete =====
+  // ===== TRAIL (formerly Fetchers) — create, list, update permission, delete =====
+  function toggleFetActive(uname,el){
+    fetActiveState[uname]=!(fetActiveState[uname]!==false);
+    el.classList.toggle('on');
+  }
+  // Premium card renderer for a single Trail user
+  function fetcherCard(s){
+    const days=s.permission_days||0;
+    const active=fetActiveState[s.username]!==false;
+    const chipsVals=[1,7,15,30,60,90,365];
+    const chips=chipsVals.map(v=>`<span class="mini-chip ${v===days?'on':''}" onclick="setFetcherCardDays('${s.username}',${v},this)">${v}d</span>`).join('');
+    return `<div class="premium-card" style="--pc:rgba(124,58,237,0.5);">
+      <div class="premium-card-head">
+        <div class="premium-avatar-name">
+          <div class="premium-avatar" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);">${(s.username[0]||'T').toUpperCase()}</div>
+          <div style="min-width:0;">
+            <div class="premium-uname">${s.username}</div>
+            <div class="premium-unote">${s.note||'No note'}</div>
+          </div>
+        </div>
+        <div class="toggle-switch ${active?'on':''}" onclick="toggleFetActive('${s.username}',this)" title="Active status (visual only)">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+      <div class="limit-label">🎯 Permission (Days / UID)</div>
+      <input type="number" class="field" id="fcard-days-${s.username}" value="${days}" min="1" style="margin-bottom:4px;">
+      <div class="mini-chip-row">${chips}</div>
+      <div class="premium-card-actions">
+        <button class="btn btn-purple" style="flex:1;" onclick="saveFetcherCard('${s.username}')">💾 Save</button>
+        <button class="btn-sm btn-sm-red" onclick="deleteFetcher('${s.username}')">Delete</button>
+      </div>
+      <div class="res-msg" id="r-fcard-${s.username}"></div>
+    </div>`;
+  }
+  function renderFetcherCards(list){
+    const grid=document.getElementById('fetcher-cards-grid');
+    if(!grid)return;
+    if(!list||!list.length){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px;">No trail users found</div>';return;}
+    grid.innerHTML=list.map(fetcherCard).join('');
+  }
+  function setFetcherCardDays(uname,val,el){
+    document.getElementById('fcard-days-'+uname).value=val;
+    el.parentElement.querySelectorAll('.mini-chip').forEach(c=>c.classList.remove('on'));
+    el.classList.add('on');
+  }
+  async function saveFetcherCard(uname){
+    const days=parseInt(document.getElementById('fcard-days-'+uname).value);
+    if(!days||days<1)return res('r-fcard-'+uname,'Enter valid days','err');
+    try{
+      const r=await fetch('/admin/update-fetcher-permission',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:uname,permission_days:days})});
+      const d=await r.json();
+      if(r.ok){
+        toast(`${uname} → ${days}d permission saved`);
+        res('r-fcard-'+uname,'✓ Saved','ok');
+        loadFetchers();
+      }else{toast(d.message||'Failed','err');res('r-fcard-'+uname,'✗ '+(d.message||'Error'),'err');}
+    }catch(e){res('r-fcard-'+uname,'✗ Connection error','err');}
+  }
   async function createFetcher(){
     const u=document.getElementById('new-fet-user').value.trim();
     const p=document.getElementById('new-fet-pass').value.trim();
@@ -1465,7 +1588,7 @@
       const r=await fetch('/admin/create-fetcher',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:u,password:p,note:n,permission_days:days})});
       const d=await r.json();
       if(!r.ok){toast(d.message||'Failed','err');res('r-fet-create','✗ '+(d.message||'Backend endpoint /admin/create-fetcher not found'),'err');return;}
-      toast(`Fetcher "${u}" created — ${days} day permission`);
+      toast(`Trail user "${u}" created — ${days} day permission`);
       res('r-fet-create',`✓ Created: ${u} | 🎯 ${days} days`,'ok');
       document.getElementById('new-fet-user').value='';
       document.getElementById('new-fet-pass').value='';
@@ -1474,30 +1597,22 @@
     }catch(e){toast('Connection error','err');res('r-fet-create','✗ Connection error — backend endpoint /admin/create-fetcher needed','err');}
   }
   async function loadFetchers(){
-    const tb=document.getElementById('fetcher-tbody');
-    if(!tb)return;
-    tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:var(--dim);">Loading...</td></tr>';
+    const grid=document.getElementById('fetcher-cards-grid');
+    if(!grid)return;
+    grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px;">Loading...</div>';
     try{
       const r=await fetch('/admin/list-fetchers?admin_key='+encodeURIComponent(SESSION.adminKey));
       const d=await r.json();
-      if(!r.ok||!d.fetchers?.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:var(--dim); padding:24px;">No fetchers found</td></tr>';return;}
-      tb.innerHTML=d.fetchers.map(s=>`<tr>
-        <td><span class="badge badge-purple">${s.username}</span></td>
-        <td style="color:var(--muted); font-size:12px;">${s.note||'—'}</td>
-        <td><span class="badge badge-blue">🎯 ${s.permission_days||0}d / UID</span></td>
-        <td>
-          <button class="btn-sm btn-sm-purple" style="margin-right:6px;" onclick="document.getElementById('fet-username').value='${s.username}';document.getElementById('fet-sel').value='${s.username}';"> Select</button>
-          <button class="btn-sm btn-sm-red" onclick="deleteFetcher('${s.username}')">Delete</button>
-        </td>
-      </tr>`).join('');
+      if(!r.ok||!d.fetchers?.length){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:24px;">No trail users found</div>';return;}
+      renderFetcherCards(d.fetchers);
       populateFetcherDropdown(d.fetchers);
-    }catch(e){tb.innerHTML='<tr><td colspan="4" style="text-align:center; color:#f87171;">Connection error — backend endpoint /admin/list-fetchers needed</td></tr>';}
+    }catch(e){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:#f87171; padding:30px;">Connection error — backend endpoint /admin/list-fetchers needed</div>';}
   }
   function populateFetcherDropdown(list){
     const el=document.getElementById('fet-sel');
     if(!el||!list)return;
     const prev=el.value;
-    el.innerHTML='<option value="">— Select Fetcher —</option>';
+    el.innerHTML='<option value="">— Select Trail User —</option>';
     list.forEach(s=>{
       const o=document.createElement('option');
       o.value=s.username;
@@ -1510,7 +1625,7 @@
     const sel=document.getElementById('fet-sel').value;
     const username=document.getElementById('fet-username').value.trim()||sel;
     const days=parseInt(document.getElementById('fet-perm-days').value);
-    if(!username)return toast('Select or enter a fetcher','err');
+    if(!username)return toast('Select or enter a trail user','err');
     if(!days||days<1)return toast('Enter valid day count','err');
     try{
       const r=await fetch('/admin/update-fetcher-permission',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username,permission_days:days})});
@@ -1523,13 +1638,13 @@
     }catch(e){toast('Connection error','err');res('r-fet-perm','✗ Connection error','err');}
   }
   async function deleteFetcher(uname){
-    if(!confirm(`Delete fetcher: ${uname}?`))return;
+    if(!confirm(`Delete trail user: ${uname}?`))return;
     const r=await fetch('/admin/delete-fetcher',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:uname})});
-    if(r.ok){toast('Fetcher deleted');loadFetchers();}
+    if(r.ok){toast('Trail user deleted');loadFetchers();}
     else{const d=await r.json();toast(d.message||'Failed','err');}
   }
 
-  // ===== ✅ NEW: SETTINGS — change master key / create extra admin login =====
+  // ===== SETTINGS — change master key / create extra admin login =====
   async function changeMasterKey(){
     const cur=document.getElementById('set-current-key').value.trim();
     const n1=document.getElementById('set-new-key').value.trim();
