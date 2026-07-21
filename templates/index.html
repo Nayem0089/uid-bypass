@@ -401,6 +401,70 @@
     .toggle-switch.on .toggle-knob { left: 21px; }
     .big-stat-value { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 800; color: #60a5fa; margin-bottom: 16px; line-height: 1; }
     .premium-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+    /* ============ AUTO RE-ADD SPECIFIC STYLES ============ */
+    .auto-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .auto-badge.enabled {
+      background: rgba(34,197,94,0.12);
+      color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+    .auto-badge.disabled {
+      background: rgba(239,68,68,0.12);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.25);
+    }
+    .auto-badge.running {
+      background: rgba(59,130,246,0.12);
+      color: #60a5fa;
+      border: 1px solid rgba(59,130,246,0.25);
+      animation: pulse-blue 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-blue {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .countdown-timer {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      color: #60a5fa;
+      font-weight: 700;
+    }
+    .auto-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .auto-stat-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .auto-stat-item .value {
+      font-family: 'Space Mono', monospace;
+      font-size: 22px;
+      font-weight: 800;
+      color: #60a5fa;
+    }
+    .auto-stat-item .label {
+      font-size: 9px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -451,6 +515,10 @@
         <button class="nav-item active" id="nav-uids" onclick="switchTab('uids')">
           <div class="nav-icon-wrap">🎮</div>
           <span class="nav-label">UID Vault</span>
+        </button>
+        <button class="nav-item" id="nav-auto" onclick="switchTab('auto')">
+          <div class="nav-icon-wrap">🔄</div>
+          <span class="nav-label">Auto Re-Add</span>
         </button>
         <button class="nav-item" id="nav-resellers" style="display:none" onclick="switchTab('resellers')">
           <div class="nav-icon-wrap">👥</div>
@@ -538,9 +606,88 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Days Left</th><th>Action</th></tr></thead>
-              <tbody id="main-uid-tbody"><tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">Loading...</td></tr></tbody>
+              <thead><tr><th>UID</th><th>Name</th><th>Days</th><th>Status</th><th>Expires</th><th>Days Left</th><th>Auto</th><th>Action</th></tr></thead>
+              <tbody id="main-uid-tbody"><tr><td colspan="8" style="text-align:center; color:var(--dim); padding:40px;">Loading...</td></tr></tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- AUTO RE-ADD TAB -->
+        <div id="main-tab-auto" class="panel-section">
+          <div class="page-header">
+            <div class="page-header-icon">🔄</div>
+            <div><h1>AUTO RE-ADD SYSTEM</h1><p>Automatically re-submit UIDs every 7 hours</p></div>
+          </div>
+          
+          <!-- Auto Re-Add Stats -->
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-num white" id="ar-total-uids">—</div><div class="stat-label">Total UIDs</div></div>
+            <div class="stat-card"><div class="stat-num green" id="ar-pending">—</div><div class="stat-label">Pending Queue</div></div>
+            <div class="stat-card"><div class="stat-num blue" id="ar-success">—</div><div class="stat-label">Successful</div></div>
+            <div class="stat-card"><div class="stat-num red" id="ar-failed">—</div><div class="stat-label">Failed</div></div>
+          </div>
+          
+          <!-- Auto Re-Add Controls -->
+          <div class="card-grid">
+            <div class="card">
+              <h3>⚙️ Auto Re-Add Controls</h3>
+              <div class="form-check form-switch" style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                <input type="checkbox" id="ar-global-toggle" style="width:48px; height:24px; cursor:pointer;" onchange="toggleAutoGlobal(this.checked)">
+                <label style="font-weight:600; font-size:13px;">Global Auto Re-Add</label>
+                <span id="ar-global-status" class="auto-badge enabled">ENABLED</span>
+              </div>
+              <div style="margin-bottom:16px;">
+                <label style="font-size:12px; color:var(--muted);">Interval (hours):</label>
+                <input type="number" id="ar-interval" class="field" value="7" min="1" max="72" style="margin-bottom:8px;">
+                <button class="btn btn-blue" onclick="updateAutoInterval()">Update Interval</button>
+              </div>
+              <div style="display:flex; gap:12px;">
+                <button class="btn btn-red" onclick="forceAutoRun()" style="flex:1;">⚡ Force Run Now</button>
+                <button class="btn btn-dark" onclick="loadAutoStats()" style="flex:1;">⟳ Refresh Stats</button>
+              </div>
+              <div class="res-msg" id="r-auto-control"></div>
+            </div>
+            <div class="card">
+              <h3>📊 Scheduler Status</h3>
+              <div id="ar-scheduler-status">
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
+                  <span style="color:var(--dim);">Status:</span>
+                  <span id="ar-status-text" class="auto-badge running">Loading...</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
+                  <span style="color:var(--dim);">Next Run:</span>
+                  <span id="ar-next-run" class="countdown-timer">—</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
+                  <span style="color:var(--dim);">Last Run:</span>
+                  <span id="ar-last-run" style="color:var(--muted); font-size:13px;">—</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0;">
+                  <span style="color:var(--dim);">Countdown:</span>
+                  <span id="ar-countdown" class="countdown-timer">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Per-UID Auto Settings -->
+          <div class="card card-wide">
+            <h3>🎯 Per-UID Auto Settings</h3>
+            <div class="toolbar">
+              <button class="btn btn-dark" style="width:auto; padding:8px 16px;" onclick="loadAutoUIDs()">⟳ Refresh</button>
+              <div class="search"><input type="text" id="ar-search" class="field" style="margin:0;" placeholder="Filter UID or Name"></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr>
+                  <th>UID</th><th>Name</th><th>Auto Status</th>
+                  <th>Last Submit</th><th>Next Submit</th>
+                  <th>Retries</th><th>API Status</th>
+                  <th>Action</th>
+                </tr></thead>
+                <tbody id="ar-uid-tbody"><tr><td colspan="8" style="text-align:center; color:var(--dim); padding:40px;">Loading...</td></tr></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -884,12 +1031,7 @@
     }; draw();
   })();
 
-  // ===== DEVICE ID (persistent per-browser fingerprint, used ONLY for the
-  // Reseller single-device login restriction. This does NOT log anyone in
-  // automatically — it is just an identifier sent along with the reseller's
-  // username/password so the backend can tell "this is the same PC" or
-  // "this is a different PC". Trail (fetcher) logins never send this, so
-  // Trail accounts can log in from unlimited devices. =====
+  // ===== DEVICE ID =====
   function getDeviceId(){
     let id;
     try{ id = localStorage.getItem('sc_device_id'); }catch(e){}
@@ -900,10 +1042,13 @@
     return id;
   }
 
-  // ===== STATE (in-memory only — NOT persisted, so there is no auto-login) =====
+  // ===== STATE =====
   let SESSION={role:null,adminKey:null,username:null,password:null};
   let mainUIDs=[],subUIDs=[],fetcherUIDs=[],pendUID=null,pendIsMain=false,pendIsFetcher=false,pendQCUser=null,creditLog=[],subCredits=0,fetcherPermDays=0;
-  let fetActiveState={},resActiveState={}; // decorative-only "Active" toggle state per user (not stored on backend)
+  let fetActiveState={},resActiveState={};
+  let autoStats = { total_uids: 0, pending_submissions: 0, successful_submissions: 0, failed_submissions: 0 };
+  let countdownInterval = null;
+  
   const clear=()=>{ SESSION={role:null,adminKey:null,username:null,password:null}; };
   const saveLog=()=>{ try{localStorage.setItem('sc_log',JSON.stringify(creditLog));}catch(e){} };
   const loadLog=()=>{ try{const s=localStorage.getItem('sc_log');if(s)creditLog=JSON.parse(s);}catch(e){} };
@@ -959,7 +1104,6 @@
   }
 
   // ===== ROW RENDER =====
-  // tier: 'main' | 'sub' | 'fetcher' — decides which revoke endpoint the row's delete button hits.
   function uidRow(u,tier){
     const uid=u.uid||u.id||u.user_id||'?';
     const name=u.name||u.username||u.player||'—';
@@ -971,6 +1115,13 @@
     else if(rem<=0) badge='<span class="badge badge-red">✖ Expired</span>';
     else if(rem<=7) badge='<span class="badge badge-orange">⚠ Soon</span>';
     else badge='<span class="badge badge-green">● Active</span>';
+    
+    // Auto status badge
+    const autoEnabled = u.auto_submit_enabled !== false;
+    const autoBadge = autoEnabled 
+      ? '<span class="auto-badge enabled">🔄 ON</span>'
+      : '<span class="auto-badge disabled">⛔ OFF</span>';
+    
     const fn=`openDelModal('${uid}','${tier}')`;
     return `<tr>
       <td><span class="uid-mono">${uid}</span><button class="copy-btn" onclick="navigator.clipboard.writeText('${uid}');toast('Copied!')">📋</button></td>
@@ -979,9 +1130,235 @@
       <td>${badge}</td>
       <td style="font-size:12px; color:var(--muted);">${fmtDate(expRaw)}</td>
       <td>${dlBadge(rem)}</td>
+      <td>${autoBadge}</td>
       <td><button class="btn-sm btn-sm-red" onclick="${fn}">DELETE</button></td>
     </tr>`;
   }
+
+  // ===== AUTO RE-ADD FUNCTIONS =====
+  async function loadAutoStats() {
+    try {
+      const r = await fetch('/admin/auto-submit/stats?admin_key=' + encodeURIComponent(SESSION.adminKey));
+      const d = await r.json();
+      if (r.ok && d.stats) {
+        autoStats = d.stats;
+        updateAutoUI();
+      }
+    } catch(e) {
+      console.error('Error loading auto stats:', e);
+    }
+  }
+
+  function updateAutoUI() {
+    document.getElementById('ar-total-uids').textContent = autoStats.total_uids || 0;
+    document.getElementById('ar-pending').textContent = autoStats.pending_submissions || 0;
+    document.getElementById('ar-success').textContent = autoStats.successful_submissions || 0;
+    document.getElementById('ar-failed').textContent = autoStats.failed_submissions || 0;
+    
+    // Update status
+    const statusText = document.getElementById('ar-status-text');
+    if (autoStats.is_running) {
+      statusText.textContent = 'RUNNING';
+      statusText.className = 'auto-badge running';
+    } else if (autoStats.global_enabled) {
+      statusText.textContent = 'SCHEDULED';
+      statusText.className = 'auto-badge enabled';
+    } else {
+      statusText.textContent = 'DISABLED';
+      statusText.className = 'auto-badge disabled';
+    }
+    
+    // Update next run time
+    if (autoStats.next_run_time) {
+      const nextRun = new Date(autoStats.next_run_time);
+      document.getElementById('ar-next-run').textContent = nextRun.toLocaleString();
+      startCountdown(nextRun);
+    } else {
+      document.getElementById('ar-next-run').textContent = '—';
+    }
+    
+    // Update last run time
+    if (autoStats.last_run_time) {
+      document.getElementById('ar-last-run').textContent = new Date(autoStats.last_run_time).toLocaleString();
+    } else {
+      document.getElementById('ar-last-run').textContent = '—';
+    }
+    
+    // Update global toggle
+    document.getElementById('ar-global-toggle').checked = autoStats.global_enabled !== false;
+    const statusBadge = document.getElementById('ar-global-status');
+    if (autoStats.global_enabled !== false) {
+      statusBadge.textContent = 'ENABLED';
+      statusBadge.className = 'auto-badge enabled';
+    } else {
+      statusBadge.textContent = 'DISABLED';
+      statusBadge.className = 'auto-badge disabled';
+    }
+  }
+
+  function startCountdown(targetTime) {
+    if (countdownInterval) clearInterval(countdownInterval);
+    
+    countdownInterval = setInterval(() => {
+      const now = new Date();
+      const diff = targetTime - now;
+      
+      if (diff <= 0) {
+        document.getElementById('ar-countdown').textContent = 'NOW';
+        return;
+      }
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      
+      document.getElementById('ar-countdown').textContent = 
+        `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }, 1000);
+  }
+
+  async function toggleAutoGlobal(enabled) {
+    try {
+      const r = await fetch('/admin/auto-submit/settings?admin_key=' + encodeURIComponent(SESSION.adminKey), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: enabled })
+      });
+      const d = await r.json();
+      if (r.ok) {
+        toast('Auto Re-Add ' + (enabled ? 'enabled' : 'disabled'));
+        loadAutoStats();
+      } else {
+        toast(d.message || 'Failed to update', 'err');
+      }
+    } catch(e) {
+      toast('Connection error', 'err');
+    }
+  }
+
+  async function updateAutoInterval() {
+    const interval = parseInt(document.getElementById('ar-interval').value);
+    if (!interval || interval < 1) {
+      toast('Enter valid interval (1-72 hours)', 'err');
+      return;
+    }
+    try {
+      const r = await fetch('/admin/auto-submit/settings?admin_key=' + encodeURIComponent(SESSION.adminKey), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interval_hours: interval })
+      });
+      const d = await r.json();
+      if (r.ok) {
+        toast('Interval updated to ' + interval + ' hours');
+        loadAutoStats();
+      } else {
+        toast(d.message || 'Failed to update', 'err');
+      }
+    } catch(e) {
+      toast('Connection error', 'err');
+    }
+  }
+
+  async function forceAutoRun() {
+    try {
+      const r = await fetch('/admin/auto-submit/force?admin_key=' + encodeURIComponent(SESSION.adminKey), {
+        method: 'POST'
+      });
+      const d = await r.json();
+      if (r.ok) {
+        toast('Auto Re-Add triggered!');
+        loadAutoStats();
+        setTimeout(loadAutoStats, 5000); // Reload after 5 seconds to see results
+      } else {
+        toast(d.message || 'Failed to trigger', 'err');
+      }
+    } catch(e) {
+      toast('Connection error', 'err');
+    }
+  }
+
+  async function loadAutoUIDs() {
+    try {
+      const r = await fetch('/admin/api/uids?admin_key=' + encodeURIComponent(SESSION.adminKey));
+      const d = await r.json();
+      if (r.ok) {
+        renderAutoTable(d);
+      }
+    } catch(e) {
+      console.error('Error loading auto UIDs:', e);
+    }
+  }
+
+  function renderAutoTable(uids) {
+    const tbody = document.getElementById('ar-uid-tbody');
+    if (!uids || uids.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--dim); padding:40px;">No UIDs found</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = uids.map(u => {
+      const autoEnabled = u.auto_submit_enabled !== false;
+      const status = u.last_api_status || 'pending';
+      const statusBadge = {
+        'success': '<span class="badge badge-green">✓ Success</span>',
+        'failed': '<span class="badge badge-red">✗ Failed</span>',
+        'retry': '<span class="badge badge-orange">⟳ Retry</span>',
+        'pending': '<span class="badge badge-white">⏳ Pending</span>'
+      }[status] || '<span class="badge badge-white">⏳ Pending</span>';
+      
+      return `<tr>
+        <td><span class="uid-mono">${u.uid}</span></td>
+        <td style="font-weight:600;">${u.name || '—'}</td>
+        <td>${autoEnabled ? '<span class="auto-badge enabled">🔄 ON</span>' : '<span class="auto-badge disabled">⛔ OFF</span>'}</td>
+        <td style="font-size:12px; color:var(--muted);">${u.last_auto_submit_time ? new Date(u.last_auto_submit_time).toLocaleString() : 'Never'}</td>
+        <td style="font-size:12px; color:var(--muted);">${u.next_auto_submit_time ? new Date(u.next_auto_submit_time).toLocaleString() : '—'}</td>
+        <td style="font-family:'Space Mono',monospace;">${u.retry_count || 0}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="btn-sm ${autoEnabled ? 'btn-sm-red' : 'btn-sm-blue'}" 
+                  onclick="toggleUIDAuto(${u.id}, ${!autoEnabled})">
+            ${autoEnabled ? 'Disable' : 'Enable'}
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function toggleUIDAuto(uidId, enabled) {
+    try {
+      const r = await fetch('/admin/auto-submit/toggle-uid?admin_key=' + encodeURIComponent(SESSION.adminKey), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: uidId, enabled: enabled })
+      });
+      const d = await r.json();
+      if (r.ok) {
+        toast('Auto-submit ' + (enabled ? 'enabled' : 'disabled') + ' for UID');
+        loadAutoUIDs();
+        loadAutoStats();
+      } else {
+        toast(d.message || 'Failed to update', 'err');
+      }
+    } catch(e) {
+      toast('Connection error', 'err');
+    }
+  }
+
+  // Filter for auto table
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('ar-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        const q = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#ar-uid-tbody tr');
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(q) ? '' : 'none';
+        });
+      });
+    }
+  });
 
   // ===== AUTH =====
   function switchAuthTab(t){
@@ -990,6 +1367,7 @@
     document.getElementById('login-fetcher').style.display=t==='fetcher'?'block':'none';
     document.getElementById('login-main').style.display=t==='main'?'block':'none';
   }
+  
   async function doMainLogin(){
     const key=document.getElementById('main-key').value.trim();
     if(!key)return res('err-main','Enter Master Key','err');
@@ -1001,11 +1379,7 @@
       enterMain();
     }catch(e){res('err-main','Connection error','err');}
   }
-  // Reseller login — single-device restricted. We send a persistent device_id
-  // along with the credentials. The Flask backend is responsible for storing
-  // the device_id tied to this reseller and rejecting the login (or kicking
-  // the previous device) if a different device_id tries to log in — this
-  // frontend only sends the id and surfaces the backend's response.
+
   async function doSubLogin(){
     const u=document.getElementById('sub-user').value.trim();
     const p=document.getElementById('sub-pass').value.trim();
@@ -1024,10 +1398,7 @@
       enterSub();
     }catch(e){res('err-sub','Connection error','err');}
   }
-  // Trail login (third user tier). Same shape as sub-admin login but
-  // hits the /fetcher/* endpoints, which are backed by a permission_days value
-  // set by the Main Admin instead of a credit balance. No device_id is sent —
-  // Trail accounts are allowed unlimited simultaneous device logins.
+
   async function doFetcherLogin(){
     const u=document.getElementById('fetcher-user').value.trim();
     const p=document.getElementById('fetcher-pass').value.trim();
@@ -1040,6 +1411,7 @@
       enterFetcher();
     }catch(e){res('err-fetcher','Connection error','err');}
   }
+
   function enterMain(){
     document.getElementById('auth-gate').style.display='none';
     document.getElementById('app-layout').style.display='block';
@@ -1055,7 +1427,9 @@
     document.getElementById('sidebar-role').textContent='MAIN ADMIN';
     document.getElementById('sidebar-credits').style.display='none';
     mainLoadUIDs(); loadResellers(); loadFetchers(); loadLog(); renderCreditLog();
+    loadAutoStats(); loadAutoUIDs();
   }
+
   function enterSub(){
     document.getElementById('auth-gate').style.display='none';
     document.getElementById('app-layout').style.display='block';
@@ -1072,8 +1446,7 @@
     document.getElementById('sidebar-credits').style.display='block';
     subLoadUIDs(); subLoadCredits();
   }
-  // Enter the Trail panel — pulls the permission_days assigned by the
-  // Main Admin and shows it instead of a credit balance in the sidebar.
+
   function enterFetcher(){
     document.getElementById('auth-gate').style.display='none';
     document.getElementById('app-layout').style.display='block';
@@ -1091,6 +1464,7 @@
     document.getElementById('sidebar-credits').textContent='🎯 — days permission';
     fetcherLoadUIDs(); fetcherLoadPermission();
   }
+
   function switchTab(t){
     document.querySelectorAll('.nav-item[id^="nav-"]').forEach(b=>b.classList.remove('active'));
     document.getElementById('nav-'+t).classList.add('active');
@@ -1099,8 +1473,11 @@
     if(t==='resellers')loadResellers();
     if(t==='fetchers')loadFetchers();
     if(t==='credit'){loadResellers();renderCreditLog();}
+    if(t==='auto'){loadAutoStats();loadAutoUIDs();}
   }
+
   function doLogout(){
+    if (countdownInterval) clearInterval(countdownInterval);
     clear();
     document.getElementById('app-layout').style.display='none';
     document.getElementById('auth-gate').style.display='flex';
@@ -1112,24 +1489,27 @@
   // ===== MAIN UIDs =====
   async function mainLoadUIDs(){
     const tb=document.getElementById('main-uid-tbody');
-    tb.innerHTML='<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:30px;">Loading...</td></tr>';
+    tb.innerHTML='<tr><td colspan="8" style="text-align:center; color:var(--dim); padding:30px;">Loading...</td></tr>';
     try{
       const r=await fetch('/admin/list?admin_key='+encodeURIComponent(SESSION.adminKey));
       const d=await r.json();
-      if(!r.ok){tb.innerHTML=`<tr><td colspan="7" style="color:#f87171; text-align:center;">Error: ${d.message}</td></tr>`;return;}
+      if(!r.ok){tb.innerHTML=`<tr><td colspan="8" style="color:#f87171; text-align:center;">Error: ${d.message}</td></tr>`;return;}
       mainUIDs=d.licenses||[];
       renderMainTable(mainUIDs);
       calcStats(mainUIDs,'ms-total','ms-active','ms-expired','ms-soon');
-    }catch(e){tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>';}
+    }catch(e){tb.innerHTML='<tr><td colspan="8" style="color:#f87171; text-align:center;">Connection error</td></tr>';}
   }
+
   function renderMainTable(uids){
     const tb=document.getElementById('main-uid-tbody');
-    tb.innerHTML=uids.length?uids.map(u=>uidRow(u,'main')).join(''):'<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">✨ No UIDs found</td></tr>';
+    tb.innerHTML=uids.length?uids.map(u=>uidRow(u,'main')).join(''):'<tr><td colspan="8" style="text-align:center; color:var(--dim); padding:40px;">✨ No UIDs found</td></tr>';
   }
+
   document.getElementById('m-search').addEventListener('input',e=>{
     const q=e.target.value.toLowerCase();
     renderMainTable(mainUIDs.filter(u=>(u.uid||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));
   });
+
   async function mainAddUID(){
     const uid=document.getElementById('m-uid').value.trim();
     const name=document.getElementById('m-name').value.trim()||'Player';
@@ -1137,27 +1517,27 @@
     if(!uid)return toast('UID required','err');
     const r=await fetch('/admin/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,name,days:parseInt(days)})});
     const d=await r.json();
-    if(r.ok){toast('UID created!');res('r-m-add','✓ UID added','ok');document.getElementById('m-uid').value='';document.getElementById('m-name').value='';mainLoadUIDs();}
+    if(r.ok){toast('UID created!');res('r-m-add','✓ UID added','ok');document.getElementById('m-uid').value='';document.getElementById('m-name').value='';mainLoadUIDs();loadAutoStats();}
     else{toast(d.message,'err');res('r-m-add','✗ '+d.message,'err');}
   }
+
   async function mainRenewUID(){
     const uid=document.getElementById('m-renew-uid').value.trim();
     const days=document.getElementById('m-renew-days').value;
     if(!uid)return toast('Enter UID','err');
     const r=await fetch('/admin/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,uid,days:parseInt(days)})});
     const d=await r.json();
-    if(r.ok){toast(`Renewed +${days} days`);res('r-m-rm','✓ Renewed','ok');document.getElementById('m-renew-uid').value='';mainLoadUIDs();}
+    if(r.ok){toast(`Renewed +${days} days`);res('r-m-rm','✓ Renewed','ok');document.getElementById('m-renew-uid').value='';mainLoadUIDs();loadAutoStats();}
     else toast(d.message,'err');
   }
+
   function mainRemoveUID(){
     const uid=document.getElementById('m-rm-uid').value.trim();
     if(!uid)return toast('Enter UID','err');
     openDelModal(uid,'main');
   }
 
-  // ===== SUB UIDs (Reseller — device_id is included on every call so the
-  // backend can additionally verify the active session still belongs to
-  // this device on each request, not just at login) =====
+  // ===== SUB UIDs =====
   async function subLoadUIDs(){
     const tb=document.getElementById('sub-uid-tbody');
     tb.innerHTML='<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:30px;">Loading...</td></tr>';
@@ -1171,14 +1551,17 @@
       calcStats(subUIDs,'ss-total','ss-active','ss-expired',null);
     }catch(e){tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>';}
   }
+
   function renderSubTable(uids){
     const tb=document.getElementById('sub-uid-tbody');
     tb.innerHTML=uids.length?uids.map(u=>uidRow(u,'sub')).join(''):'<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">No UIDs found</td></tr>';
   }
+
   document.getElementById('s-search').addEventListener('input',e=>{
     const q=e.target.value.toLowerCase();
     renderSubTable(subUIDs.filter(u=>(u.uid||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));
   });
+
   async function subLoadCredits(){
     try{
       const r=await fetch('/subadmin/credits?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password)+'&device_id='+encodeURIComponent(getDeviceId()));
@@ -1192,6 +1575,7 @@
       }
     }catch(e){}
   }
+
   async function subAddUID(){
     await subLoadCredits();
     if(subCredits<1){toast('No credit! Contact Main Admin.','err');return;}
@@ -1204,6 +1588,7 @@
     if(r.ok){toast('UID added (1 credit used)');res('r-s-add','✓ Added','ok');document.getElementById('s-uid').value='';document.getElementById('s-name').value='';subLoadUIDs();subLoadCredits();}
     else{const d=await r.json();toast(d.message,'err');}
   }
+
   async function subRenewUID(){
     const uid=document.getElementById('s-renew-uid').value.trim();
     const days=document.getElementById('s-renew-days').value;
@@ -1213,16 +1598,14 @@
     if(r.ok){toast(`Renewed +${days} days`);res('r-s-rm','✓ Renewed','ok');document.getElementById('s-renew-uid').value='';subLoadUIDs();}
     else{const d=await r.json();toast(d.message,'err');}
   }
+
   function subRemoveUID(){
     const uid=document.getElementById('s-rm-uid').value.trim();
     if(!uid)return toast('Enter UID','err');
     openDelModal(uid,'sub');
   }
 
-  // ===== TRAIL UIDs (formerly Fetcher UIDs) — no device_id, unlimited logins =====
-  // A Trail user never picks a day count — every UID they create or renew always
-  // uses fetcherPermDays, which is set on the backend by the Main Admin via
-  // /admin/create-fetcher (initial) or /admin/update-fetcher-permission (later).
+  // ===== TRAIL UIDs =====
   async function fetcherLoadPermission(){
     try{
       const r=await fetch('/fetcher/permission?username='+encodeURIComponent(SESSION.username)+'&password='+encodeURIComponent(SESSION.password));
@@ -1236,6 +1619,7 @@
       }
     }catch(e){}
   }
+
   async function fetcherLoadUIDs(){
     const tb=document.getElementById('fetcher-uid-tbody');
     tb.innerHTML='<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:30px;">Loading...</td></tr>';
@@ -1248,14 +1632,17 @@
       calcStats(fetcherUIDs,'fs-total','fs-active','fs-expired',null);
     }catch(e){tb.innerHTML='<tr><td colspan="7" style="color:#f87171; text-align:center;">Connection error</td></tr>';}
   }
+
   function renderFetcherTable(uids){
     const tb=document.getElementById('fetcher-uid-tbody');
     tb.innerHTML=uids.length?uids.map(u=>uidRow(u,'fetcher')).join(''):'<tr><td colspan="7" style="text-align:center; color:var(--dim); padding:40px;">No UIDs found</td></tr>';
   }
+
   document.getElementById('f-search').addEventListener('input',e=>{
     const q=e.target.value.toLowerCase();
     renderFetcherTable(fetcherUIDs.filter(u=>(u.uid||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q)));
   });
+
   async function fetcherAddUID(){
     await fetcherLoadPermission();
     if(!fetcherPermDays||fetcherPermDays<1){toast('No permission set! Contact Main Admin.','err');return;}
@@ -1266,6 +1653,7 @@
     if(r.ok){toast(`UID added (${fetcherPermDays} days)`);res('r-f-add','✓ Added','ok');document.getElementById('f-uid').value='';document.getElementById('f-name').value='';fetcherLoadUIDs();}
     else{const d=await r.json();toast(d.message,'err');}
   }
+
   async function fetcherRenewUID(){
     await fetcherLoadPermission();
     const uid=document.getElementById('f-renew-uid').value.trim();
@@ -1274,6 +1662,7 @@
     if(r.ok){toast(`Renewed +${fetcherPermDays} days`);res('r-f-rm','✓ Renewed','ok');document.getElementById('f-renew-uid').value='';fetcherLoadUIDs();}
     else{const d=await r.json();toast(d.message,'err');}
   }
+
   function fetcherRemoveUID(){
     const uid=document.getElementById('f-rm-uid').value.trim();
     if(!uid)return toast('Enter UID','err');
@@ -1281,14 +1670,12 @@
   }
 
   // ===== DELETE MODAL =====
-  // tier: 'main' | 'sub' | 'fetcher'
   function openDelModal(uid,tier){
     pendUID=uid; pendIsMain=(tier==='main'); pendIsFetcher=(tier==='fetcher');
     document.getElementById('modal-del-body').innerHTML=`Remove UID <span style="font-family:monospace; color:#f87171; font-weight:700;">${uid}</span>?<br><span style="font-size:12px; color:var(--dim);">This action is irreversible.</span>`;
     openModal('modal-delete');
   }
 
-  // ===== confirmDelete with notification + auto-refresh =====
   async function confirmDelete(){
     if(!pendUID)return closeModal('modal-delete');
     const uid=pendUID, isMain=pendIsMain, isFetcher=pendIsFetcher;
@@ -1328,6 +1715,8 @@
         if(mf)mf.value='';
         if(sf)sf.value='';
         if(ff)ff.value='';
+        loadAutoStats();
+        loadAutoUIDs();
       } else {
         toast((d.message||'Remove failed'),'err');
       }
@@ -1350,6 +1739,7 @@
       }else{toast(d.message||'Failed','err');res(resId,'✗ '+(d.message||'Error'),'err');}
     }catch(e){toast('Connection error','err');res(resId,'✗ Connection error','err');}
   }
+
   async function giveCredits(){
     const sel=document.getElementById('credit-sel').value;
     const username=document.getElementById('credit-reseller').value.trim()||sel;
@@ -1358,6 +1748,7 @@
     if(!amount||amount<1)return toast('Enter valid amount','err');
     await doGiveCredits(username,amount,'r-credit');
   }
+
   async function quickGiveCredits(){
     const sel=document.getElementById('qc-sel').value;
     const username=document.getElementById('qc-username').value.trim()||sel;
@@ -1367,7 +1758,6 @@
     await doGiveCredits(username,amount,'r-qc');
   }
 
-  // ===== QUICK CREDIT MODAL (from top-of-section trigger, kept for compatibility) =====
   function openQuickCredit(uname){
     pendQCUser=uname;
     document.getElementById('qc-modal-label').innerHTML=`Adding credits to: <span style="color:#60a5fa; font-weight:700;">${uname}</span>`;
@@ -1375,6 +1765,7 @@
     document.getElementById('r-qc-modal').innerHTML='';
     openModal('modal-credit');
   }
+
   async function confirmQuickCredit(){
     const amount=parseInt(document.getElementById('qc-modal-amount').value);
     if(!pendQCUser||!amount||amount<1){res('r-qc-modal','Enter valid amount','err');return;}
@@ -1397,6 +1788,7 @@
     if(creditLog.length>200)creditLog=creditLog.slice(0,200);
     saveLog();
   }
+
   function renderCreditLog(){
     const tb=document.getElementById('credit-log-tbody');
     if(!tb)return;
@@ -1417,7 +1809,7 @@
     resActiveState[uname]=!(resActiveState[uname]!==false);
     el.classList.toggle('on');
   }
-  // Premium card renderer for a single reseller
+
   function resellerCard(s){
     const credits=s.credits||0;
     const active=resActiveState[s.username]!==false;
@@ -1451,17 +1843,20 @@
       <div class="res-msg" id="r-rcard-${s.username}"></div>
     </div>`;
   }
+
   function renderResellerCards(list){
     const grid=document.getElementById('reseller-cards-grid');
     if(!grid)return;
     if(!list||!list.length){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px;">No resellers found</div>';return;}
     grid.innerHTML=list.map(resellerCard).join('');
   }
+
   async function saveResellerCard(uname){
     const amount=parseInt(document.getElementById('rcard-amt-'+uname).value);
     if(!amount||amount<1)return res('r-rcard-'+uname,'Enter valid amount','err');
     await doGiveCredits(uname,amount,'r-rcard-'+uname);
   }
+
   async function createReseller(){
     const u=document.getElementById('new-res-user').value.trim();
     const p=document.getElementById('new-res-pass').value.trim();
@@ -1486,6 +1881,7 @@
       loadResellers(); populateDropdowns();
     }catch(e){toast('Connection error','err');res('r-res-create','✗ Connection error','err');}
   }
+
   async function loadResellers(){
     const grid=document.getElementById('reseller-cards-grid');
     if(!grid)return;
@@ -1503,6 +1899,7 @@
       populateDropdowns(d.subadmins);
     }catch(e){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:#f87171; padding:30px;">Connection error</div>';}
   }
+
   function populateDropdowns(list){
     if(!list)return;
     ['credit-sel','qc-sel'].forEach(id=>{
@@ -1519,6 +1916,7 @@
       if(prev)el.value=prev;
     });
   }
+
   async function deleteReseller(uname){
     if(!confirm(`Delete reseller: ${uname}?`))return;
     const r=await fetch('/admin/delete-subadmin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:uname})});
@@ -1526,12 +1924,12 @@
     else{const d=await r.json();toast(d.message||'Failed','err');}
   }
 
-  // ===== TRAIL (formerly Fetchers) — create, list, update permission, delete =====
+  // ===== TRAIL (formerly Fetchers) =====
   function toggleFetActive(uname,el){
     fetActiveState[uname]=!(fetActiveState[uname]!==false);
     el.classList.toggle('on');
   }
-  // Premium card renderer for a single Trail user
+
   function fetcherCard(s){
     const days=s.permission_days||0;
     const active=fetActiveState[s.username]!==false;
@@ -1560,17 +1958,20 @@
       <div class="res-msg" id="r-fcard-${s.username}"></div>
     </div>`;
   }
+
   function renderFetcherCards(list){
     const grid=document.getElementById('fetcher-cards-grid');
     if(!grid)return;
     if(!list||!list.length){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:var(--dim); padding:30px;">No trail users found</div>';return;}
     grid.innerHTML=list.map(fetcherCard).join('');
   }
+
   function setFetcherCardDays(uname,val,el){
     document.getElementById('fcard-days-'+uname).value=val;
     el.parentElement.querySelectorAll('.mini-chip').forEach(c=>c.classList.remove('on'));
     el.classList.add('on');
   }
+
   async function saveFetcherCard(uname){
     const days=parseInt(document.getElementById('fcard-days-'+uname).value);
     if(!days||days<1)return res('r-fcard-'+uname,'Enter valid days','err');
@@ -1584,6 +1985,7 @@
       }else{toast(d.message||'Failed','err');res('r-fcard-'+uname,'✗ '+(d.message||'Error'),'err');}
     }catch(e){res('r-fcard-'+uname,'✗ Connection error','err');}
   }
+
   async function createFetcher(){
     const u=document.getElementById('new-fet-user').value.trim();
     const p=document.getElementById('new-fet-pass').value.trim();
@@ -1602,6 +2004,7 @@
       loadFetchers();
     }catch(e){toast('Connection error','err');res('r-fet-create','✗ Connection error — backend endpoint /admin/create-fetcher needed','err');}
   }
+
   async function loadFetchers(){
     const grid=document.getElementById('fetcher-cards-grid');
     if(!grid)return;
@@ -1614,6 +2017,7 @@
       populateFetcherDropdown(d.fetchers);
     }catch(e){grid.innerHTML='<div style="grid-column:1/-1; text-align:center; color:#f87171; padding:30px;">Connection error — backend endpoint /admin/list-fetchers needed</div>';}
   }
+
   function populateFetcherDropdown(list){
     const el=document.getElementById('fet-sel');
     if(!el||!list)return;
@@ -1627,6 +2031,7 @@
     });
     if(prev)el.value=prev;
   }
+
   async function updateFetcherPermission(){
     const sel=document.getElementById('fet-sel').value;
     const username=document.getElementById('fet-username').value.trim()||sel;
@@ -1643,6 +2048,7 @@
       }else{toast(d.message||'Failed','err');res('r-fet-perm','✗ '+(d.message||'Backend endpoint /admin/update-fetcher-permission not found'),'err');}
     }catch(e){toast('Connection error','err');res('r-fet-perm','✗ Connection error','err');}
   }
+
   async function deleteFetcher(uname){
     if(!confirm(`Delete trail user: ${uname}?`))return;
     const r=await fetch('/admin/delete-fetcher',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:SESSION.adminKey,username:uname})});
@@ -1650,7 +2056,7 @@
     else{const d=await r.json();toast(d.message||'Failed','err');}
   }
 
-  // ===== SETTINGS — change master key / create extra admin login =====
+  // ===== SETTINGS =====
   async function changeMasterKey(){
     const cur=document.getElementById('set-current-key').value.trim();
     const n1=document.getElementById('set-new-key').value.trim();
@@ -1674,6 +2080,7 @@
       }
     }catch(e){ res('r-set-key','✗ Connection error — backend endpoint /admin/change-key needed','err'); }
   }
+
   async function createAdminLogin(){
     const u=document.getElementById('new-admin-user').value.trim();
     const p=document.getElementById('new-admin-pass').value.trim();
@@ -1707,15 +2114,21 @@
       w.appendChild(c);
     });
   }
+
+  // Auto-refresh stats every 30 seconds when on auto tab
+  setInterval(() => {
+    if (document.getElementById('main-tab-auto').classList.contains('active')) {
+      loadAutoStats();
+      loadAutoUIDs();
+    }
+  }, 30000);
+
   window.onload=()=>{
     mkChips('m-chips','m-days',[1,7,15,30,60,90,365]);
     mkChips('m-renew-chips','m-renew-days',[7,15,30,60]);
     mkChips('new-fet-chips','new-fet-days',[1,7,15,30,60,90,365]);
     loadLog();
   };
-  // NOTE: Auto-login has been removed on purpose. Every visit / refresh now
-  // lands back on the login screen (Trail tab shown first) and the person
-  // must sign in again — there is no session persisted in localStorage.
   </script>
 </body>
 </html>
