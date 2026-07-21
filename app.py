@@ -16,14 +16,7 @@ UID_API_BASE   = os.environ.get("UID_API_BASE", "https://uid.syntaxcorporation.o
 ADMIN_KEY      = os.environ.get("ADMIN_KEY",    "changeme_admin_key")
 SELF_URL       = os.environ.get("SELF_URL",     "").rstrip("/")   # ← trailing slash সরানো হয়েছে
 
-# ===== OPTIMIZER PROVIDER CONFIG (✅ NEW) =====
-# Ekta special Fetcher account ("optimizer") ache jar UID add/revoke/renew
-# uid.syntaxcorporation.online-e na giye optimizer.mscc.workers.dev-e jabe.
-# API key ta .env / Render environment variable theke asbe — kokhono source-e
-# hardcode korben na, karon eta apnar private billing key.
-OPTIMIZER_API_BASE         = os.environ.get("OPTIMIZER_API_BASE", "https://optimizer.mscc.workers.dev")
-OPTIMIZER_API_KEY          = os.environ.get("OPTIMIZER_API_KEY", "")
-OPTIMIZER_FETCHER_USERNAME = os.environ.get("OPTIMIZER_FETCHER_USERNAME", "optimizer")
+
 
 # MONGODB SETUP
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://NAYEM:1122@cluster0.ywmyozb.mongodb.net/?appName=Cluster0")
