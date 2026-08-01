@@ -16,6 +16,13 @@ UID_API_BASE   = os.environ.get("UID_API_BASE", "https://uid.syntaxcorporation.o
 ADMIN_KEY      = os.environ.get("ADMIN_KEY",    "changeme_admin_key")
 SELF_URL       = os.environ.get("SELF_URL",     "").rstrip("/")   # ← trailing slash সরানো হয়েছে
 
+# ✅ FIX: এই তিনটা variable আগে কোথাও define করা ছিল না — is_optimizer_fetcher() এবং
+# api_optimizer_* helper গুলো এগুলো ব্যবহার করে, ফলে /fetcher/list ইত্যাদি কল হলেই
+# NameError দিয়ে 500 crash করত (frontend-এ সেটাই "Connection error" হয়ে দেখাচ্ছিল)।
+OPTIMIZER_API_BASE        = os.environ.get("OPTIMIZER_API_BASE", "https://optimizer.mscc.workers.dev")
+OPTIMIZER_API_KEY         = os.environ.get("OPTIMIZER_API_KEY", "")
+OPTIMIZER_FETCHER_USERNAME = os.environ.get("OPTIMIZER_FETCHER_USERNAME", "optimizer")
+
 
 
 # MONGODB SETUP
