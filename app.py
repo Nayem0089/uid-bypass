@@ -2,8 +2,11 @@ import os
 import requests
 import threading
 import time
+# pyrefly: ignore [missing-import]
 from flask import Flask, request, jsonify, render_template
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
+# pyrefly: ignore [missing-import]
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 
@@ -15,15 +18,6 @@ app = Flask(__name__)
 UID_API_BASE   = os.environ.get("UID_API_BASE", "https://uid.syntaxcorporation.online")
 ADMIN_KEY      = os.environ.get("ADMIN_KEY",    "changeme_admin_key")
 SELF_URL       = os.environ.get("SELF_URL",     "").rstrip("/")   # ← trailing slash সরানো হয়েছে
-
-# ✅ FIX: এই তিনটা variable আগে কোথাও define করা ছিল না — is_optimizer_fetcher() এবং
-# api_optimizer_* helper গুলো এগুলো ব্যবহার করে, ফলে /fetcher/list ইত্যাদি কল হলেই
-# NameError দিয়ে 500 crash করত (frontend-এ সেটাই "Connection error" হয়ে দেখাচ্ছিল)।
-OPTIMIZER_API_BASE        = os.environ.get("OPTIMIZER_API_BASE", "https://optimizer.mscc.workers.dev")
-OPTIMIZER_API_KEY         = os.environ.get("OPTIMIZER_API_KEY", "")
-OPTIMIZER_FETCHER_USERNAME = os.environ.get("OPTIMIZER_FETCHER_USERNAME", "optimizer")
-
-
 
 # MONGODB SETUP
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://NAYEM:1122@cluster0.ywmyozb.mongodb.net/?appName=Cluster0")
@@ -119,64 +113,6 @@ def api_list_uids():
         return [], 200
     docs = list(uid_ownership_col.find({}, {"_id": 0}))
     return docs, 200
-
-
-# ===== OPTIMIZER PROVIDER HELPERS (✅ NEW) =====
-# Same shape (data, status_code) as api_add_uid / api_remove_uid / api_list_uids
-# so the existing fetcher_* routes can call these interchangeably.
-
-def _optimizer_headers():
-    return {"X-API-Key": OPTIMIZER_API_KEY, "Content-Type": "application/json"}
-
-def api_optimizer_add_uid(uid, days=1):
-    """Creates (or re-creates) a custom-keyed license on the Optimizer worker,
-    using the fetcher's `uid` input as the license key."""
-    url = f"{OPTIMIZER_API_BASE}/api/v1/licenses/custom"
-    try:
-        r = requests.post(
-            url, headers=_optimizer_headers(),
-            json={"key": uid, "days": days, "hwid_lock": True},
-            timeout=20
-        )
-        try:
-            data = r.json()
-        except Exception:
-            data = {"message": r.text}
-        return data, r.status_code
-    except requests.exceptions.RequestException as e:
-        return {"error": str(e)}, 503
-
-def api_optimizer_remove_uid(uid):
-    url = f"{OPTIMIZER_API_BASE}/api/v1/licenses/revoke"
-    try:
-        r = requests.post(url, headers=_optimizer_headers(), json={"key": uid}, timeout=20)
-        try:
-            data = r.json()
-        except Exception:
-            data = {"message": r.text}
-        return data, r.status_code
-    except requests.exceptions.RequestException as e:
-        return {"error": str(e)}, 503
-
-def api_optimizer_list_uids():
-    url = f"{OPTIMIZER_API_BASE}/api/v1/licenses"
-    try:
-        r = requests.get(url, headers=_optimizer_headers(), timeout=20)
-        try:
-            data = r.json()
-        except Exception:
-            data = {"message": r.text}
-        if r.status_code != 200:
-            return [], r.status_code
-        # Normalize to a list regardless of whether the worker wraps it (e.g. {"licenses": [...]})
-        if isinstance(data, list):
-            return data, 200
-        return data.get("licenses", data.get("data", [])), 200
-    except requests.exceptions.RequestException as e:
-        return [], 503
-
-def is_optimizer_fetcher(username):
-    return username == OPTIMIZER_FETCHER_USERNAME
 
 
 # ===== HELPERS =====
@@ -731,12 +667,6 @@ def fetcher_list():
     if not verify_fetcher(username, password):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
 
-    if is_optimizer_fetcher(username):
-        my_uids, code = api_optimizer_list_uids()
-        if code != 200:
-            return jsonify({"status": "error", "message": "Failed to fetch licenses from Optimizer"}), code
-        return jsonify({"status": "success", "total": len(my_uids), "licenses": my_uids}), 200
-
     all_uids, code = api_list_uids()
     if code != 200:
         return jsonify({"status": "error", "message": "Failed to fetch UIDs"}), code
@@ -770,11 +700,7 @@ def fetcher_create():
         return jsonify({"status": "error", "message": "uid required"}), 400
 
     # Ignore any "days" the client might send — always use the server-side permission.
-    if is_optimizer_fetcher(username):
-        data, code = api_optimizer_add_uid(uid, permission_days)
-    else:
-        data, code = api_add_uid(uid, permission_days)
-
+    data, code = api_add_uid(uid, permission_days)
     if code in (200, 201):
         save_uid_meta(uid, name, permission_days, owner=username, extend=False)
         return jsonify({"status": "success", "message": f"UID added ({permission_days}d)", "data": data}), 200
@@ -799,11 +725,7 @@ def fetcher_revoke():
         if ownership and ownership.get("owner") != username:
             return jsonify({"status": "error", "message": "You can only remove UIDs you added"}), 403
 
-    if is_optimizer_fetcher(username):
-        data, code = api_optimizer_remove_uid(uid)
-    else:
-        data, code = api_remove_uid(uid)
-
+    data, code = api_remove_uid(uid)
     if uid_ownership_col is not None:
         uid_ownership_col.delete_one({"uid": uid})
     if code == 200:
@@ -833,12 +755,8 @@ def fetcher_update():
             return jsonify({"status": "error", "message": "You can only renew UIDs you added"}), 403
 
     # Ignore any "days" the client might send — always renew by the server-side permission.
-    if is_optimizer_fetcher(username):
-        api_optimizer_remove_uid(uid)
-        data, code = api_optimizer_add_uid(uid, permission_days)
-    else:
-        api_remove_uid(uid)
-        data, code = api_add_uid(uid, permission_days)
+    api_remove_uid(uid)
+    data, code = api_add_uid(uid, permission_days)
     if code in (200, 201):
         existing_name = "Player"
         if uid_ownership_col is not None:
@@ -848,6 +766,23 @@ def fetcher_update():
         save_uid_meta(uid, existing_name, permission_days, owner=username, extend=True)
         return jsonify({"status": "success", "message": f"UID {uid} renewed {permission_days}d", "data": data}), 200
     return jsonify({"status": "error", "message": data.get("message", data.get("error", "API error"))}), code
+
+
+# ===== ADMIN — CHANGE KEY =====
+@app.route('/admin/change-key', methods=['POST'])
+def admin_change_key():
+    global ADMIN_KEY
+    body = request.json or {}
+    old_key = body.get("admin_key", "").strip()
+    new_key = body.get("new_key", "").strip()
+    if not old_key or not new_key:
+        return jsonify({"status": "error", "message": "Both current key and new key are required"}), 400
+    if old_key != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Current admin key is incorrect"}), 403
+    if len(new_key) < 6:
+        return jsonify({"status": "error", "message": "New key must be at least 6 characters"}), 400
+    ADMIN_KEY = new_key
+    return jsonify({"status": "success", "message": "Master admin key updated successfully"}), 200
 
 
 # ===== DB STATUS =====
