@@ -650,6 +650,36 @@ def fetcher_login():
     return jsonify({"status": "error", "message": "Invalid credentials"}), 403
 
 
+# ===== ✅ UNIFIED LOGIN (auto-detects main_admin / sub_admin / fetcher) =====
+@app.route('/unified/login', methods=['POST'])
+def unified_login():
+    """
+    Frontend single login box সব role-এর জন্য এই একটাই endpoint কল করে।
+    identifier = admin_key OR username, password = password (admin_key হলে ফাঁকা থাকতে পারে)
+    """
+    body = request.json or {}
+    identifier = (body.get("identifier") or "").strip()
+    password   = (body.get("password") or "").strip()
+
+    if not identifier and not password:
+        return jsonify({"status": "error", "message": "Identifier or password required"}), 400
+
+    # 1) Main Admin — identifier is treated as the master admin key
+    #    (works whether the key was typed into the identifier box or password box)
+    if identifier == ADMIN_KEY or password == ADMIN_KEY:
+        return jsonify({"status": "success", "role": "main_admin", "admin_key": ADMIN_KEY}), 200
+
+    # 2) Sub-Admin (Reseller)
+    if verify_subadmin(identifier, password):
+        return jsonify({"status": "success", "role": "sub_admin", "username": identifier}), 200
+
+    # 3) Fetcher (Trail)
+    if verify_fetcher(identifier, password):
+        return jsonify({"status": "success", "role": "fetcher", "username": identifier}), 200
+
+    return jsonify({"status": "error", "message": "Invalid username, password, or Master Key"}), 403
+
+
 @app.route('/fetcher/permission', methods=['GET'])
 def fetcher_permission():
     username = request.args.get("username", "")
