@@ -209,6 +209,17 @@ def get_fetcher_permission_days(username):
     return int(doc.get("permission_days", 0))
 
 
+def get_client_ip():
+    """Extracts client IP address respecting reverse proxies (Render, Cloudflare, Nginx)"""
+    if request.headers.get("CF-Connecting-IP"):
+        return request.headers.get("CF-Connecting-IP").split(",")[0].strip()
+    if request.headers.get("X-Forwarded-For"):
+        return request.headers.get("X-Forwarded-For").split(",")[0].strip()
+    if request.headers.get("X-Real-IP"):
+        return request.headers.get("X-Real-IP").split(",")[0].strip()
+    return request.remote_addr or "127.0.0.1"
+
+
 def verify_trail_user(username, password):
     """Trail user login check."""
     if trail_users_col is None:
@@ -559,6 +570,10 @@ def list_trail_users():
         return jsonify({"status": "error", "message": "Database not connected"}), 500
 
     users = list(trail_users_col.find({}, {"_id": 0, "password": 0}))
+    if trail_keys_col is not None:
+        for u in users:
+            uname = u.get("username")
+            u["claimed_count"] = trail_keys_col.count_documents({"claimed_by": uname, "status": "claimed"})
     return jsonify({
         "status": "success",
         "total": len(users),
@@ -579,15 +594,15 @@ def delete_trail_user():
     if not user:
         return jsonify({"status": "error", "message": "Trail user not found"}), 404
 
-    claimed_key = user.get("claimed_key")
-    if claimed_key and trail_keys_col is not None:
-        trail_keys_col.update_one(
-            {"key": claimed_key},
-            {"$set": {"status": "available", "claimed_by": None, "claimed_at": None}}
+    # Release any keys claimed by this username back to pool
+    if trail_keys_col is not None:
+        trail_keys_col.update_many(
+            {"claimed_by": username},
+            {"$set": {"status": "available", "claimed_by": None, "claimed_ip": None, "claimed_at": None}}
         )
 
     trail_users_col.delete_one({"username": username})
-    return jsonify({"status": "success", "message": f"Trail user '{username}' deleted"}), 200
+    return jsonify({"status": "success", "message": f"Trail user '{username}' deleted (associated keys returned to pool)"}), 200
 
 
 @app.route('/admin/add-trail-keys', methods=['POST'])
@@ -624,6 +639,7 @@ def add_trail_keys():
                 "key": k,
                 "status": "available",
                 "claimed_by": None,
+                "claimed_ip": None,
                 "claimed_at": None,
                 "added_at": now_iso
             })
@@ -676,8 +692,40 @@ def delete_trail_key():
 
     if trail_users_col is not None:
         trail_users_col.update_many({"claimed_key": key}, {"$set": {"claimed_key": None, "claimed_at": None}})
+        trail_users_col.update_many({"claimed_keys": key}, {"$pull": {"claimed_keys": key}})
 
     return jsonify({"status": "success", "message": "Key deleted from pool"}), 200
+
+
+@app.route('/admin/reset-trail-key', methods=['POST'])
+def reset_trail_key():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if trail_keys_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    key = body.get("key", "").strip()
+    if not key:
+        return jsonify({"status": "error", "message": "Key is required"}), 400
+
+    result = trail_keys_col.update_one(
+        {"key": key},
+        {"$set": {
+            "status": "available",
+            "claimed_by": None,
+            "claimed_ip": None,
+            "claimed_at": None
+        }}
+    )
+    if result.matched_count == 0:
+        return jsonify({"status": "error", "message": "Key not found"}), 404
+
+    if trail_users_col is not None:
+        trail_users_col.update_many({"claimed_key": key}, {"$set": {"claimed_key": None, "claimed_at": None}})
+        trail_users_col.update_many({"claimed_keys": key}, {"$pull": {"claimed_keys": key}})
+
+    return jsonify({"status": "success", "message": f"Key '{key}' reset to available pool"}), 200
 
 
 # ===== TRAIL USER ENDPOINTS =====
@@ -706,17 +754,29 @@ def trail_status():
     if not verify_trail_user(username, password):
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
 
-    user = trail_users_col.find_one({"username": username}, {"_id": 0, "password": 0})
+    client_ip = get_client_ip()
+
     available_stock = 0
     if trail_keys_col is not None:
         available_stock = trail_keys_col.count_documents({"status": "available"})
 
+    # Check if this IP address has already claimed a key
+    claimed_doc = None
+    if trail_keys_col is not None:
+        claimed_doc = trail_keys_col.find_one({
+            "claimed_ip": client_ip,
+            "status": "claimed"
+        })
+
+    has_key = bool(claimed_doc and claimed_doc.get("key"))
+
     return jsonify({
         "status": "success",
         "username": username,
-        "claimed_key": user.get("claimed_key") if user else None,
-        "claimed_at": user.get("claimed_at") if user else None,
-        "has_key": bool(user.get("claimed_key")) if user else False,
+        "client_ip": client_ip,
+        "claimed_key": claimed_doc.get("key") if has_key else None,
+        "claimed_at": claimed_doc.get("claimed_at") if has_key else None,
+        "has_key": has_key,
         "available_stock": available_stock
     }), 200
 
@@ -735,21 +795,31 @@ def trail_claim_key():
     if not user:
         return jsonify({"status": "error", "message": "User not found"}), 404
 
-    # 1 User = 1 Key limit
-    if user.get("claimed_key"):
+    client_ip = get_client_ip()
+
+    # Rule: 1 IP = 1 Key limit!
+    # A key claimed from an IP can never be claimed again, and that IP cannot claim another key.
+    existing_ip_claim = trail_keys_col.find_one({
+        "claimed_ip": client_ip,
+        "status": "claimed"
+    })
+    if existing_ip_claim:
         return jsonify({
             "status": "already_claimed",
-            "message": "You have already claimed your 1 Free Bypass Key!",
-            "key": user["claimed_key"],
-            "claimed_at": user.get("claimed_at")
+            "message": "This IP address has already claimed 1 Free Bypass Key!",
+            "key": existing_ip_claim["key"],
+            "claimed_at": existing_ip_claim.get("claimed_at"),
+            "client_ip": client_ip
         }), 200
 
     now_iso = datetime.utcnow().isoformat()
+    # Atomically pick an unclaimed key from the available pool
     claimed_doc = trail_keys_col.find_one_and_update(
         {"status": "available"},
         {"$set": {
             "status": "claimed",
             "claimed_by": username,
+            "claimed_ip": client_ip,
             "claimed_at": now_iso
         }},
         return_document=ReturnDocument.AFTER
@@ -765,17 +835,24 @@ def trail_claim_key():
 
     trail_users_col.update_one(
         {"username": username},
-        {"$set": {
-            "claimed_key": assigned_key,
-            "claimed_at": now_iso
-        }}
+        {
+            "$set": {
+                "latest_claimed_key": assigned_key,
+                "latest_claimed_at": now_iso
+            },
+            "$addToSet": {
+                "claimed_ips": client_ip,
+                "claimed_keys": assigned_key
+            }
+        }
     )
 
     return jsonify({
         "status": "success",
-        "message": "Free Bypass Key claimed successfully! (1 Key per user limit)",
+        "message": "Free Bypass Key claimed successfully! (1 Key per IP limit)",
         "key": assigned_key,
-        "claimed_at": now_iso
+        "claimed_at": now_iso,
+        "client_ip": client_ip
     }), 200
 
 

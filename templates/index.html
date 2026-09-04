@@ -942,7 +942,7 @@
             </div>
             <div class="table-container-card">
               <table class="app-table">
-                <thead><tr><th>Bypass Key</th><th>Status</th><th>Claimed By</th><th>Date</th><th>Action</th></tr></thead>
+                <thead><tr><th>Bypass Key</th><th>Status</th><th>Claimed User / IP</th><th>Date</th><th>Action</th></tr></thead>
                 <tbody id="m-tbody-trail-keys"><tr><td colspan="5" style="text-align:center; color:var(--ink-700); padding:25px;">Loading Keys...</td></tr></tbody>
               </table>
             </div>
@@ -956,7 +956,7 @@
             </div>
             <div class="table-container-card">
               <table class="app-table">
-                <thead><tr><th>Username</th><th>Note</th><th>Assigned Key (1 Key Limit)</th><th>Claimed Date</th><th>Action</th></tr></thead>
+                <thead><tr><th>Username</th><th>Note</th><th>Claimed Keys / Status</th><th>Claimed Date</th><th>Action</th></tr></thead>
                 <tbody id="m-tbody-trail-users"><tr><td colspan="5" style="text-align:center; color:var(--ink-700); padding:25px;">Loading Users...</td></tr></tbody>
               </table>
             </div>
@@ -1108,7 +1108,7 @@
             <div class="header-icon-badge" style="background:var(--emerald-dim); color:var(--emerald); border-color:var(--emerald-line);">⚡</div>
             <div>
               <h1 class="header-heading">FREE BYPASS <span>TRAIL PORTAL</span></h1>
-              <div class="header-subtext">Claim your exclusive Free Bypass Key • 1 Account = 1 Key Limit</div>
+              <div class="header-subtext">Claim your exclusive Free Bypass Key • 1 Device/IP = 1 Key Limit</div>
             </div>
           </div>
           <div class="header-status-pill">
@@ -1118,10 +1118,16 @@
         </div>
 
         <!-- HERO STATUS BAR -->
-        <div class="credit-hero-bar" style="background:rgba(16,185,129,0.06); border-color:var(--emerald-line);">
-          <div class="credit-glow-pill" style="border-color:var(--emerald-line); background:var(--emerald-dim);">
-            <span style="color:#6ee7b7;">Account:</span>
-            <span class="credit-num-mono" id="trail-hero-username" style="color:#6ee7b7;">—</span>
+        <div class="credit-hero-bar" style="background:rgba(16,185,129,0.06); border-color:var(--emerald-line); flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div class="credit-glow-pill" style="border-color:var(--emerald-line); background:var(--emerald-dim);">
+              <span style="color:#6ee7b7;">Account:</span>
+              <span class="credit-num-mono" id="trail-hero-username" style="color:#6ee7b7;">—</span>
+            </div>
+            <div class="credit-glow-pill" style="border-color:var(--hairline-br); background:rgba(255,255,255,0.04);">
+              <span style="color:var(--ink-500);">Your IP:</span>
+              <span class="credit-num-mono" id="trail-hero-ip" style="color:#6ee7b7;">Detecting...</span>
+            </div>
           </div>
           <div id="trail-claim-state-badge" style="font-family:var(--f-mono); font-size:11.5px; padding:6px 14px; border-radius:var(--r-pill); background:var(--emerald-dim); color:#6ee7b7; border:1px solid var(--emerald-line); font-weight:600;">
             Checking Key Status...
@@ -1140,7 +1146,7 @@
             </h2>
             <p style="color:var(--ink-500); font-size:14px; max-width:540px; margin:0 auto 24px; line-height:1.6;">
               Click the button below to claim your unique Free Bypass Key from the pool. <br>
-              <b style="color:#6ee7b7;">Rule: 1 User can only claim 1 Key!</b> Once claimed, it is permanently locked to your account.
+              <b style="color:#6ee7b7;">Rule: 1 IP / Device can only claim 1 Key!</b> Once claimed, it is permanently locked to this IP address.
             </p>
             <div style="display:inline-flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border:1px solid var(--hairline); padding:8px 20px; border-radius:var(--r-pill); margin-bottom:30px; font-family:var(--f-mono); font-size:12.5px;">
               <span style="color:var(--ink-500);">Available Stock in Pool:</span>
@@ -1158,13 +1164,13 @@
           <!-- SECTION B: CLAIMED STATE (USER HAS ALREADY CLAIMED) -->
           <div id="user-trail-claimed-section" class="dashboard-card" style="display:none; text-align:center; padding:48px 32px; border-color:var(--emerald-line);">
             <div style="display:inline-flex; align-items:center; gap:8px; background:var(--emerald-dim); border:1px solid var(--emerald-line); padding:6px 18px; border-radius:var(--r-pill); font-family:var(--f-mono); font-size:11.5px; color:#6ee7b7; font-weight:700; margin-bottom:20px;">
-              <span>✓</span> 1 USER = 1 KEY ASSIGNED & LOCKED
+              <span>✓</span> 1 IP = 1 KEY ASSIGNED & LOCKED
             </div>
             <h2 style="font-family:var(--f-display); font-size:24px; font-weight:800; color:var(--ink-100); margin-bottom:10px;">
               Your Exclusive Free Bypass Key
             </h2>
             <p style="color:var(--ink-500); font-size:13px; margin-bottom:24px;">
-              This key is permanently bound to your account (<b id="user-display-uname" style="color:var(--ink-100);">User</b>). You can copy and use it anytime.
+              This key is permanently bound to your device IP (<b id="user-display-ip" style="color:#6ee7b7;">—</b>). You can copy and use it anytime.
             </p>
 
             <div class="claimed-key-box">
@@ -1185,9 +1191,9 @@
           <div class="dashboard-card" style="margin-top:24px;">
             <div class="card-head-title"><span style="color:var(--blue);">ℹ</span> Free Trail Guidelines & Policy</div>
             <ul style="color:var(--ink-500); font-size:12.5px; line-height:1.9; padding-left:20px;">
-              <li><strong style="color:var(--ink-300);">1 Key Per Account:</strong> Each user account is strictly entitled to exactly 1 Free Bypass Key.</li>
-              <li><strong style="color:var(--ink-300);">Permanent Assignment:</strong> Once claimed, your key remains permanently accessible to your account.</li>
-              <li><strong style="color:var(--ink-300);">Fast Re-access:</strong> Simply log into this portal anytime with your username and password to retrieve your key.</li>
+              <li><strong style="color:var(--ink-300);">1 Key Per IP / Device:</strong> Each unique IP address is strictly entitled to exactly 1 Free Bypass Key from the stock.</li>
+              <li><strong style="color:var(--ink-300);">Fresh Key Per IP:</strong> Each different IP address receives a brand new, previously unclaimed key.</li>
+              <li><strong style="color:var(--ink-300);">Permanent Lock:</strong> Once claimed from an IP, that key will never be given out to any other user or IP.</li>
             </ul>
           </div>
 
@@ -2043,7 +2049,7 @@
           ? `<span class="days-badge days-warn" style="font-weight:700;">Claimed</span>`
           : `<span class="days-badge days-safe" style="font-weight:700;">Available</span>`;
         const claimedUser = isClaimed
-          ? `<span class="status-badge badge-emerald">👤 ${k.claimed_by}</span>`
+          ? `<span class="status-badge badge-emerald">👤 ${k.claimed_by || 'User'}</span>${k.claimed_ip ? `<br><span style="font-family:var(--f-mono); font-size:10.5px; color:#6ee7b7; margin-top:3px; display:inline-block;">🌐 ${k.claimed_ip}</span>` : ''}`
           : `<span style="color:var(--ink-700);">Unclaimed</span>`;
         const displayDate = formatHumanDate(k.claimed_at || k.added_at);
 
@@ -2057,7 +2063,10 @@
             <td>${claimedUser}</td>
             <td style="font-family:var(--f-mono); font-size:11px; color:var(--ink-500);">${displayDate}</td>
             <td>
-              <button class="btn-sm-action btn-sm-red" onclick="adminDeleteTrailKeyAction('${k.key}')">Delete</button>
+              <div style="display:flex; gap:6px;">
+                ${isClaimed ? `<button class="btn-sm-action btn-sm-amber" onclick="adminResetTrailKeyAction('${k.key}')" title="Reset to available pool">Reset</button>` : ''}
+                <button class="btn-sm-action btn-sm-red" onclick="adminDeleteTrailKeyAction('${k.key}')">Delete</button>
+              </div>
             </td>
           </tr>
         `;
@@ -2069,9 +2078,31 @@
       const filtered = trailKeysList.filter(k =>
         (k.key || '').toLowerCase().includes(q) ||
         (k.claimed_by || '').toLowerCase().includes(q) ||
+        (k.claimed_ip || '').toLowerCase().includes(q) ||
         (k.status || '').toLowerCase().includes(q)
       );
       renderTrailKeysTable(filtered);
+    }
+
+    async function adminResetTrailKeyAction(key) {
+      if (!confirm(`Reset key '${key}' back to Available? The previous user/IP claim will be released.`)) return;
+      try {
+        const res = await fetch('/admin/reset-trail-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_key: SESSION.adminKey, key })
+        });
+        if (res.ok) {
+          notifyToast(`Key '${key}' returned to available pool`);
+          adminLoadTrailKeysAction();
+          adminLoadTrailUsersAction();
+        } else {
+          const d = await res.json();
+          notifyToast(d.message || 'Could not reset key', 'err');
+        }
+      } catch (e) {
+        notifyToast('Network error resetting key', 'err');
+      }
     }
 
     async function adminDeleteTrailKeyAction(key) {
@@ -2148,18 +2179,24 @@
           }
 
           tbody.innerHTML = trailUsersList.map(u => {
-            const hasKey = !!u.claimed_key;
-            const keyDisplay = hasKey
-              ? `<span class="mono-uid" style="color:#6ee7b7;">${u.claimed_key}</span>
-                 <button class="copy-pill-btn" onclick="navigator.clipboard.writeText('${u.claimed_key}'); notifyToast('Key copied');">Copy</button>`
-              : `<span class="days-badge days-warn">Not Claimed Yet</span>`;
+            const count = u.claimed_count || 0;
+            let statusDisplay;
+            if (count > 1) {
+              statusDisplay = `<span class="days-badge days-safe" style="font-weight:700;">⚡ ${count} Keys Claimed (IPs)</span>`;
+            } else if (count === 1 || u.claimed_key) {
+              const kStr = u.claimed_key || (u.claimed_keys && u.claimed_keys[0]) || '1 Key Claimed';
+              statusDisplay = `<span class="mono-uid" style="color:#6ee7b7;">${kStr}</span>
+                 <button class="copy-pill-btn" onclick="navigator.clipboard.writeText('${kStr}'); notifyToast('Key copied');">Copy</button>`;
+            } else {
+              statusDisplay = `<span class="days-badge days-warn">Not Claimed Yet</span>`;
+            }
 
             return `
               <tr>
                 <td><span class="status-badge badge-emerald">👤 ${u.username}</span></td>
                 <td style="color:var(--ink-500); font-size:11.5px;">${u.note || '—'}</td>
-                <td>${keyDisplay}</td>
-                <td style="font-family:var(--f-mono); font-size:11px; color:var(--ink-500);">${formatHumanDate(u.claimed_at)}</td>
+                <td>${statusDisplay}</td>
+                <td style="font-family:var(--f-mono); font-size:11px; color:var(--ink-500);">${formatHumanDate(u.latest_claimed_at || u.claimed_at)}</td>
                 <td>
                   <button class="btn-sm-action btn-sm-red" onclick="adminDeleteTrailUserAction('${u.username}')">Delete User</button>
                 </td>
@@ -2476,17 +2513,23 @@
 
         if (res.ok) {
           document.getElementById('trail-hero-username').textContent = username;
+          if (document.getElementById('trail-hero-ip')) {
+            document.getElementById('trail-hero-ip').textContent = data.client_ip || '—';
+          }
           document.getElementById('user-trail-stock').textContent = data.available_stock || 0;
 
           if (data.has_key && data.claimed_key) {
             currentUserClaimedKey = data.claimed_key;
-            stateBadge.innerHTML = '✓ ACTIVE KEY ASSIGNED (1 KEY LIMIT)';
+            stateBadge.innerHTML = '✓ ACTIVE KEY ASSIGNED (1 IP LIMIT)';
             stateBadge.style.background = 'var(--emerald-dim)';
             stateBadge.style.borderColor = 'var(--emerald-line)';
             stateBadge.style.color = '#6ee7b7';
 
             document.getElementById('user-display-key').textContent = data.claimed_key;
             document.getElementById('user-key-claimed-date').textContent = data.claimed_at ? new Date(data.claimed_at).toLocaleString() : 'Active';
+            if (document.getElementById('user-display-ip')) {
+              document.getElementById('user-display-ip').textContent = data.client_ip || 'Your IP';
+            }
 
             unclaimedSec.style.display = 'none';
             claimedSec.style.display = 'block';
@@ -2522,7 +2565,11 @@
         const data = await res.json();
 
         if (res.ok) {
-          notifyToast('🎉 Free Bypass Key claimed successfully!');
+          if (data.status === 'already_claimed') {
+            notifyToast('⚠️ This IP has already claimed a key!', 'warn');
+          } else {
+            notifyToast('🎉 Free Bypass Key claimed successfully!');
+          }
           trailFetchStatus();
         } else {
           showInlineMsg('msg-trail-claim', '✗ ' + (data.message || 'Could not claim key'), 'err');
