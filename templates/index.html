@@ -43,6 +43,10 @@
       --violet-dim: rgba(167,139,250,0.14);
       --violet-line: rgba(167,139,250,0.4);
 
+      --emerald:      #10b981;
+      --emerald-dim:  rgba(16,185,129,0.14);
+      --emerald-line: rgba(16,185,129,0.4);
+
       --blue:       #5eb1ff;
       --blue-dim:   rgba(94,177,255,0.14);
 
@@ -161,6 +165,7 @@
       padding: 1px;
       background: conic-gradient(from 0deg, var(--amber), var(--teal), var(--violet), var(--amber));
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
       -webkit-mask-composite: xor; mask-composite: exclude;
       animation: spinRing 6s linear infinite;
       opacity: 0.8;
@@ -456,6 +461,9 @@
     .btn-danger-action:hover { background: var(--alert-dim); }
     .btn-blue-action { background: var(--blue); color: #071322; }
     .btn-purple-action { background: var(--violet); color: #1c1230; }
+    .btn-green-action { background: var(--emerald); color: #022013; font-weight: 700; }
+    .btn-green-action:hover { filter: brightness(1.15); box-shadow: 0 0 20px rgba(16,185,129,0.3); }
+    .btn-teal-action { background: var(--teal); color: #02201c; font-weight: 700; }
 
     .btn-sm-action { width: auto; padding: 5px 12px; border-radius: var(--r-pill); font-family: var(--f-body); font-size: 11px; font-weight: 600; cursor: pointer; border: none; transition: all .18s; }
     .btn-sm-action:hover { transform: scale(1.04); }
@@ -465,6 +473,43 @@
     .btn-sm-blue:hover { background: var(--blue); color: #071322; }
     .btn-sm-purple { background: var(--violet-dim); border: 1px solid var(--violet-line); color: var(--violet); }
     .btn-sm-purple:hover { background: var(--violet); color: #1c1230; }
+    .btn-sm-green { background: var(--emerald-dim); border: 1px solid var(--emerald-line); color: #6ee7b7; }
+    .btn-sm-green:hover { background: var(--emerald); color: #022013; }
+
+    .pulse-glow { animation: pulseEmerald 2s infinite; }
+    @keyframes pulseEmerald {
+      0%, 100% { box-shadow: 0 0 10px rgba(16,185,129,0.25); }
+      50% { box-shadow: 0 0 25px rgba(16,185,129,0.6); transform: scale(1.01); }
+    }
+
+    .claimed-key-box {
+      background: rgba(16,185,129,0.06);
+      border: 1px solid var(--emerald-line);
+      border-radius: var(--r-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin: 16px 0;
+      position: relative;
+    }
+    .key-display-text {
+      font-family: var(--f-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: #6ee7b7;
+      letter-spacing: 2px;
+      background: rgba(0,0,0,0.5);
+      padding: 16px 24px;
+      border-radius: var(--r-sm);
+      border: 1px dashed var(--emerald-line);
+      width: 100%;
+      text-align: center;
+      word-break: break-all;
+      user-select: all;
+    }
+    .badge-emerald { background: var(--emerald-dim); color: #6ee7b7; border: 1px solid var(--emerald-line); }
 
     /* Tables */
     .table-container-card { border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--hairline); background: rgba(255,255,255,0.015); }
@@ -665,8 +710,8 @@
         </button>
 
         <button class="nav-btn" id="nav-btn-fetchers" style="display:none;" onclick="navigateTab('fetchers')">
-          <div class="nav-icon-box">◎</div>
-          <span class="sidebar-text">Fetchers</span>
+          <div class="nav-icon-box" style="color:var(--emerald);">⚡</div>
+          <span class="sidebar-text">FREE BYPASS TRAIL</span>
         </button>
 
         <button class="nav-btn" id="nav-btn-credit" style="display:none;" onclick="navigateTab('credit')">
@@ -838,67 +883,81 @@
 
         </div>
 
-        <!-- TAB 3: FETCHERS -->
+        <!-- TAB 3: FREE BYPASS TRAIL -->
         <div id="view-tab-fetchers" class="panel-view-tab">
 
           <div class="dashboard-header">
             <div class="header-title-box">
-              <div class="header-icon-badge">◎</div>
-              <div><h1 class="header-heading">Fetcher <span>Management</span></h1><div class="header-subtext">Third-tier users with fixed UID validity duration</div></div>
+              <div class="header-icon-badge" style="background:var(--emerald-dim); color:var(--emerald); border-color:var(--emerald-line);">⚡</div>
+              <div>
+                <h1 class="header-heading">FREE BYPASS <span>TRAIL</span></h1>
+                <div class="header-subtext">Pre-load keys stock & manage trail users (1 User = 1 Key limit)</div>
+              </div>
             </div>
+            <div class="header-status-pill">
+              <span class="status-dot-live"></span>
+              <span>1 Key Per User Enforced</span>
+            </div>
+          </div>
+
+          <div class="metrics-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="metric-card"><div class="metric-value white" id="tr-stat-total-keys">0</div><div class="metric-label">Total Stock Keys</div></div>
+            <div class="metric-card"><div class="metric-value green" id="tr-stat-avail-keys">0</div><div class="metric-label">Available (Unclaimed)</div></div>
+            <div class="metric-card"><div class="metric-value amber" id="tr-stat-claimed-keys">0</div><div class="metric-label">Claimed Keys</div></div>
+            <div class="metric-card"><div class="metric-value blue" id="tr-stat-total-users">0</div><div class="metric-label">Trail Users</div></div>
           </div>
 
           <div class="dashboard-grid-2">
 
-            <div class="dashboard-card">
-              <div class="card-head-title">Create Fetcher Account</div>
-              <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:14px;">Every UID added by this fetcher will automatically have the configured validity duration.</p>
-              <input type="text" id="fet-new-user" class="input-field-app" placeholder="Fetcher Username">
-              <input type="password" id="fet-new-pass" class="input-field-app" placeholder="Password">
-              <input type="text" id="fet-new-note" class="input-field-app" placeholder="Note (Optional)">
-              <select id="fet-new-days" class="input-field-app">
-                <option value="1">1 Day Permission</option>
-                <option value="7">7 Days Permission</option>
-                <option value="15">15 Days Permission</option>
-                <option value="30" selected>30 Days Permission</option>
-                <option value="60">60 Days Permission</option>
-                <option value="90">90 Days Permission</option>
-                <option value="365">1 Year Permission</option>
-              </select>
-              <div class="duration-chips-wrap" id="fet-chips-container"></div>
-              <button class="app-btn btn-purple-action" onclick="createFetcherAction()"><span>Create Fetcher</span></button>
-              <div class="inline-msg-box" id="msg-fet-create"></div>
+            <!-- Card 1: Pre-load Keys Stock -->
+            <div class="dashboard-card" style="border-color:var(--emerald-line);">
+              <div class="card-head-title"><span style="color:var(--emerald);">⚡</span> Pre-load Free Bypass Keys (Key Pool)</div>
+              <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:12px;">Admin pre-stores keys here. Each user will get exactly 1 key from this stock when they log in.</p>
+              <textarea id="tr-keys-input" class="input-field-app" rows="4" style="resize:vertical; min-height:88px; font-family:var(--f-mono); font-size:12px;" placeholder="Paste keys here (one key per line, or comma-separated)...&#10;e.g.&#10;BYPASS-FREE-KEY-001&#10;BYPASS-FREE-KEY-002&#10;BYPASS-FREE-KEY-003"></textarea>
+              <button class="app-btn btn-green-action" onclick="adminAddTrailKeysAction()"><span>📥 Deposit Keys into Stock</span></button>
+              <div class="inline-msg-box" id="msg-tr-keys"></div>
             </div>
 
+            <!-- Card 2: Create Trail User Account -->
             <div class="dashboard-card">
-              <div class="card-head-title">Update Fetcher Permission</div>
-              <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:14px;">Modify the validity duration granted to an existing fetcher.</p>
-              <select id="fet-update-sel" class="input-field-app" onchange="syncFetcherSel()"><option value="">— Select Fetcher —</option></select>
-              <input type="text" id="fet-update-user-inp" class="input-field-app" placeholder="Or type username manually">
-              <select id="fet-update-days" class="input-field-app">
-                <option value="1">1 Day</option>
-                <option value="7">7 Days</option>
-                <option value="15">15 Days</option>
-                <option value="30" selected>30 Days</option>
-                <option value="60">60 Days</option>
-                <option value="90">90 Days</option>
-                <option value="365">1 Year</option>
-              </select>
-              <button class="app-btn btn-blue-action" onclick="updateFetcherPermAction()"><span>Update Permission</span></button>
-              <div class="inline-msg-box" id="msg-fet-update"></div>
+              <div class="card-head-title"><span style="color:var(--teal);">👤</span> Create Trail User Account</div>
+              <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:12px;">Create credentials for users so they can log in to claim their 1 key.</p>
+              <input type="text" id="tr-new-user" class="input-field-app" placeholder="Trail Username">
+              <input type="password" id="tr-new-pass" class="input-field-app" placeholder="Password">
+              <input type="text" id="tr-new-note" class="input-field-app" placeholder="Note / Reference (Optional)">
+              <button class="app-btn btn-teal-action" onclick="adminCreateTrailUserAction()"><span>Create Trail Account</span></button>
+              <div class="inline-msg-box" id="msg-tr-user"></div>
             </div>
 
           </div>
 
-          <div class="dashboard-card dashboard-card-full">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-              <div class="card-head-title" style="margin:0;">Active Fetcher Accounts</div>
-              <button class="app-btn btn-dark-action" style="width:auto; padding:8px 20px;" onclick="loadFetchersAction()"><span>Refresh List</span></button>
+          <!-- Table 1: Key Pool Stock -->
+          <div class="dashboard-card dashboard-card-full" style="margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+              <div class="card-head-title" style="margin:0;"><span style="color:var(--emerald);">🔑</span> Free Bypass Keys Stock</div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="tr-search-keys" class="input-field-app" style="margin:0; width:220px; padding:8px 12px; font-size:12px;" placeholder="Filter keys..." onkeyup="filterTrailKeysTable()">
+                <button class="app-btn btn-dark-action" style="width:auto; padding:8px 18px;" onclick="adminLoadTrailKeysAction()"><span>Refresh Keys</span></button>
+              </div>
             </div>
             <div class="table-container-card">
               <table class="app-table">
-                <thead><tr><th>Username</th><th>Note</th><th>Assigned Permission</th><th>Actions</th></tr></thead>
-                <tbody id="m-tbody-fetchers"><tr><td colspan="4" style="text-align:center; color:var(--ink-700); padding:30px;">Loading Fetchers...</td></tr></tbody>
+                <thead><tr><th>Bypass Key</th><th>Status</th><th>Claimed By</th><th>Date</th><th>Action</th></tr></thead>
+                <tbody id="m-tbody-trail-keys"><tr><td colspan="5" style="text-align:center; color:var(--ink-700); padding:25px;">Loading Keys...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Table 2: Registered Trail Users -->
+          <div class="dashboard-card dashboard-card-full">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+              <div class="card-head-title" style="margin:0;"><span style="color:var(--teal);">👥</span> Registered Trail User Accounts</div>
+              <button class="app-btn btn-dark-action" style="width:auto; padding:8px 18px;" onclick="adminLoadTrailUsersAction()"><span>Refresh Users</span></button>
+            </div>
+            <div class="table-container-card">
+              <table class="app-table">
+                <thead><tr><th>Username</th><th>Note</th><th>Assigned Key (1 Key Limit)</th><th>Claimed Date</th><th>Action</th></tr></thead>
+                <tbody id="m-tbody-trail-users"><tr><td colspan="5" style="text-align:center; color:var(--ink-700); padding:25px;">Loading Users...</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -1041,60 +1100,97 @@
 
       </div>
 
-      <!-- PANEL C: FETCHER -->
-      <div id="fetcher-panel" class="workspace-page">
+      <!-- PANEL C: FREE BYPASS TRAIL PORTAL -->
+      <div id="trail-panel" class="workspace-page">
 
         <div class="dashboard-header">
           <div class="header-title-box">
-            <div class="header-icon-badge">◎</div>
-            <div><h1 class="header-heading">Fetcher <span>Vault</span></h1><div class="header-subtext">Assigned validity UID operations</div></div>
+            <div class="header-icon-badge" style="background:var(--emerald-dim); color:var(--emerald); border-color:var(--emerald-line);">⚡</div>
+            <div>
+              <h1 class="header-heading">FREE BYPASS <span>TRAIL PORTAL</span></h1>
+              <div class="header-subtext">Claim your exclusive Free Bypass Key • 1 Account = 1 Key Limit</div>
+            </div>
+          </div>
+          <div class="header-status-pill">
+            <span class="status-dot-live"></span>
+            <span id="trail-portal-status-text">Connected</span>
           </div>
         </div>
 
-        <div class="credit-hero-bar">
-          <div class="credit-glow-pill purple"><span>Fixed Permission:</span><span class="credit-num-mono" id="f-hero-perm">0</span><span>Days / UID</span></div>
+        <!-- HERO STATUS BAR -->
+        <div class="credit-hero-bar" style="background:rgba(16,185,129,0.06); border-color:var(--emerald-line);">
+          <div class="credit-glow-pill" style="border-color:var(--emerald-line); background:var(--emerald-dim);">
+            <span style="color:#6ee7b7;">Account:</span>
+            <span class="credit-num-mono" id="trail-hero-username" style="color:#6ee7b7;">—</span>
+          </div>
+          <div id="trail-claim-state-badge" style="font-family:var(--f-mono); font-size:11.5px; padding:6px 14px; border-radius:var(--r-pill); background:var(--emerald-dim); color:#6ee7b7; border:1px solid var(--emerald-line); font-weight:600;">
+            Checking Key Status...
+          </div>
         </div>
 
-        <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div class="metric-card"><div class="metric-value white" id="f-stat-total">—</div><div class="metric-label">Total UIDs</div></div>
-          <div class="metric-card"><div class="metric-value green" id="f-stat-active">—</div><div class="metric-label">Active Licenses</div></div>
-          <div class="metric-card"><div class="metric-value red" id="f-stat-expired">—</div><div class="metric-label">Expired Licenses</div></div>
-        </div>
+        <div style="max-width:820px; margin:20px auto 40px;">
 
-        <div class="dashboard-grid-2">
-
-          <div class="dashboard-card">
-            <div class="card-head-title">Add UID <span style="font-family:var(--f-mono); font-size:11px; color:var(--violet); font-weight:400;">(Fixed Duration)</span></div>
-            <input type="text" id="f-inp-uid" class="input-field-app" placeholder="User ID">
-            <input type="text" id="f-inp-name" class="input-field-app" placeholder="Player Name">
-            <p style="font-size:11.5px; color:var(--ink-500); margin:-4px 0 14px;">Every UID created will be valid for exactly <b id="f-desc-days" style="color:var(--ink-100);">—</b> days set by Master Admin.</p>
-            <button class="app-btn btn-purple-action" onclick="fetcherAddUIDAction()"><span>Save UID</span></button>
-            <div class="inline-msg-box" id="msg-f-add"></div>
+          <!-- SECTION A: UNCLAIMED STATE (USER HAS NOT CLAIMED YET) -->
+          <div id="user-trail-unclaimed-section" class="dashboard-card" style="display:none; text-align:center; padding:48px 32px; border-color:var(--emerald-line); box-shadow:0 0 50px rgba(16,185,129,0.08);">
+            <div style="width:76px; height:76px; border-radius:50%; background:var(--emerald-dim); border:1px solid var(--emerald-line); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:36px;">
+              🔑
+            </div>
+            <h2 style="font-family:var(--f-display); font-size:24px; font-weight:800; color:var(--ink-100); margin-bottom:12px;">
+              Your Free Bypass Key Is Ready!
+            </h2>
+            <p style="color:var(--ink-500); font-size:14px; max-width:540px; margin:0 auto 24px; line-height:1.6;">
+              Click the button below to claim your unique Free Bypass Key from the pool. <br>
+              <b style="color:#6ee7b7;">Rule: 1 User can only claim 1 Key!</b> Once claimed, it is permanently locked to your account.
+            </p>
+            <div style="display:inline-flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); border:1px solid var(--hairline); padding:8px 20px; border-radius:var(--r-pill); margin-bottom:30px; font-family:var(--f-mono); font-size:12.5px;">
+              <span style="color:var(--ink-500);">Available Stock in Pool:</span>
+              <span id="user-trail-stock" style="color:var(--emerald); font-weight:700; font-size:14px;">0</span>
+              <span style="color:var(--ink-500);">Keys</span>
+            </div>
+            <div>
+              <button id="btn-claim-key" class="app-btn btn-green-action pulse-glow" style="max-width:360px; margin:0 auto; padding:16px 30px; font-size:14px;" onclick="trailClaimMyKey()">
+                <span>⚡ Claim My Free Bypass Key Now</span>
+              </button>
+            </div>
+            <div class="inline-msg-box" id="msg-trail-claim" style="margin-top:16px;"></div>
           </div>
 
-          <div class="dashboard-card">
-            <div class="card-head-title">Manage Owned UIDs</div>
-            <input type="text" id="f-inp-rm-uid" class="input-field-app" placeholder="UID to Remove">
-            <button class="app-btn btn-danger-action" style="margin-bottom:16px;" onclick="fetcherTriggerRemove()"><span>Remove UID</span></button>
-            <hr class="section-divider">
-            <input type="text" id="f-inp-renew-uid" class="input-field-app" placeholder="UID to Renew">
-            <p style="font-size:11.5px; color:var(--ink-500); margin:-4px 0 14px;">Renews by your assigned permission duration (<b id="f-desc-renew-days" style="color:var(--ink-100);">—</b> days).</p>
-            <button class="app-btn btn-amber-action" onclick="fetcherRenewUIDAction()"><span>Renew UID</span></button>
-            <div class="inline-msg-box" id="msg-f-manage"></div>
+          <!-- SECTION B: CLAIMED STATE (USER HAS ALREADY CLAIMED) -->
+          <div id="user-trail-claimed-section" class="dashboard-card" style="display:none; text-align:center; padding:48px 32px; border-color:var(--emerald-line);">
+            <div style="display:inline-flex; align-items:center; gap:8px; background:var(--emerald-dim); border:1px solid var(--emerald-line); padding:6px 18px; border-radius:var(--r-pill); font-family:var(--f-mono); font-size:11.5px; color:#6ee7b7; font-weight:700; margin-bottom:20px;">
+              <span>✓</span> 1 USER = 1 KEY ASSIGNED & LOCKED
+            </div>
+            <h2 style="font-family:var(--f-display); font-size:24px; font-weight:800; color:var(--ink-100); margin-bottom:10px;">
+              Your Exclusive Free Bypass Key
+            </h2>
+            <p style="color:var(--ink-500); font-size:13px; margin-bottom:24px;">
+              This key is permanently bound to your account (<b id="user-display-uname" style="color:var(--ink-100);">User</b>). You can copy and use it anytime.
+            </p>
+
+            <div class="claimed-key-box">
+              <div class="key-display-text" id="user-display-key">...</div>
+              <div style="display:flex; gap:12px; width:100%; max-width:340px;">
+                <button class="app-btn btn-green-action" style="flex:1;" onclick="copyClaimedKey()">
+                  <span>📋 Copy Bypass Key</span>
+                </button>
+              </div>
+            </div>
+
+            <div style="font-family:var(--f-mono); font-size:11.5px; color:var(--ink-700); margin-top:16px;">
+              Claimed At: <span id="user-key-claimed-date" style="color:var(--ink-500);">—</span>
+            </div>
           </div>
 
-        </div>
+          <!-- INSTRUCTIONS CARD -->
+          <div class="dashboard-card" style="margin-top:24px;">
+            <div class="card-head-title"><span style="color:var(--blue);">ℹ</span> Free Trail Guidelines & Policy</div>
+            <ul style="color:var(--ink-500); font-size:12.5px; line-height:1.9; padding-left:20px;">
+              <li><strong style="color:var(--ink-300);">1 Key Per Account:</strong> Each user account is strictly entitled to exactly 1 Free Bypass Key.</li>
+              <li><strong style="color:var(--ink-300);">Permanent Assignment:</strong> Once claimed, your key remains permanently accessible to your account.</li>
+              <li><strong style="color:var(--ink-300);">Fast Re-access:</strong> Simply log into this portal anytime with your username and password to retrieve your key.</li>
+            </ul>
+          </div>
 
-        <div class="table-toolbar">
-          <button class="app-btn btn-dark-action" style="width:auto; padding:10px 22px;" onclick="fetcherFetchUIDs()"><span>Refresh My Vault</span></button>
-          <div class="search-input-box"><input type="text" id="f-search-box" placeholder="Filter my UIDs..."></div>
-        </div>
-
-        <div class="table-container-card">
-          <table class="app-table">
-            <thead><tr><th>UID</th><th>Player Name</th><th>Duration</th><th>Status</th><th>Expires At</th><th>Time Left</th><th>Actions</th></tr></thead>
-            <tbody id="f-tbody-uids"><tr><td colspan="7" style="text-align:center; color:var(--ink-700); padding:30px;">Loading UIDs...</td></tr></tbody>
-          </table>
         </div>
 
       </div>
@@ -1371,6 +1467,11 @@
             saveSession();
             notifyToast(`Welcome, Reseller ${SESSION.username}`);
             launchWorkspaceView('sub_admin');
+          } else if (data.role === 'trail') {
+            SESSION = { role: 'trail', adminKey: null, username: data.username || identifier, password: password };
+            saveSession();
+            notifyToast(`Welcome, Free Trail User ${SESSION.username}`);
+            launchWorkspaceView('trail');
           } else if (data.role === 'fetcher') {
             SESSION = { role: 'fetcher', adminKey: null, username: data.username || identifier, password: password };
             saveSession();
@@ -1399,7 +1500,7 @@
 
       const masterPanel = document.getElementById('master-admin-panel');
       const subPanel = document.getElementById('subadmin-panel');
-      const fetcherPanel = document.getElementById('fetcher-panel');
+      const trailPanel = document.getElementById('trail-panel');
 
       const navResellers = document.getElementById('nav-btn-resellers');
       const navFetchers = document.getElementById('nav-btn-fetchers');
@@ -1414,7 +1515,7 @@
       if (role === 'main_admin') {
         masterPanel.classList.add('active');
         subPanel.classList.remove('active');
-        fetcherPanel.classList.remove('active');
+        trailPanel?.classList.remove('active');
 
         navResellers.style.display = 'flex';
         navFetchers.style.display = 'flex';
@@ -1429,13 +1530,14 @@
         navigateTab('uids');
         mainFetchUIDs();
         loadResellersAction();
-        loadFetchersAction();
+        adminLoadTrailKeysAction();
+        adminLoadTrailUsersAction();
         loadLocalAuditLog();
         renderCreditLogView();
       } else if (role === 'sub_admin') {
         subPanel.classList.add('active');
         masterPanel.classList.remove('active');
-        fetcherPanel.classList.remove('active');
+        trailPanel?.classList.remove('active');
 
         navResellers.style.display = 'none';
         navFetchers.style.display = 'none';
@@ -1449,8 +1551,34 @@
 
         subFetchCredits();
         subFetchUIDs();
+      } else if (role === 'trail') {
+        trailPanel?.classList.add('active');
+        masterPanel.classList.remove('active');
+        subPanel.classList.remove('active');
+
+        navResellers.style.display = 'none';
+        navFetchers.style.display = 'none';
+        navCredit.style.display = 'none';
+        navSettings.style.display = 'none';
+
+        userDisplayName.textContent = SESSION.username.toUpperCase();
+        userDisplayRole.textContent = 'FREE TRAIL';
+        userDisplayRole.style.background = 'var(--emerald-dim)';
+        userDisplayRole.style.color = '#6ee7b7';
+        userDisplayRole.style.borderColor = 'var(--emerald-line)';
+        userAvatarIcon.textContent = (SESSION.username[0] || 'T').toUpperCase();
+        userAvatarIcon.style.background = 'var(--emerald-dim)';
+        userAvatarIcon.style.borderColor = 'var(--emerald-line)';
+        userAvatarIcon.style.color = '#6ee7b7';
+        userCreditsTag.style.display = 'none';
+
+        document.getElementById('trail-hero-username').textContent = SESSION.username;
+        const displayUname = document.getElementById('user-display-uname');
+        if (displayUname) displayUname.textContent = SESSION.username;
+
+        trailFetchStatus();
       } else if (role === 'fetcher') {
-        fetcherPanel.classList.add('active');
+        trailPanel?.classList.add('active');
         masterPanel.classList.remove('active');
         subPanel.classList.remove('active');
 
@@ -1462,10 +1590,9 @@
         userDisplayName.textContent = SESSION.username.toUpperCase();
         userDisplayRole.textContent = 'FETCHER';
         userAvatarIcon.textContent = (SESSION.username[0] || 'F').toUpperCase();
-        userCreditsTag.style.display = 'block';
+        userCreditsTag.style.display = 'none';
 
-        fetcherFetchPermission();
-        fetcherFetchUIDs();
+        trailFetchStatus();
       }
     }
 
@@ -1479,7 +1606,7 @@
       if (activeView) activeView.classList.add('active');
 
       if (tabName === 'resellers') loadResellersAction();
-      if (tabName === 'fetchers') loadFetchersAction();
+      if (tabName === 'fetchers') { adminLoadTrailKeysAction(); adminLoadTrailUsersAction(); }
       if (tabName === 'credit') { loadResellersAction(); renderCreditLogView(); }
     }
 
@@ -1845,145 +1972,220 @@
       }
     }
 
-    // ===== 9. FETCHER MANAGEMENT LOGIC (MASTER ADMIN SIDE) =====
-    async function createFetcherAction() {
-      const u = document.getElementById('fet-new-user').value.trim();
-      const p = document.getElementById('fet-new-pass').value.trim();
-      const note = document.getElementById('fet-new-note').value.trim();
-      const days = parseInt(document.getElementById('fet-new-days').value) || 30;
+    // ===== 9. FREE BYPASS TRAIL MANAGEMENT (MASTER ADMIN SIDE) =====
+    let trailKeysList = [];
+    let trailUsersList = [];
+
+    async function adminAddTrailKeysAction() {
+      const keysInput = document.getElementById('tr-keys-input').value.trim();
+      if (!keysInput) {
+        notifyToast('Please paste at least one key', 'err');
+        showInlineMsg('msg-tr-keys', '✗ Enter keys before depositing', 'err');
+        return;
+      }
+
+      try {
+        const res = await fetch('/admin/add-trail-keys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_key: SESSION.adminKey, keys: keysInput })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          notifyToast(data.message || 'Keys deposited into stock');
+          showInlineMsg('msg-tr-keys', `✓ ${data.message}`, 'ok');
+          document.getElementById('tr-keys-input').value = '';
+          adminLoadTrailKeysAction();
+        } else {
+          showInlineMsg('msg-tr-keys', '✗ ' + (data.message || 'Failed to add keys'), 'err');
+        }
+      } catch (err) {
+        showInlineMsg('msg-tr-keys', '✗ Connection error', 'err');
+      }
+    }
+
+    async function adminLoadTrailKeysAction() {
+      const tbody = document.getElementById('m-tbody-trail-keys');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-500); padding:24px;">Loading Keys...</td></tr>';
+
+      try {
+        const res = await fetch('/admin/list-trail-keys?admin_key=' + encodeURIComponent(SESSION.adminKey));
+        const data = await res.json();
+
+        if (res.ok && data.keys) {
+          trailKeysList = data.keys;
+          document.getElementById('tr-stat-total-keys').textContent = data.total || 0;
+          document.getElementById('tr-stat-avail-keys').textContent = data.available || 0;
+          document.getElementById('tr-stat-claimed-keys').textContent = data.claimed || 0;
+
+          renderTrailKeysTable(trailKeysList);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#fb4b4b;">Error loading keys</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#fb4b4b;">Connection error</td></tr>';
+      }
+    }
+
+    function renderTrailKeysTable(list) {
+      const tbody = document.getElementById('m-tbody-trail-keys');
+      if (!tbody) return;
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-700); padding:24px;">No keys in stock. Use the form above to deposit keys.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(k => {
+        const isClaimed = k.status === 'claimed';
+        const statusBadge = isClaimed
+          ? `<span class="days-badge days-warn" style="font-weight:700;">Claimed</span>`
+          : `<span class="days-badge days-safe" style="font-weight:700;">Available</span>`;
+        const claimedUser = isClaimed
+          ? `<span class="status-badge badge-emerald">👤 ${k.claimed_by}</span>`
+          : `<span style="color:var(--ink-700);">Unclaimed</span>`;
+        const displayDate = formatHumanDate(k.claimed_at || k.added_at);
+
+        return `
+          <tr>
+            <td>
+              <span class="mono-uid" style="color:#6ee7b7;">${k.key}</span>
+              <button class="copy-pill-btn" onclick="navigator.clipboard.writeText('${k.key}'); notifyToast('Key copied');">Copy</button>
+            </td>
+            <td>${statusBadge}</td>
+            <td>${claimedUser}</td>
+            <td style="font-family:var(--f-mono); font-size:11px; color:var(--ink-500);">${displayDate}</td>
+            <td>
+              <button class="btn-sm-action btn-sm-red" onclick="adminDeleteTrailKeyAction('${k.key}')">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterTrailKeysTable() {
+      const q = (document.getElementById('tr-search-keys')?.value || '').toLowerCase();
+      const filtered = trailKeysList.filter(k =>
+        (k.key || '').toLowerCase().includes(q) ||
+        (k.claimed_by || '').toLowerCase().includes(q) ||
+        (k.status || '').toLowerCase().includes(q)
+      );
+      renderTrailKeysTable(filtered);
+    }
+
+    async function adminDeleteTrailKeyAction(key) {
+      if (!confirm(`Are you sure you want to delete key '${key}'?`)) return;
+      try {
+        const res = await fetch('/admin/delete-trail-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_key: SESSION.adminKey, key })
+        });
+        if (res.ok) {
+          notifyToast(`Key '${key}' deleted`);
+          adminLoadTrailKeysAction();
+          adminLoadTrailUsersAction();
+        } else {
+          const d = await res.json();
+          notifyToast(d.message || 'Delete failed', 'err');
+        }
+      } catch (err) {
+        notifyToast('Connection error', 'err');
+      }
+    }
+
+    async function adminCreateTrailUserAction() {
+      const u = document.getElementById('tr-new-user').value.trim();
+      const p = document.getElementById('tr-new-pass').value.trim();
+      const note = document.getElementById('tr-new-note').value.trim();
 
       if (!u || !p) {
         notifyToast('Username and Password required', 'err');
-        showInlineMsg('msg-fet-create', '✗ Fill username & password', 'err');
+        showInlineMsg('msg-tr-user', '✗ Username and password required', 'err');
         return;
       }
 
       try {
-        const res = await fetch('/admin/create-fetcher', {
+        const res = await fetch('/admin/create-trail-user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ admin_key: SESSION.adminKey, username: u, password: p, note, permission_days: days })
+          body: JSON.stringify({ admin_key: SESSION.adminKey, username: u, password: p, note })
         });
         const data = await res.json();
 
         if (res.ok) {
-          notifyToast(`Fetcher '${u}' created (${days}d permission)`);
-          showInlineMsg('msg-fet-create', `✓ Fetcher '${u}' created`, 'ok');
-          document.getElementById('fet-new-user').value = '';
-          document.getElementById('fet-new-pass').value = '';
-          document.getElementById('fet-new-note').value = '';
-          loadFetchersAction();
+          notifyToast(`Trail user '${u}' created`);
+          showInlineMsg('msg-tr-user', `✓ User '${u}' created successfully`, 'ok');
+          document.getElementById('tr-new-user').value = '';
+          document.getElementById('tr-new-pass').value = '';
+          document.getElementById('tr-new-note').value = '';
+          adminLoadTrailUsersAction();
         } else {
-          showInlineMsg('msg-fet-create', '✗ ' + (data.message || 'Error creating fetcher'), 'err');
+          showInlineMsg('msg-tr-user', '✗ ' + (data.message || 'Error creating user'), 'err');
         }
       } catch (err) {
-        showInlineMsg('msg-fet-create', '✗ Connection error', 'err');
+        showInlineMsg('msg-tr-user', '✗ Connection error', 'err');
       }
     }
 
-    async function loadFetchersAction() {
-      const tbody = document.getElementById('m-tbody-fetchers');
+    async function adminLoadTrailUsersAction() {
+      const tbody = document.getElementById('m-tbody-trail-users');
       if (!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--ink-500); padding:24px;">Loading Fetchers...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-500); padding:24px;">Loading Trail Users...</td></tr>';
 
       try {
-        const res = await fetch('/admin/list-fetchers?admin_key=' + encodeURIComponent(SESSION.adminKey));
+        const res = await fetch('/admin/list-trail-users?admin_key=' + encodeURIComponent(SESSION.adminKey));
         const data = await res.json();
 
-        if (res.ok && data.fetchers) {
-          const list = data.fetchers;
-          if (!list.length) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--ink-700); padding:24px;">No Fetchers found</td></tr>';
+        if (res.ok && data.users) {
+          trailUsersList = data.users;
+          document.getElementById('tr-stat-total-users').textContent = data.total || 0;
+
+          if (!trailUsersList.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--ink-700); padding:24px;">No trail users found.</td></tr>';
             return;
           }
 
-          tbody.innerHTML = list.map(f => `
-            <tr>
-              <td><span class="status-badge badge-purple">${f.username}</span></td>
-              <td style="color:var(--ink-500); font-size:11.5px;">${f.note || '—'}</td>
-              <td><span class="status-badge badge-blue">${f.permission_days || 0} Days / UID</span></td>
-              <td>
-                <button class="btn-sm-action btn-sm-purple" style="margin-right:6px;" onclick="selectFetcherForUpdate('${f.username}', ${f.permission_days || 30})">Select</button>
-                <button class="btn-sm-action btn-sm-red" onclick="deleteFetcherAction('${f.username}')">Delete</button>
-              </td>
-            </tr>
-          `).join('');
+          tbody.innerHTML = trailUsersList.map(u => {
+            const hasKey = !!u.claimed_key;
+            const keyDisplay = hasKey
+              ? `<span class="mono-uid" style="color:#6ee7b7;">${u.claimed_key}</span>
+                 <button class="copy-pill-btn" onclick="navigator.clipboard.writeText('${u.claimed_key}'); notifyToast('Key copied');">Copy</button>`
+              : `<span class="days-badge days-warn">Not Claimed Yet</span>`;
 
-          populateFetcherDropdowns(list);
-        }
-      } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#fb4b4b;">Connection error</td></tr>';
-      }
-    }
-
-    function populateFetcherDropdowns(list) {
-      const sel = document.getElementById('fet-update-sel');
-      if (!sel) return;
-      sel.innerHTML = '<option value="">— Select Fetcher —</option>';
-      list.forEach(f => {
-        const opt = document.createElement('option');
-        opt.value = f.username;
-        opt.textContent = `${f.username} (${f.permission_days || 0}d)`;
-        sel.appendChild(opt);
-      });
-    }
-
-    function selectFetcherForUpdate(uname, days) {
-      document.getElementById('fet-update-user-inp').value = uname;
-      document.getElementById('fet-update-sel').value = uname;
-      document.getElementById('fet-update-days').value = days;
-    }
-
-    function syncFetcherSel() {
-      const val = document.getElementById('fet-update-sel').value;
-      if (val) document.getElementById('fet-update-user-inp').value = val;
-    }
-
-    async function updateFetcherPermAction() {
-      const selVal = document.getElementById('fet-update-sel').value;
-      const username = document.getElementById('fet-update-user-inp').value.trim() || selVal;
-      const days = parseInt(document.getElementById('fet-update-days').value);
-
-      if (!username) {
-        notifyToast('Please select or input a fetcher', 'err');
-        return;
-      }
-      if (!days || days < 1) {
-        notifyToast('Please enter a valid day count', 'err');
-        return;
-      }
-
-      try {
-        const res = await fetch('/admin/update-fetcher-permission', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ admin_key: SESSION.adminKey, username, permission_days: days })
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          notifyToast(`Updated ${username} permission to ${days} days`);
-          showInlineMsg('msg-fet-update', `✓ Permission updated to ${days} days`, 'ok');
-          loadFetchersAction();
+            return `
+              <tr>
+                <td><span class="status-badge badge-emerald">👤 ${u.username}</span></td>
+                <td style="color:var(--ink-500); font-size:11.5px;">${u.note || '—'}</td>
+                <td>${keyDisplay}</td>
+                <td style="font-family:var(--f-mono); font-size:11px; color:var(--ink-500);">${formatHumanDate(u.claimed_at)}</td>
+                <td>
+                  <button class="btn-sm-action btn-sm-red" onclick="adminDeleteTrailUserAction('${u.username}')">Delete User</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
         } else {
-          showInlineMsg('msg-fet-update', '✗ ' + (data.message || 'Update failed'), 'err');
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#fb4b4b;">Error loading users</td></tr>';
         }
       } catch (err) {
-        showInlineMsg('msg-fet-update', '✗ Connection error', 'err');
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#fb4b4b;">Connection error</td></tr>';
       }
     }
 
-    async function deleteFetcherAction(uname) {
-      if (!confirm(`Are you sure you want to delete fetcher '${uname}'?`)) return;
+    async function adminDeleteTrailUserAction(uname) {
+      if (!confirm(`Delete trail user '${uname}'? If they claimed a key, it will be released back to the available pool.`)) return;
       try {
-        const res = await fetch('/admin/delete-fetcher', {
+        const res = await fetch('/admin/delete-trail-user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ admin_key: SESSION.adminKey, username: uname })
         });
         if (res.ok) {
-          notifyToast(`Fetcher '${uname}' deleted`);
-          loadFetchersAction();
+          notifyToast(`User '${uname}' deleted`);
+          adminLoadTrailUsersAction();
+          adminLoadTrailKeysAction();
         } else {
           const d = await res.json();
           notifyToast(d.message || 'Delete failed', 'err');
@@ -2256,134 +2458,95 @@
       triggerDeleteModal(uid, 'sub');
     }
 
-    // ===== 13. FETCHER PANEL LOGIC =====
-    async function fetcherFetchPermission() {
-      try {
-        const res = await fetch('/fetcher/permission?username=' + encodeURIComponent(SESSION.username) + '&password=' + encodeURIComponent(SESSION.password));
-        const data = await res.json();
-        if (res.ok) {
-          activeFetcherPermDays = data.permission_days || data.days || 0;
-          document.getElementById('f-hero-perm').textContent = activeFetcherPermDays;
-          document.getElementById('f-desc-days').textContent = activeFetcherPermDays;
-          document.getElementById('f-desc-renew-days').textContent = activeFetcherPermDays;
-          document.getElementById('user-display-credits').textContent = `${activeFetcherPermDays} Days Perm`;
-        }
-      } catch (e) {}
-    }
+    // ===== 13. FREE BYPASS TRAIL USER PORTAL LOGIC =====
+    let currentUserClaimedKey = null;
 
-    async function fetcherFetchUIDs() {
-      const tbody = document.getElementById('f-tbody-uids');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--ink-500); padding:30px;">Loading your UID Vault...</td></tr>';
+    async function trailFetchStatus() {
+      const username = SESSION.username;
+      const password = SESSION.password;
+      if (!username || !password) return;
+
+      const stateBadge = document.getElementById('trail-claim-state-badge');
+      const unclaimedSec = document.getElementById('user-trail-unclaimed-section');
+      const claimedSec = document.getElementById('user-trail-claimed-section');
 
       try {
-        const res = await fetch('/fetcher/list?username=' + encodeURIComponent(SESSION.username) + '&password=' + encodeURIComponent(SESSION.password));
+        const res = await fetch(`/trail/status?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
         const data = await res.json();
 
         if (res.ok) {
-          fetcherUIDsList = data.licenses || [];
-          renderFetcherUIDsTable(fetcherUIDsList);
-          updateStatsCards(fetcherUIDsList, 'f-stat-total', 'f-stat-active', 'f-stat-expired', null);
-        } else {
-          tbody.innerHTML = `<tr><td colspan="7" style="color:#fb4b4b; text-align:center;">Error: ${data.message}</td></tr>`;
+          document.getElementById('trail-hero-username').textContent = username;
+          document.getElementById('user-trail-stock').textContent = data.available_stock || 0;
+
+          if (data.has_key && data.claimed_key) {
+            currentUserClaimedKey = data.claimed_key;
+            stateBadge.innerHTML = '✓ ACTIVE KEY ASSIGNED (1 KEY LIMIT)';
+            stateBadge.style.background = 'var(--emerald-dim)';
+            stateBadge.style.borderColor = 'var(--emerald-line)';
+            stateBadge.style.color = '#6ee7b7';
+
+            document.getElementById('user-display-key').textContent = data.claimed_key;
+            document.getElementById('user-key-claimed-date').textContent = data.claimed_at ? new Date(data.claimed_at).toLocaleString() : 'Active';
+
+            unclaimedSec.style.display = 'none';
+            claimedSec.style.display = 'block';
+          } else {
+            currentUserClaimedKey = null;
+            stateBadge.innerHTML = 'READY TO CLAIM (1 KEY AVAILABLE)';
+            stateBadge.style.background = 'var(--amber-dim)';
+            stateBadge.style.borderColor = 'var(--amber-line)';
+            stateBadge.style.color = 'var(--amber)';
+
+            unclaimedSec.style.display = 'block';
+            claimedSec.style.display = 'none';
+          }
         }
-      } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="7" style="color:#fb4b4b; text-align:center;">Connection error</td></tr>';
+      } catch (e) {
+        console.error('Error fetching trail status', e);
       }
     }
 
-    function renderFetcherUIDsTable(uids) {
-      const tbody = document.getElementById('f-tbody-uids');
-      if (!uids.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--ink-700); padding:40px;">No UIDs found</td></tr>';
-        return;
-      }
-      tbody.innerHTML = uids.map(u => buildUIDTableRow(u, 'fetcher')).join('');
-    }
-
-    document.getElementById('f-search-box')?.addEventListener('input', e => {
-      const q = e.target.value.toLowerCase();
-      const filtered = fetcherUIDsList.filter(u =>
-        (u.uid || '').toLowerCase().includes(q) ||
-        (u.name || '').toLowerCase().includes(q)
-      );
-      renderFetcherUIDsTable(filtered);
-    });
-
-    async function fetcherAddUIDAction() {
-      await fetcherFetchPermission();
-      if (!activeFetcherPermDays || activeFetcherPermDays < 1) {
-        notifyToast('No permission duration configured. Contact Master Admin.', 'err');
-        return;
-      }
-
-      const uid = document.getElementById('f-inp-uid').value.trim();
-      const name = document.getElementById('f-inp-name').value.trim() || 'Player';
-
-      if (!uid) {
-        notifyToast('UID is required', 'err');
-        return;
-      }
+    async function trailClaimMyKey() {
+      const btn = document.getElementById('btn-claim-key');
+      const msgBox = document.getElementById('msg-trail-claim');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡ Claiming Key From Pool...</span>';
+      msgBox.innerHTML = '';
 
       try {
-        const res = await fetch('/fetcher/create', {
+        const res = await fetch('/trail/claim-key', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: SESSION.username, password: SESSION.password, uid, name, days: activeFetcherPermDays })
+          body: JSON.stringify({ username: SESSION.username, password: SESSION.password })
         });
         const data = await res.json();
 
         if (res.ok) {
-          notifyToast(`UID ${uid} added (${activeFetcherPermDays} days)`);
-          showInlineMsg('msg-f-add', `✓ UID activated (${activeFetcherPermDays}d)`, 'ok');
-          document.getElementById('f-inp-uid').value = '';
-          document.getElementById('f-inp-name').value = '';
-          fetcherFetchUIDs();
+          notifyToast('🎉 Free Bypass Key claimed successfully!');
+          trailFetchStatus();
         } else {
-          notifyToast(data.message || 'Add UID failed', 'err');
-          showInlineMsg('msg-f-add', '✗ ' + (data.message || 'Error'), 'err');
+          showInlineMsg('msg-trail-claim', '✗ ' + (data.message || 'Could not claim key'), 'err');
+          notifyToast(data.message || 'Claim failed', 'err');
         }
       } catch (err) {
-        showInlineMsg('msg-f-add', '✗ Connection error', 'err');
+        showInlineMsg('msg-trail-claim', '✗ Connection error', 'err');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡ Claim My Free Bypass Key Now</span>';
       }
     }
 
-    async function fetcherRenewUIDAction() {
-      await fetcherFetchPermission();
-      const uid = document.getElementById('f-inp-renew-uid').value.trim();
-
-      if (!uid) {
-        notifyToast('Please enter a UID to renew', 'err');
+    function copyClaimedKey() {
+      const key = currentUserClaimedKey || document.getElementById('user-display-key')?.textContent;
+      if (!key || key === '...') {
+        notifyToast('No key to copy', 'err');
         return;
       }
-
-      try {
-        const res = await fetch('/fetcher/update', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: SESSION.username, password: SESSION.password, uid, days: activeFetcherPermDays })
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          notifyToast(`Renewed ${uid} +${activeFetcherPermDays} days`);
-          showInlineMsg('msg-f-manage', `✓ UID extended +${activeFetcherPermDays}d`, 'ok');
-          document.getElementById('f-inp-renew-uid').value = '';
-          fetcherFetchUIDs();
-        } else {
-          notifyToast(data.message || 'Renewal failed', 'err');
-        }
-      } catch (err) {
-        showInlineMsg('msg-f-manage', '✗ Connection error', 'err');
-      }
-    }
-
-    function fetcherTriggerRemove() {
-      const uid = document.getElementById('f-inp-rm-uid').value.trim();
-      if (!uid) {
-        notifyToast('Please enter a UID to remove', 'err');
-        return;
-      }
-      triggerDeleteModal(uid, 'fetcher');
+      navigator.clipboard.writeText(key).then(() => {
+        notifyToast('✓ Bypass Key copied to clipboard!');
+      }).catch(() => {
+        notifyToast('Failed to copy', 'err');
+      });
     }
 
     // ===== 14. DELETE CONFIRMATION MODAL =====
@@ -2552,6 +2715,21 @@
           });
           if (res.ok) {
             launchWorkspaceView('sub_admin');
+            return;
+          }
+        } catch (e) {}
+        clearSession();
+      }
+
+      if (SESSION.role === 'trail' && SESSION.username && SESSION.password) {
+        try {
+          const res = await fetch('/trail/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: SESSION.username, password: SESSION.password })
+          });
+          if (res.ok) {
+            launchWorkspaceView('trail');
             return;
           }
         } catch (e) {}

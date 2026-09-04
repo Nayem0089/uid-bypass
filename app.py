@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify, render_template
 # pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 # pyrefly: ignore [missing-import]
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 from datetime import datetime, timedelta
 
 load_dotenv()
@@ -37,10 +37,12 @@ try:
     fetchers_col      = db["fetchers"]
     uid_ownership_col = db["uid_ownership"]
     credit_log_col    = db["credit_log"]
+    trail_users_col   = db["trail_users"]
+    trail_keys_col    = db["trail_keys"]
     print("MongoDB connected OK")
 except Exception as e:
     print(f"MongoDB FAILED: {e}")
-    mongo_client = db = subadmins_col = fetchers_col = uid_ownership_col = credit_log_col = None
+    mongo_client = db = subadmins_col = fetchers_col = uid_ownership_col = credit_log_col = trail_users_col = trail_keys_col = None
 
 
 # ===== KEEP-ALIVE SELF-PING (FIX) =====
@@ -205,6 +207,13 @@ def get_fetcher_permission_days(username):
     if not doc:
         return 0
     return int(doc.get("permission_days", 0))
+
+
+def verify_trail_user(username, password):
+    """Trail user login check."""
+    if trail_users_col is None:
+        return False
+    return trail_users_col.find_one({"username": username, "password": password}) is not None
 
 
 # ===== FRONTEND =====
@@ -507,6 +516,269 @@ def delete_fetcher():
     return jsonify({"status": "success", "message": f"Fetcher '{username}' deleted"}), 200
 
 
+# ===== ✅ FREE BYPASS TRAIL MANAGEMENT (Admin & User) =====
+
+@app.route('/admin/create-trail-user', methods=['POST'])
+def create_trail_user():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if trail_users_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+    note     = body.get("note", "").strip()
+
+    if not username or not password:
+        return jsonify({"status": "error", "message": "Username and password are required"}), 400
+
+    if trail_users_col.find_one({"username": username}):
+        return jsonify({"status": "error", "message": "Trail username already exists"}), 409
+
+    trail_users_col.insert_one({
+        "username":    username,
+        "password":    password,
+        "note":        note,
+        "claimed_key": None,
+        "claimed_at":  None,
+        "created_at":  datetime.utcnow().isoformat()
+    })
+
+    return jsonify({
+        "status": "success",
+        "message": f"Trail user '{username}' created successfully"
+    }), 200
+
+
+@app.route('/admin/list-trail-users', methods=['GET'])
+def list_trail_users():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if trail_users_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    users = list(trail_users_col.find({}, {"_id": 0, "password": 0}))
+    return jsonify({
+        "status": "success",
+        "total": len(users),
+        "users": users
+    }), 200
+
+
+@app.route('/admin/delete-trail-user', methods=['POST'])
+def delete_trail_user():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if trail_users_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    username = body.get("username", "").strip()
+    user = trail_users_col.find_one({"username": username})
+    if not user:
+        return jsonify({"status": "error", "message": "Trail user not found"}), 404
+
+    claimed_key = user.get("claimed_key")
+    if claimed_key and trail_keys_col is not None:
+        trail_keys_col.update_one(
+            {"key": claimed_key},
+            {"$set": {"status": "available", "claimed_by": None, "claimed_at": None}}
+        )
+
+    trail_users_col.delete_one({"username": username})
+    return jsonify({"status": "success", "message": f"Trail user '{username}' deleted"}), 200
+
+
+@app.route('/admin/add-trail-keys', methods=['POST'])
+def add_trail_keys():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if trail_keys_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    raw_keys = body.get("keys", "")
+    if isinstance(raw_keys, str):
+        import re
+        tokens = re.split(r'[\r\n,;]+', raw_keys)
+    elif isinstance(raw_keys, list):
+        tokens = raw_keys
+    else:
+        tokens = []
+
+    keys_to_add = [t.strip() for t in tokens if t and t.strip()]
+    if not keys_to_add:
+        return jsonify({"status": "error", "message": "Please provide at least one key"}), 400
+
+    added_count = 0
+    duplicate_count = 0
+    now_iso = datetime.utcnow().isoformat()
+
+    for k in keys_to_add:
+        existing = trail_keys_col.find_one({"key": k})
+        if existing:
+            duplicate_count += 1
+        else:
+            trail_keys_col.insert_one({
+                "key": k,
+                "status": "available",
+                "claimed_by": None,
+                "claimed_at": None,
+                "added_at": now_iso
+            })
+            added_count += 1
+
+    return jsonify({
+        "status": "success",
+        "message": f"Added {added_count} new key(s) ({duplicate_count} duplicates skipped)",
+        "added_count": added_count,
+        "duplicate_count": duplicate_count
+    }), 200
+
+
+@app.route('/admin/list-trail-keys', methods=['GET'])
+def list_trail_keys():
+    if request.args.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if trail_keys_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    keys = list(trail_keys_col.find({}, {"_id": 0}).sort("added_at", -1))
+    total_keys = len(keys)
+    available_keys = sum(1 for k in keys if k.get("status") == "available")
+    claimed_keys = total_keys - available_keys
+
+    return jsonify({
+        "status": "success",
+        "total": total_keys,
+        "available": available_keys,
+        "claimed": claimed_keys,
+        "keys": keys
+    }), 200
+
+
+@app.route('/admin/delete-trail-key', methods=['POST'])
+def delete_trail_key():
+    body = request.json or {}
+    if body.get("admin_key") != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Invalid admin key"}), 403
+    if trail_keys_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    key = body.get("key", "").strip()
+    if not key:
+        return jsonify({"status": "error", "message": "Key is required"}), 400
+
+    result = trail_keys_col.delete_one({"key": key})
+    if result.deleted_count == 0:
+        return jsonify({"status": "error", "message": "Key not found"}), 404
+
+    if trail_users_col is not None:
+        trail_users_col.update_many({"claimed_key": key}, {"$set": {"claimed_key": None, "claimed_at": None}})
+
+    return jsonify({"status": "success", "message": "Key deleted from pool"}), 200
+
+
+# ===== TRAIL USER ENDPOINTS =====
+
+@app.route('/trail/login', methods=['POST'])
+def trail_login():
+    body = request.json or {}
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+    if not verify_trail_user(username, password):
+        return jsonify({"status": "error", "message": "Invalid username or password"}), 403
+
+    user = trail_users_col.find_one({"username": username}, {"_id": 0, "password": 0})
+    return jsonify({
+        "status": "success",
+        "role": "trail",
+        "username": username,
+        "user": user
+    }), 200
+
+
+@app.route('/trail/status', methods=['GET'])
+def trail_status():
+    username = request.args.get("username", "").strip()
+    password = request.args.get("password", "").strip()
+    if not verify_trail_user(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
+    user = trail_users_col.find_one({"username": username}, {"_id": 0, "password": 0})
+    available_stock = 0
+    if trail_keys_col is not None:
+        available_stock = trail_keys_col.count_documents({"status": "available"})
+
+    return jsonify({
+        "status": "success",
+        "username": username,
+        "claimed_key": user.get("claimed_key") if user else None,
+        "claimed_at": user.get("claimed_at") if user else None,
+        "has_key": bool(user.get("claimed_key")) if user else False,
+        "available_stock": available_stock
+    }), 200
+
+
+@app.route('/trail/claim-key', methods=['POST'])
+def trail_claim_key():
+    body = request.json or {}
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+    if not verify_trail_user(username, password):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    if trail_users_col is None or trail_keys_col is None:
+        return jsonify({"status": "error", "message": "Database not connected"}), 500
+
+    user = trail_users_col.find_one({"username": username})
+    if not user:
+        return jsonify({"status": "error", "message": "User not found"}), 404
+
+    # 1 User = 1 Key limit
+    if user.get("claimed_key"):
+        return jsonify({
+            "status": "already_claimed",
+            "message": "You have already claimed your 1 Free Bypass Key!",
+            "key": user["claimed_key"],
+            "claimed_at": user.get("claimed_at")
+        }), 200
+
+    now_iso = datetime.utcnow().isoformat()
+    claimed_doc = trail_keys_col.find_one_and_update(
+        {"status": "available"},
+        {"$set": {
+            "status": "claimed",
+            "claimed_by": username,
+            "claimed_at": now_iso
+        }},
+        return_document=ReturnDocument.AFTER
+    )
+
+    if not claimed_doc:
+        return jsonify({
+            "status": "error",
+            "message": "No keys available in stock right now! Please contact Admin."
+        }), 404
+
+    assigned_key = claimed_doc["key"]
+
+    trail_users_col.update_one(
+        {"username": username},
+        {"$set": {
+            "claimed_key": assigned_key,
+            "claimed_at": now_iso
+        }}
+    )
+
+    return jsonify({
+        "status": "success",
+        "message": "Free Bypass Key claimed successfully! (1 Key per user limit)",
+        "key": assigned_key,
+        "claimed_at": now_iso
+    }), 200
+
+
 # ===== SUB-ADMIN AUTH =====
 def verify_subadmin(username, password):
     if subadmins_col is None:
@@ -673,7 +945,11 @@ def unified_login():
     if verify_subadmin(identifier, password):
         return jsonify({"status": "success", "role": "sub_admin", "username": identifier}), 200
 
-    # 3) Fetcher (Trail)
+    # 3) Free Bypass Trail User
+    if verify_trail_user(identifier, password):
+        return jsonify({"status": "success", "role": "trail", "username": identifier}), 200
+
+    # 4) Fetcher (Legacy / Fallback)
     if verify_fetcher(identifier, password):
         return jsonify({"status": "success", "role": "fetcher", "username": identifier}), 200
 
