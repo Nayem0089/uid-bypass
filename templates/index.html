@@ -22,59 +22,74 @@
     }
 
     :root {
-      /* Surfaces */
-      --void:        #0a0b0d;
-      --deck:        #14161a;
-      --deck-raised: #1b1e23;
-      --deck-input:  #101216;
-      --hairline:    rgba(255,255,255,0.08);
-      --hairline-br: rgba(255,255,255,0.16);
+      /* Surfaces - Obsidian velvet dark base with crimson undertones */
+      --void:        #080305;
+      --deck:        rgba(22, 9, 14, 0.78);
+      --deck-raised: rgba(34, 13, 21, 0.88);
+      --deck-input:  rgba(18, 7, 12, 0.92);
+      --hairline:    rgba(255, 255, 255, 0.14);
+      --hairline-br: rgba(255, 255, 255, 0.28);
 
-      /* Signal colors — one per access tier, used consistently system-wide */
-      --amber:      #ff8b3d;
-      --amber-dim:  rgba(255,139,61,0.14);
-      --amber-line: rgba(255,139,61,0.4);
+      /* Core Red & White Theme Palette */
+      --red:          #ff2a4b;
+      --red-bright:   #ff4a68;
+      --red-dark:     #b91c1c;
+      --red-glow:     rgba(255, 42, 75, 0.5);
+      --red-dim:      rgba(255, 42, 75, 0.15);
+      --red-line:     rgba(255, 42, 75, 0.5);
 
-      --teal:       #2dd4bf;
-      --teal-dim:   rgba(45,212,191,0.14);
-      --teal-line:  rgba(45,212,191,0.4);
+      /* Amber redirects to vibrant crimson red */
+      --amber:        #ff2a4b;
+      --amber-dim:    rgba(255, 42, 75, 0.15);
+      --amber-line:   rgba(255, 42, 75, 0.5);
 
-      --violet:     #a78bfa;
-      --violet-dim: rgba(167,139,250,0.14);
-      --violet-line: rgba(167,139,250,0.4);
+      /* Pure Pearlescent White */
+      --white:        #ffffff;
+      --white-pure:   #ffffff;
+      --white-trans:  rgba(255, 255, 255, 0.94);
+      --white-dim:    rgba(255, 255, 255, 0.08);
+      --white-line:   rgba(255, 255, 255, 0.25);
+
+      --teal:         #2dd4bf;
+      --teal-dim:     rgba(45,212,191,0.14);
+      --teal-line:    rgba(45,212,191,0.4);
+
+      --violet:       #ff2a4b;
+      --violet-dim:   rgba(255,42,75,0.14);
+      --violet-line:  rgba(255,42,75,0.4);
 
       --emerald:      #10b981;
       --emerald-dim:  rgba(16,185,129,0.14);
       --emerald-line: rgba(16,185,129,0.4);
 
-      --blue:       #5eb1ff;
-      --blue-dim:   rgba(94,177,255,0.14);
+      --blue:         #ff3355;
+      --blue-dim:     rgba(255,51,85,0.15);
 
-      --alert:      #fb4b4b;
-      --alert-dim:  rgba(251,75,75,0.14);
-      --alert-line: rgba(251,75,75,0.4);
+      --alert:        #ff2a4b;
+      --alert-dim:    rgba(255,42,75,0.16);
+      --alert-line:   rgba(255,42,75,0.5);
 
-      /* Text */
-      --ink-100: #f3f4f6;
-      --ink-300: #c2c7d0;
-      --ink-500: #8c93a3;
-      --ink-700: #565d6c;
+      /* Text - High-contrast crisp white */
+      --ink-100: #ffffff;
+      --ink-300: #f1f5f9;
+      --ink-500: #cbd5e1;
+      --ink-700: #94a3b8;
 
       /* Type */
       --f-display: 'Space Grotesk', sans-serif;
       --f-body: 'IBM Plex Sans', sans-serif;
       --f-mono: 'IBM Plex Mono', monospace;
 
-      --r-sm: 6px;
-      --r-md: 10px;
-      --r-lg: 16px;
+      --r-sm: 8px;
+      --r-md: 12px;
+      --r-lg: 18px;
       --r-pill: 999px;
     }
 
     html { background: var(--void); scroll-behavior: smooth; }
 
     body {
-      background: var(--void);
+      background: radial-gradient(circle at 50% 0%, #1c090e 0%, var(--void) 75%);
       font-family: var(--f-body);
       color: var(--ink-100);
       min-height: 100vh;
@@ -86,31 +101,178 @@
 
     #bg-canvas {
       position: fixed; inset: 0; width: 100vw; height: 100vh;
-      pointer-events: none; z-index: 0; opacity: 0.55;
+      pointer-events: none; z-index: 0; opacity: 0.65;
     }
 
     .ambient-aura-1 {
-      position: fixed; top: -12%; left: 10%; width: 620px; height: 620px;
+      position: fixed; top: -15%; left: 8%; width: 680px; height: 680px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,139,61,0.07) 0%, transparent 70%);
-      pointer-events: none; z-index: 0; filter: blur(50px);
-      animation: floatAura 14s ease-in-out infinite alternate;
+      background: radial-gradient(circle, rgba(255,42,75,0.18) 0%, transparent 70%);
+      pointer-events: none; z-index: 0; filter: blur(60px);
+      animation: floatAuraRed 13s ease-in-out infinite alternate;
     }
     .ambient-aura-2 {
-      position: fixed; bottom: -16%; right: 8%; width: 620px; height: 620px;
+      position: fixed; bottom: -18%; right: 5%; width: 680px; height: 680px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(45,212,191,0.06) 0%, transparent 70%);
-      pointer-events: none; z-index: 0; filter: blur(50px);
-      animation: floatAura 18s ease-in-out infinite alternate-reverse;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      pointer-events: none; z-index: 0; filter: blur(65px);
+      animation: floatAuraWhite 17s ease-in-out infinite alternate-reverse;
     }
-    @keyframes floatAura { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px,20px) scale(1.08); } }
+    .ambient-aura-3 {
+      position: fixed; top: 40%; right: 25%; width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(220,38,38,0.12) 0%, transparent 70%);
+      pointer-events: none; z-index: 0; filter: blur(70px);
+      animation: floatAuraRed 21s ease-in-out infinite alternate;
+    }
+    @keyframes floatAuraRed { 0% { transform: translate(0,0) scale(1); filter: blur(55px); } 100% { transform: translate(35px,25px) scale(1.15); filter: blur(70px); } }
+    @keyframes floatAuraWhite { 0% { transform: translate(0,0) scale(1); filter: blur(60px); } 100% { transform: translate(-30px,-20px) scale(1.12); filter: blur(75px); } }
 
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: rgba(10,10,12,0.5); }
-    ::-webkit-scrollbar-thumb { background: #33383f; border-radius: var(--r-pill); }
-    ::-webkit-scrollbar-thumb:hover { background: var(--amber); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(8,3,5,0.6); }
+    ::-webkit-scrollbar-thumb { background: #3f1820; border-radius: var(--r-pill); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--red); box-shadow: 0 0 8px var(--red-glow); }
 
-    :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+    :focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+    /* ==========================================================================
+       GLOSSY GLASSMORPHISM & ANIMATIONS
+       ========================================================================== */
+    .term-shell, .dashboard-card, .metric-card, .table-container-card, .app-modal-box {
+      backdrop-filter: blur(20px) saturate(190%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.35), 0 20px 50px rgba(255, 42, 75, 0.16) !important;
+      border: 1px solid rgba(255, 255, 255, 0.16) !important;
+      position: relative;
+    }
+
+    /* Glossy Sheen Overlay */
+    .dashboard-card::before, .term-shell::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
+      pointer-events: none;
+    }
+
+    .btn-red-action, .btn-red-primary, .btn-glossy-red {
+      background: linear-gradient(135deg, #ff2a4b 0%, #b91c1c 100%) !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 8px 25px rgba(255, 42, 75, 0.42) !important;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-red-action:hover, .btn-red-primary:hover, .btn-glossy-red:hover {
+      filter: brightness(1.12);
+      transform: translateY(-2px);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6), 0 12px 30px rgba(255, 42, 75, 0.55) !important;
+    }
+    .btn-red-action::after, .btn-red-primary::after, .btn-glossy-red::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transform: skewX(-25deg);
+      animation: shineSweep 4.5s infinite;
+    }
+    @keyframes shineSweep {
+      0% { left: -100%; }
+      18% { left: 200%; }
+      100% { left: 200%; }
+    }
+
+    /* Duration Selector Chips */
+    .duration-chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 10px 0 14px;
+    }
+    .duration-chip-btn {
+      padding: 6px 12px;
+      border-radius: var(--r-pill);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--ink-300);
+      font-family: var(--f-mono);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .duration-chip-btn:hover {
+      background: rgba(255, 42, 75, 0.18);
+      border-color: var(--red);
+      color: #fff;
+    }
+    .duration-chip-btn.active {
+      background: linear-gradient(135deg, #ff2a4b, #dc2626);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(255, 42, 75, 0.5), inset 0 1px 1px rgba(255,255,255,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Quota Progress Bar */
+    .quota-track {
+      width: 100%;
+      height: 9px;
+      border-radius: var(--r-pill);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      margin: 8px 0;
+      position: relative;
+    }
+    .quota-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff2a4b, #ffffff);
+      border-radius: var(--r-pill);
+      transition: width 0.45s ease;
+      box-shadow: 0 0 10px var(--red-glow);
+    }
+    .quota-fill.warn { background: linear-gradient(90deg, #f59e0b, #ff2a4b); }
+    .quota-fill.full { background: #ff2a4b; }
+
+    /* Key Generation Result Card */
+    .generated-keys-box {
+      background: rgba(14, 4, 7, 0.95);
+      border: 1px solid var(--red-line);
+      border-radius: var(--r-md);
+      padding: 16px;
+      margin-top: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      animation: slideInKey .35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideInKey { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .key-glow-text {
+      font-family: var(--f-mono);
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1.5px;
+      background: rgba(255, 42, 75, 0.12);
+      padding: 10px 14px;
+      border-radius: var(--r-sm);
+      border: 1px dashed var(--red-line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      word-break: break-all;
+      user-select: all;
+    }
+
+    .key-glow-text:hover {
+      border-color: #ffffff;
+      box-shadow: 0 0 15px rgba(255, 42, 75, 0.4);
+    }
 
     /* ==========================================================================
        ACCESS TERMINAL (LOGIN)
@@ -704,6 +866,12 @@
           <span class="sidebar-text">UID Vault</span>
         </button>
 
+        <button class="nav-btn" id="nav-btn-licenses" onclick="navigateTab('licenses')">
+          <div class="nav-icon-box" style="color:var(--red);">🔑</div>
+          <span class="sidebar-text">License & Keys</span>
+          <span style="font-size:9px; background:var(--red); color:#fff; border-radius:999px; padding:2px 7px; margin-left:auto; font-weight:700; box-shadow:0 0 8px var(--red-glow);">API</span>
+        </button>
+
         <button class="nav-btn" id="nav-btn-resellers" style="display:none;" onclick="navigateTab('resellers')">
           <div class="nav-icon-box">◈</div>
           <span class="sidebar-text">Resellers</span>
@@ -819,6 +987,248 @@
               <thead><tr><th>UID</th><th>Player Name</th><th>Duration</th><th>Status</th><th>Expires At</th><th>Time Left</th><th>Actions</th></tr></thead>
               <tbody id="m-tbody-uids"><tr><td colspan="7" style="text-align:center; color:var(--ink-700); padding:40px;">Loading UID Vault...</td></tr></tbody>
             </table>
+          </div>
+
+        </div>
+
+        <!-- TAB: AUTHCLOUD LICENSE KEYS & GENERATOR HUB -->
+        <div id="view-tab-licenses" class="panel-view-tab">
+
+          <div class="dashboard-header">
+            <div class="header-title-box">
+              <div class="header-icon-badge" style="border-left-color:var(--red); color:var(--red); box-shadow:0 0 15px var(--red-glow);">🔑</div>
+              <div>
+                <h1 class="header-heading">AuthCloud <span>License Hub</span></h1>
+                <div class="header-subtext">Keys, Duration & Reseller Quotas Engine</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <span class="header-status-pill" style="border-color:var(--red-line); color:var(--white); background:var(--red-dim); box-shadow:0 0 12px var(--red-glow);">
+                <span class="status-dot-live" style="background:var(--red); box-shadow:0 0 8px var(--red);"></span>
+                <span>API: <b>http://194.233.76.156:10077</b></span>
+              </span>
+              <button class="app-btn btn-dark-action" style="width:auto; padding:8px 16px; font-size:11px;" onclick="authcloudFetchLicenses()">
+                <span>🔄 Sync Licenses</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- METRICS BAR -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-value white" id="ac-stat-total">—</div>
+              <div class="metric-label">Total Licenses</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value green" id="ac-stat-unused">—</div>
+              <div class="metric-label">Unused / Fresh Keys</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value blue" id="ac-stat-used">—</div>
+              <div class="metric-label">Used / Bound Keys</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value red" id="ac-stat-banned">—</div>
+              <div class="metric-label">Banned Keys</div>
+            </div>
+          </div>
+
+          <!-- QUICK HWID RESET BAR -->
+          <div class="dashboard-card" style="margin-bottom:24px; padding:18px 22px; background:linear-gradient(135deg, rgba(255,42,75,0.08) 0%, rgba(20,8,13,0.9) 100%);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <div style="font-family:var(--f-display); font-size:14px; font-weight:700; color:var(--white); display:flex; align-items:center; gap:8px;">
+                  <span style="color:var(--red);">🔄</span> Instant Hardware ID (HWID) Reset
+                </div>
+                <div style="font-size:11.5px; color:var(--ink-500); margin-top:2px;">Reset device binding for any customer license in 1 click.</div>
+              </div>
+              <div style="display:flex; gap:10px; flex:1; max-width:540px; min-width:280px;">
+                <input type="text" id="ac-inp-quick-reset" class="input-field-app" style="margin:0; font-family:var(--f-mono); font-size:12.5px;" placeholder="Paste License Key (e.g. KEY-XXXX-YYYY)...">
+                <button class="app-btn btn-red-action" style="width:auto; padding:10px 22px; white-space:nowrap;" onclick="authcloudQuickResetHwid()">
+                  <span>Reset HWID</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- GENERATOR & RESELLER QUOTA GRID -->
+          <div class="dashboard-grid-2">
+
+            <!-- CARD 1: KEY GENERATOR WITH DURATION PICKER -->
+            <div class="dashboard-card">
+              <div class="card-head-title" style="display:flex; align-items:center; justify-content:space-between;">
+                <span>⚡ License Key Generator</span>
+                <span style="font-size:10.5px; font-family:var(--f-mono); color:var(--red); font-weight:700;">PRO ENGINE</span>
+              </div>
+              <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:12px;">Create keys with exact duration validity and instant binding.</p>
+
+              <!-- Reseller Quota Banner (if applicable) -->
+              <div id="ac-reseller-quota-box" style="display:none; background:rgba(255,42,75,0.09); border:1px solid var(--red-line); border-radius:var(--r-sm); padding:12px; margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:600;">
+                  <span style="color:var(--ink-300);">Your Key Limit Quota:</span>
+                  <span id="ac-reseller-quota-text" style="color:var(--white); font-family:var(--f-mono);">0 / 0 Remaining</span>
+                </div>
+                <div class="quota-track">
+                  <div id="ac-reseller-quota-bar" class="quota-fill" style="width:0%;"></div>
+                </div>
+              </div>
+
+              <!-- Duration Selector (Chips) -->
+              <label style="font-size:11px; font-family:var(--f-mono); color:var(--ink-300); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Choose Key Duration:</label>
+              <div class="duration-chips-grid" id="ac-duration-chips">
+                <span class="duration-chip-btn" data-dur="1 Hour" onclick="authcloudSelectDuration('1 Hour', this)">1 Hour</span>
+                <span class="duration-chip-btn" data-dur="2 Hours" onclick="authcloudSelectDuration('2 Hours', this)">2 Hours</span>
+                <span class="duration-chip-btn" data-dur="12 Hours" onclick="authcloudSelectDuration('12 Hours', this)">12 Hours</span>
+                <span class="duration-chip-btn" data-dur="1 Day" onclick="authcloudSelectDuration('1 Day', this)">1 Day</span>
+                <span class="duration-chip-btn" data-dur="3 Days" onclick="authcloudSelectDuration('3 Days', this)">3 Days</span>
+                <span class="duration-chip-btn" data-dur="7 Days" onclick="authcloudSelectDuration('7 Days', this)">7 Days</span>
+                <span class="duration-chip-btn" data-dur="15 Days" onclick="authcloudSelectDuration('15 Days', this)">15 Days</span>
+                <span class="duration-chip-btn active" data-dur="30 Days" onclick="authcloudSelectDuration('30 Days', this)">30 Days</span>
+                <span class="duration-chip-btn" data-dur="60 Days" onclick="authcloudSelectDuration('60 Days', this)">60 Days</span>
+                <span class="duration-chip-btn" data-dur="90 Days" onclick="authcloudSelectDuration('90 Days', this)">90 Days</span>
+                <span class="duration-chip-btn" data-dur="365 Days" onclick="authcloudSelectDuration('365 Days', this)">365 Days (1 Year)</span>
+                <span class="duration-chip-btn" data-dur="Lifetime" onclick="authcloudSelectDuration('Lifetime', this)">Lifetime</span>
+                <span class="duration-chip-btn" data-dur="Custom" onclick="authcloudSelectDuration('Custom', this)" style="border-color:var(--red);">⚙ Custom</span>
+              </div>
+
+              <!-- Custom Duration Input (hidden by default) -->
+              <div id="ac-custom-duration-wrap" style="display:none; background:rgba(255,255,255,0.03); border:1px dashed var(--red-line); border-radius:var(--r-sm); padding:12px; margin-bottom:14px;">
+                <div style="font-size:11px; font-family:var(--f-mono); color:var(--red); font-weight:700; margin-bottom:8px;">Custom Duration Specification:</div>
+                <div style="display:flex; gap:10px;">
+                  <input type="number" id="ac-inp-custom-dur-val" class="input-field-app" style="margin:0; flex:1;" placeholder="Amount (e.g. 45)" min="1" value="45">
+                  <select id="ac-sel-custom-dur-unit" class="input-field-app" style="margin:0; flex:1;">
+                    <option value="Days" selected>Day(s)</option>
+                    <option value="Hours">Hour(s)</option>
+                    <option value="Minutes">Minute(s)</option>
+                    <option value="Months">Month(s)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Note / Buyer Tag -->
+              <input type="text" id="ac-inp-note" class="input-field-app" placeholder="Client Note / Reference (e.g. VIP Buyer #402)">
+
+              <!-- Key Count & Optional Custom Key -->
+              <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+                <div style="flex:1;">
+                  <label style="font-size:10.5px; font-family:var(--f-mono); color:var(--ink-500); display:block; margin-bottom:4px;">Keys Count (1-50):</label>
+                  <input type="number" id="ac-inp-count" class="input-field-app" style="margin:0;" value="1" min="1" max="50">
+                </div>
+                <div style="display:flex; gap:5px; margin-top:16px;">
+                  <button type="button" class="duration-chip-btn" onclick="document.getElementById('ac-inp-count').value=1">+1</button>
+                  <button type="button" class="duration-chip-btn" onclick="document.getElementById('ac-inp-count').value=5">+5</button>
+                  <button type="button" class="duration-chip-btn" onclick="document.getElementById('ac-inp-count').value=10">+10</button>
+                </div>
+              </div>
+
+              <!-- Optional Custom Key Input -->
+              <input type="text" id="ac-inp-custom-key" class="input-field-app" placeholder="Custom Key String (Optional — leave empty for auto-generated)">
+
+              <!-- Generate Button -->
+              <button class="app-btn btn-red-action" id="btn-ac-generate" onclick="authcloudGenerateKey()">
+                <span>⚡ Generate License Key(s)</span>
+              </button>
+
+              <div class="inline-msg-box" id="msg-ac-gen"></div>
+
+              <!-- Generated Key Output Card -->
+              <div id="ac-gen-result-card" style="display:none;" class="generated-keys-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                  <span style="font-family:var(--f-display); font-size:12px; font-weight:700; color:var(--white);">🎉 Generated License(s)</span>
+                  <div style="display:flex; gap:6px;">
+                    <button class="app-btn btn-dark-action" style="width:auto; padding:5px 12px; font-size:10.5px;" onclick="authcloudCopyAllKeys()"><span>📋 Copy All</span></button>
+                    <button class="app-btn btn-dark-action" style="width:auto; padding:5px 12px; font-size:10.5px;" onclick="authcloudDownloadKeysTxt()"><span>💾 Download .txt</span></button>
+                  </div>
+                </div>
+                <div id="ac-gen-keys-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+              </div>
+
+            </div>
+
+            <!-- CARD 2: RESELLER QUOTA LIMIT MANAGEMENT (ADMIN ONLY) -->
+            <div class="dashboard-card" id="ac-admin-reseller-card">
+              <div class="card-head-title" style="display:flex; align-items:center; justify-content:space-between;">
+                <span>🛡 Reseller Limits & Quotas</span>
+                <span style="font-size:10.5px; font-family:var(--f-mono); color:var(--white); background:var(--red); padding:2px 8px; border-radius:999px; font-weight:700;">ADMIN</span>
+              </div>
+              <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:14px;">Set exact key limits for each reseller so they cannot generate beyond their limit.</p>
+
+              <!-- Create Reseller with Limit Form -->
+              <div style="background:rgba(255,255,255,0.02); border:1px solid var(--hairline); border-radius:var(--r-md); padding:14px; margin-bottom:18px;">
+                <div style="font-size:11px; font-family:var(--f-mono); color:var(--red); font-weight:700; margin-bottom:8px;">ADD RESELLER WITH QUOTA LIMIT:</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                  <input type="text" id="ac-res-user" class="input-field-app" placeholder="Username" style="margin:0;">
+                  <input type="password" id="ac-res-pass" class="input-field-app" placeholder="Password" style="margin:0;">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+                  <input type="text" id="ac-res-note" class="input-field-app" placeholder="Note / Store Name" style="margin:0;">
+                  <input type="number" id="ac-res-limit" class="input-field-app" placeholder="Key Limit (e.g. 50)" value="50" min="1" style="margin:0;">
+                </div>
+                <button class="app-btn btn-red-action" style="margin-top:12px;" onclick="authcloudCreateResellerAction()">
+                  <span>Create Reseller with Limit</span>
+                </button>
+                <div class="inline-msg-box" id="msg-ac-res-create"></div>
+              </div>
+
+              <!-- Reseller Quotas List -->
+              <div style="font-size:11px; font-family:var(--f-mono); color:var(--ink-500); font-weight:700; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                <span>ACTIVE RESELLERS & QUOTA CONSUMPTION:</span>
+                <button class="app-btn btn-dark-action" style="width:auto; padding:4px 10px; font-size:10px;" onclick="authcloudLoadResellers()"><span>Refresh</span></button>
+              </div>
+              <div class="table-container-card" style="max-height:260px; overflow-y:auto;">
+                <table class="app-table">
+                  <thead>
+                    <tr><th>Reseller</th><th>Quota / Used</th><th>Remaining</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="ac-tbody-resellers">
+                    <tr><td colspan="4" style="text-align:center; color:var(--ink-700); padding:20px;">Loading Reseller Quotas...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- FULL-WIDTH CARD: AUTHCLOUD LICENSES REGISTRY -->
+          <div class="dashboard-card dashboard-card-full" style="margin-top:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <div class="card-head-title" style="margin:0;">AuthCloud License Registry</div>
+                <div style="font-size:11px; color:var(--ink-500); margin-top:2px;">Search, monitor, reset HWID, or ban/unban license keys in real time.</div>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <div style="display:flex; gap:6px;">
+                  <button class="duration-chip-btn active" id="ac-flt-all" onclick="authcloudFilterStatus('all')">All</button>
+                  <button class="duration-chip-btn" id="ac-flt-unused" onclick="authcloudFilterStatus('Unused')">Unused</button>
+                  <button class="duration-chip-btn" id="ac-flt-used" onclick="authcloudFilterStatus('Used')">Used</button>
+                  <button class="duration-chip-btn" id="ac-flt-banned" onclick="authcloudFilterStatus('Banned')">Banned</button>
+                </div>
+                <input type="text" id="ac-search-input" class="input-field-app" style="margin:0; width:220px; font-size:12px; padding:7px 12px;" placeholder="Search key, note, HWID..." onkeyup="authcloudSearch(this.value)">
+                <button class="app-btn btn-dark-action" style="width:auto; padding:8px 16px;" onclick="authcloudFetchLicenses()">
+                  <span>Refresh</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="table-container-card">
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>License Key</th>
+                    <th>Duration</th>
+                    <th>Note / Order</th>
+                    <th>Status</th>
+                    <th>Hardware ID (HWID)</th>
+                    <th>Expiration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ac-tbody-licenses">
+                  <tr><td colspan="7" style="text-align:center; color:var(--ink-700); padding:40px;">Click "Sync Licenses" to load keys from AuthCloud API.</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
         </div>
@@ -1236,6 +1646,57 @@
     </div>
   </div>
 
+  <!-- MODAL: BAN LICENSE -->
+  <div id="modal-ban-license" class="app-modal-overlay">
+    <div class="app-modal-box" style="border-color:var(--red-line); box-shadow:0 0 35px var(--red-glow);">
+      <h3 class="modal-title-red">🚫 Ban License Key</h3>
+      <div class="modal-body-text">You are about to revoke and ban the following license key from AuthCloud:</div>
+      <div id="modal-ban-key-text" style="font-family:var(--f-mono); font-size:13px; font-weight:700; color:var(--white); background:rgba(255,42,75,0.12); padding:8px 12px; border-radius:var(--r-sm); border:1px dashed var(--red-line); margin:10px 0; word-break:break-all;">KEY-XXXX</div>
+      <input type="text" id="modal-ban-reason" class="input-field-app" placeholder="Reason for ban (e.g. Terms Violation / Chargeback)" value="Administrative ban">
+      <div class="modal-btn-row">
+        <button class="app-btn btn-danger-action" style="flex:1;" onclick="authcloudExecuteBanConfirm()"><span>Ban License Key</span></button>
+        <button class="app-btn btn-dark-action" style="flex:1;" onclick="closeAppModal('modal-ban-license')"><span>Cancel</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LICENSE DETAILS -->
+  <div id="modal-license-details" class="app-modal-overlay">
+    <div class="app-modal-box" style="max-width:550px; border-color:var(--red-line);">
+      <h3 style="font-family:var(--f-display); font-size:16px; font-weight:700; color:var(--white); margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
+        <span>🔑 License Specification Details</span>
+        <span id="modal-lic-status-badge"></span>
+      </h3>
+      <div id="modal-license-details-body" style="font-family:var(--f-mono); font-size:12px; line-height:1.8; color:var(--ink-300); max-height:360px; overflow-y:auto; background:rgba(0,0,0,0.4); padding:14px; border-radius:var(--r-sm); border:1px solid var(--hairline);">
+        Loading details...
+      </div>
+      <div class="modal-btn-row" style="margin-top:16px;">
+        <button class="app-btn btn-dark-action" style="flex:1;" onclick="closeAppModal('modal-license-details')"><span>Close</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: UPDATE RESELLER KEY LIMIT -->
+  <div id="modal-reseller-limit" class="app-modal-overlay">
+    <div class="app-modal-box" style="border-color:var(--red-line);">
+      <h3 style="font-family:var(--f-display); font-size:16px; font-weight:700; color:var(--white); margin-bottom:6px;">
+        ✏ Edit Reseller Key Limit
+      </h3>
+      <div class="modal-body-text" id="modal-reseller-limit-user">Updating limit for reseller</div>
+      <label style="font-size:11px; font-family:var(--f-mono); color:var(--ink-500); display:block; margin:10px 0 4px;">New Key Generation Limit (Quota):</label>
+      <input type="number" id="modal-reseller-limit-inp" class="input-field-app" min="0" placeholder="e.g. 100">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+        <input type="checkbox" id="modal-reseller-reset-used" style="accent-color:var(--red); width:16px; height:16px; cursor:pointer;">
+        <label for="modal-reseller-reset-used" style="font-size:11.5px; color:var(--ink-300); cursor:pointer;">Reset used keys count back to 0</label>
+      </div>
+      <div class="modal-btn-row">
+        <button class="app-btn btn-red-action" style="flex:1;" onclick="authcloudExecuteUpdateLimitConfirm()"><span>Save New Limit</span></button>
+        <button class="app-btn btn-dark-action" style="flex:1;" onclick="closeAppModal('modal-reseller-limit')"><span>Cancel</span></button>
+      </div>
+      <div class="inline-msg-box" id="msg-modal-reseller-limit"></div>
+    </div>
+  </div>
+
   <div id="global-toast">
     <span id="toast-icon">✦</span>
     <span id="toast-message">Notification</span>
@@ -1259,11 +1720,11 @@
       window.addEventListener('resize', resize);
 
       const colorPalette = [
-        'rgba(255, 139, 61, ',
-        'rgba(45, 212, 191, ',
-        'rgba(167, 139, 250, ',
+        'rgba(255, 42, 75, ',
         'rgba(255, 255, 255, ',
-        'rgba(94, 177, 255, '
+        'rgba(255, 74, 104, ',
+        'rgba(255, 255, 255, ',
+        'rgba(220, 38, 38, '
       ];
 
       for (let i = 0; i < 85; i++) {
@@ -1468,6 +1929,19 @@
             saveSession();
             notifyToast('Master Admin access granted');
             launchWorkspaceView('main_admin');
+          } else if (data.role === 'key_reseller') {
+            SESSION = {
+              role: 'key_reseller',
+              adminKey: null,
+              username: data.username || identifier,
+              password: password,
+              key_limit: data.key_limit || 0,
+              keys_used: data.keys_used || 0,
+              remaining: data.remaining || 0
+            };
+            saveSession();
+            notifyToast(`Welcome, Key Reseller ${SESSION.username}`);
+            launchWorkspaceView('key_reseller');
           } else if (data.role === 'sub_admin') {
             SESSION = { role: 'sub_admin', adminKey: null, username: data.username || identifier, password: password };
             saveSession();
@@ -1508,10 +1982,12 @@
       const subPanel = document.getElementById('subadmin-panel');
       const trailPanel = document.getElementById('trail-panel');
 
+      const navLicenses = document.getElementById('nav-btn-licenses');
       const navResellers = document.getElementById('nav-btn-resellers');
       const navFetchers = document.getElementById('nav-btn-fetchers');
       const navCredit = document.getElementById('nav-btn-credit');
       const navSettings = document.getElementById('nav-btn-settings');
+      const navUids = document.getElementById('nav-btn-uids');
 
       const userDisplayName = document.getElementById('user-display-name');
       const userDisplayRole = document.getElementById('user-display-role');
@@ -1523,10 +1999,15 @@
         subPanel.classList.remove('active');
         trailPanel?.classList.remove('active');
 
+        if (navUids) navUids.style.display = 'flex';
+        if (navLicenses) navLicenses.style.display = 'flex';
         navResellers.style.display = 'flex';
         navFetchers.style.display = 'flex';
         navCredit.style.display = 'flex';
         navSettings.style.display = 'flex';
+
+        document.getElementById('ac-admin-reseller-card').style.display = 'block';
+        document.getElementById('ac-reseller-quota-box').style.display = 'none';
 
         userDisplayName.textContent = 'ADMINISTRATOR';
         userDisplayRole.textContent = 'MASTER ADMIN';
@@ -1540,11 +2021,40 @@
         adminLoadTrailUsersAction();
         loadLocalAuditLog();
         renderCreditLogView();
+        authcloudFetchLicenses();
+      } else if (role === 'key_reseller') {
+        masterPanel.classList.add('active');
+        subPanel.classList.remove('active');
+        trailPanel?.classList.remove('active');
+
+        if (navUids) navUids.style.display = 'none';
+        if (navLicenses) navLicenses.style.display = 'flex';
+        navResellers.style.display = 'none';
+        navFetchers.style.display = 'none';
+        navCredit.style.display = 'none';
+        navSettings.style.display = 'none';
+
+        document.getElementById('ac-admin-reseller-card').style.display = 'none';
+        document.getElementById('ac-reseller-quota-box').style.display = 'block';
+
+        userDisplayName.textContent = SESSION.username.toUpperCase();
+        userDisplayRole.textContent = 'KEY RESELLER';
+        userDisplayRole.style.color = 'var(--white)';
+        userDisplayRole.style.background = 'var(--red)';
+        userDisplayRole.style.borderColor = 'var(--red-line)';
+        userAvatarIcon.textContent = (SESSION.username[0] || 'K').toUpperCase();
+        userCreditsTag.style.display = 'none';
+
+        navigateTab('licenses');
+        authcloudUpdateResellerQuotaDisplay(SESSION.key_limit, SESSION.keys_used, SESSION.remaining);
+        authcloudFetchLicenses();
       } else if (role === 'sub_admin') {
         subPanel.classList.add('active');
         masterPanel.classList.remove('active');
         trailPanel?.classList.remove('active');
 
+        if (navUids) navUids.style.display = 'flex';
+        if (navLicenses) navLicenses.style.display = 'none';
         navResellers.style.display = 'none';
         navFetchers.style.display = 'none';
         navCredit.style.display = 'none';
@@ -1562,6 +2072,7 @@
         masterPanel.classList.remove('active');
         subPanel.classList.remove('active');
 
+        if (navLicenses) navLicenses.style.display = 'none';
         navResellers.style.display = 'none';
         navFetchers.style.display = 'none';
         navCredit.style.display = 'none';
@@ -1588,6 +2099,7 @@
         masterPanel.classList.remove('active');
         subPanel.classList.remove('active');
 
+        if (navLicenses) navLicenses.style.display = 'none';
         navResellers.style.display = 'none';
         navFetchers.style.display = 'none';
         navCredit.style.display = 'none';
@@ -1611,6 +2123,17 @@
       const activeView = document.getElementById('view-tab-' + tabName);
       if (activeView) activeView.classList.add('active');
 
+      if (tabName === 'licenses') {
+        authcloudFetchLicenses();
+        if (SESSION.role === 'main_admin') {
+          authcloudLoadResellers();
+          document.getElementById('ac-admin-reseller-card').style.display = 'block';
+          document.getElementById('ac-reseller-quota-box').style.display = 'none';
+        } else {
+          document.getElementById('ac-admin-reseller-card').style.display = 'none';
+          document.getElementById('ac-reseller-quota-box').style.display = 'block';
+        }
+      }
       if (tabName === 'resellers') loadResellersAction();
       if (tabName === 'fetchers') { adminLoadTrailKeysAction(); adminLoadTrailUsersAction(); }
       if (tabName === 'credit') { loadResellersAction(); renderCreditLogView(); }
@@ -2729,6 +3252,584 @@
       });
     }
 
+    // ===== 18. AUTHCLOUD LICENSE & KEY HUB ENGINE =====
+    let authcloudLicensesCache = [];
+    let authcloudActiveFilter = 'all';
+    let selectedLicenseDuration = '30 Days';
+    let generatedKeysCache = [];
+    let banTargetKey = null;
+    let updateLimitTargetUser = null;
+
+    function authcloudSelectDuration(durationStr, el) {
+      selectedLicenseDuration = durationStr;
+      document.querySelectorAll('#ac-duration-chips .duration-chip-btn').forEach(btn => btn.classList.remove('active'));
+      if (el) el.classList.add('active');
+      const customWrap = document.getElementById('ac-custom-duration-wrap');
+      if (durationStr === 'Custom') {
+        customWrap.style.display = 'block';
+      } else {
+        customWrap.style.display = 'none';
+      }
+    }
+
+    function authcloudGetEffectiveDuration() {
+      if (selectedLicenseDuration === 'Custom') {
+        const val = document.getElementById('ac-inp-custom-dur-val')?.value || '30';
+        const unit = document.getElementById('ac-sel-custom-dur-unit')?.value || 'Days';
+        return `${val} ${unit}`;
+      }
+      return selectedLicenseDuration;
+    }
+
+    async function authcloudFetchLicenses(status = '') {
+      try {
+        const tbody = document.getElementById('ac-tbody-licenses');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--ink-500); padding:30px;"><div class="loading-spinner" style="margin:0 auto 10px;"></div>Loading live AuthCloud licenses...</td></tr>`;
+
+        let url = '/api/authcloud/licenses';
+        if (status && status !== 'all') url += '?status=' + encodeURIComponent(status);
+        
+        let res = await fetch(url);
+        let data;
+        if (res.ok) {
+          data = await res.json();
+        } else {
+          let directUrl = 'http://194.233.76.156:10077/lib/api/licenses';
+          if (status && status !== 'all') directUrl += '?status=' + encodeURIComponent(status);
+          res = await fetch(directUrl);
+          data = await res.json();
+        }
+
+        authcloudLicensesCache = data.licenses || [];
+        
+        const totalEl = document.getElementById('ac-stat-total');
+        const unusedEl = document.getElementById('ac-stat-unused');
+        const usedEl = document.getElementById('ac-stat-used');
+        const bannedEl = document.getElementById('ac-stat-banned');
+
+        if (totalEl) totalEl.textContent = data.count !== undefined ? data.count : authcloudLicensesCache.length;
+        if (unusedEl) unusedEl.textContent = authcloudLicensesCache.filter(k => (k.status || '').toLowerCase() === 'unused').length;
+        if (usedEl) usedEl.textContent = authcloudLicensesCache.filter(k => (k.status || '').toLowerCase() === 'used').length;
+        if (bannedEl) bannedEl.textContent = authcloudLicensesCache.filter(k => (k.status || '').toLowerCase() === 'banned').length;
+
+        renderAuthcloudLicensesTable(authcloudLicensesCache);
+      } catch (err) {
+        console.error('Error fetching AuthCloud licenses:', err);
+        const tbody = document.getElementById('ac-tbody-licenses');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ff8a8a; padding:30px;">⚠️ Failed to load licenses from AuthCloud API. (${err.message})</td></tr>`;
+      }
+    }
+
+    function renderAuthcloudLicensesTable(list) {
+      const tbody = document.getElementById('ac-tbody-licenses');
+      if (!tbody) return;
+
+      let filtered = list;
+      if (authcloudActiveFilter && authcloudActiveFilter !== 'all') {
+        filtered = list.filter(k => (k.status || '').toLowerCase() === authcloudActiveFilter.toLowerCase());
+      }
+
+      const searchVal = (document.getElementById('ac-search-input')?.value || '').toLowerCase().trim();
+      if (searchVal) {
+        filtered = filtered.filter(k => {
+          return (k.key || '').toLowerCase().includes(searchVal) ||
+                 (k.note || '').toLowerCase().includes(searchVal) ||
+                 (k.hwid || '').toLowerCase().includes(searchVal) ||
+                 String(k.id || '').toLowerCase().includes(searchVal);
+        });
+      }
+
+      if (!filtered || filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--ink-700); padding:35px;">No licenses found matching current filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        const key = item.key || '—';
+        const duration = item.duration || '—';
+        const note = item.note || 'None';
+        const status = item.status || 'Unused';
+        const hwid = (item.hwid && item.hwid !== 'None') ? item.hwid : ((item.hardwareId && item.hardwareId !== 'None') ? item.hardwareId : 'Not Bound');
+        const rawExpiry = item.expiresAt || item.expires_at || item.expiry;
+        const expires = rawExpiry ? (rawExpiry.includes('T') ? rawExpiry.split('T')[0] : rawExpiry) : '—';
+        const isBanned = status.toLowerCase() === 'banned';
+
+        let statusBadge = '<span class="status-badge badge-green" style="background:rgba(16,185,129,0.15); color:#34d399; border-color:rgba(16,185,129,0.4);">Unused</span>';
+        if (status.toLowerCase() === 'used') {
+          statusBadge = '<span class="status-badge badge-blue" style="background:rgba(94,177,255,0.15); color:#93c5fd; border-color:rgba(94,177,255,0.4);">Used / Bound</span>';
+        } else if (isBanned) {
+          statusBadge = '<span class="status-badge badge-red" style="background:rgba(255,42,75,0.18); color:#ff6b81; border-color:var(--red-line);">Banned</span>';
+        }
+
+        const hwidDisplay = hwid === 'Not Bound' || !hwid ? 
+          '<span style="color:var(--ink-700); font-family:var(--f-mono); font-size:11px;">None</span>' : 
+          `<span style="color:var(--ink-300); font-family:var(--f-mono); font-size:11px;" title="${hwid}">${hwid.slice(0, 12)}...</span>`;
+
+        return `
+          <tr>
+            <td>
+              <span class="mono-uid" style="color:var(--white); font-weight:700;">${key}</span>
+              <button class="copy-pill-btn" onclick="navigator.clipboard.writeText('${key}'); notifyToast('License key copied!');">Copy</button>
+            </td>
+            <td style="font-family:var(--f-mono); font-size:11.5px; color:var(--red); font-weight:600;">${duration}</td>
+            <td style="font-size:12px; color:var(--ink-300); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${note}</td>
+            <td>${statusBadge}</td>
+            <td>${hwidDisplay}</td>
+            <td style="font-family:var(--f-mono); font-size:11px; color:var(--ink-500);">${expires}</td>
+            <td>
+              <div style="display:flex; gap:6px; flex-wrap:nowrap;">
+                <button class="app-btn btn-dark-action" style="width:auto; padding:5px 10px; font-size:11px;" title="Reset HWID" onclick="authcloudResetHwidForKey('${key}')">
+                  <span>🔄 Reset</span>
+                </button>
+                ${isBanned ? 
+                  `<button class="app-btn btn-amber-action" style="width:auto; padding:5px 10px; font-size:11px;" onclick="authcloudUnbanKey('${key}')"><span>🔓 Unban</span></button>` :
+                  `<button class="app-btn btn-danger-action" style="width:auto; padding:5px 10px; font-size:11px;" onclick="authcloudPromptBan('${key}')"><span>🚫 Ban</span></button>`
+                }
+                <button class="app-btn btn-dark-action" style="width:auto; padding:5px 10px; font-size:11px;" title="Details" onclick="authcloudViewDetails('${key}')">
+                  <span>ℹ</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function authcloudFilterStatus(status) {
+      authcloudActiveFilter = status;
+      document.querySelectorAll('#ac-flt-all, #ac-flt-unused, #ac-flt-used, #ac-flt-banned').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById('ac-flt-' + status.toLowerCase());
+      if (activeBtn) activeBtn.classList.add('active');
+      renderAuthcloudLicensesTable(authcloudLicensesCache);
+    }
+
+    function authcloudSearch(query) {
+      renderAuthcloudLicensesTable(authcloudLicensesCache);
+    }
+
+    async function authcloudGenerateKey() {
+      const msgBox = document.getElementById('msg-ac-gen');
+      const btn = document.getElementById('btn-ac-generate');
+      msgBox.className = 'inline-msg-box';
+      msgBox.textContent = '';
+
+      const duration = authcloudGetEffectiveDuration();
+      const note = document.getElementById('ac-inp-note')?.value.trim();
+      const count = parseInt(document.getElementById('ac-inp-count')?.value) || 1;
+      const customKey = document.getElementById('ac-inp-custom-key')?.value.trim();
+
+      if (SESSION.role === 'key_reseller' || SESSION.role === 'sub_admin') {
+        const remaining = SESSION.remaining !== undefined ? SESSION.remaining : (SESSION.key_limit - (SESSION.keys_used || 0));
+        if (remaining <= 0) {
+          msgBox.className = 'inline-msg-box err';
+          msgBox.textContent = '❌ Generation blocked: You have reached your key limit (0 remaining). Contact Master Admin to increase quota.';
+          return;
+        }
+        if (count > remaining) {
+          msgBox.className = 'inline-msg-box err';
+          msgBox.textContent = `❌ Quota exceeded: You only have ${remaining} key(s) remaining. Cannot generate ${count} keys.`;
+          return;
+        }
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡ Generating Key(s)...</span>';
+
+      const payload = {
+        duration: duration,
+        note: note,
+        count: count
+      };
+      if (customKey) payload.key = customKey;
+
+      if (SESSION.role === 'main_admin') {
+        payload.admin_key = SESSION.admin_key || ADMIN_KEY;
+      } else {
+        payload.username = SESSION.username;
+        payload.password = SESSION.password;
+      }
+
+      try {
+        const res = await fetch('/api/authcloud/licenses/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          msgBox.className = 'inline-msg-box ok';
+          msgBox.textContent = `✅ Successfully created ${data.licenses ? data.licenses.length : count} license key(s)!`;
+          notifyToast(`Generated ${data.licenses ? data.licenses.length : count} key(s)`);
+
+          generatedKeysCache = data.licenses || [];
+          renderGeneratedKeysBox(generatedKeysCache, duration);
+
+          if (data.reseller_quota) {
+            SESSION.key_limit = data.reseller_quota.key_limit;
+            SESSION.keys_used = data.reseller_quota.keys_used;
+            SESSION.remaining = data.reseller_quota.remaining;
+            authcloudUpdateResellerQuotaDisplay(SESSION.key_limit, SESSION.keys_used, SESSION.remaining);
+          }
+
+          authcloudFetchLicenses();
+          if (SESSION.role === 'main_admin') authcloudLoadResellers();
+        } else {
+          msgBox.className = 'inline-msg-box err';
+          msgBox.textContent = data.message || 'Failed to create license key.';
+        }
+      } catch (err) {
+        msgBox.className = 'inline-msg-box err';
+        msgBox.textContent = 'Network error communicating with AuthCloud: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡ Generate License Key(s)</span>';
+      }
+    }
+
+    function renderGeneratedKeysBox(keys, duration) {
+      const card = document.getElementById('ac-gen-result-card');
+      const container = document.getElementById('ac-gen-keys-container');
+      if (!card || !container) return;
+
+      container.innerHTML = keys.map(k => {
+        const keyCode = k.key || k;
+        return `
+          <div class="key-glow-text">
+            <span>${keyCode}</span>
+            <button class="copy-pill-btn" style="padding:4px 10px; font-size:11px;" onclick="navigator.clipboard.writeText('${keyCode}'); notifyToast('License key copied!');">
+              📋 Copy
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      card.style.display = 'block';
+    }
+
+    function authcloudCopyAllKeys() {
+      if (!generatedKeysCache || generatedKeysCache.length === 0) return;
+      const text = generatedKeysCache.map(k => k.key || k).join('\n');
+      navigator.clipboard.writeText(text);
+      notifyToast(`Copied ${generatedKeysCache.length} key(s) to clipboard!`);
+    }
+
+    function authcloudDownloadKeysTxt() {
+      if (!generatedKeysCache || generatedKeysCache.length === 0) return;
+      const text = generatedKeysCache.map(k => k.key || k).join('\n');
+      const blob = new Blob([text], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `AuthCloud_Keys_${Date.now()}.txt`;
+      a.click();
+      notifyToast('Keys downloaded as .txt file');
+    }
+
+    async function authcloudQuickResetHwid() {
+      const inp = document.getElementById('ac-inp-quick-reset');
+      const key = (inp?.value || '').trim();
+      if (!key) {
+        notifyToast('Please paste or enter a license key');
+        return;
+      }
+      await authcloudResetHwidForKey(key);
+      if (inp) inp.value = '';
+    }
+
+    async function authcloudResetHwidForKey(keyStr) {
+      try {
+        notifyToast('Resetting HWID binding...');
+        const res = await fetch('/api/authcloud/licenses/reset-hwid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: keyStr })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          notifyToast(`✅ HWID successfully reset for key: ${keyStr}`);
+          authcloudFetchLicenses();
+        } else {
+          notifyToast(`❌ Reset HWID failed: ${data.message || 'Unknown error'}`);
+        }
+      } catch (err) {
+        notifyToast('Error connecting to API: ' + err.message);
+      }
+    }
+
+    function authcloudPromptBan(keyStr) {
+      banTargetKey = keyStr;
+      const keyTextEl = document.getElementById('modal-ban-key-text');
+      if (keyTextEl) keyTextEl.textContent = keyStr;
+      openAppModal('modal-ban-license');
+    }
+
+    async function authcloudExecuteBanConfirm() {
+      if (!banTargetKey) return;
+      const reason = document.getElementById('modal-ban-reason')?.value || 'Administrative ban';
+      closeAppModal('modal-ban-license');
+      try {
+        notifyToast('Banning license key...');
+        const res = await fetch('/api/authcloud/licenses/ban', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: banTargetKey, reason: reason })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          notifyToast(`🚫 License key ${banTargetKey} has been banned.`);
+          authcloudFetchLicenses();
+        } else {
+          notifyToast(`❌ Failed to ban: ${data.message || 'Error'}`);
+        }
+      } catch (err) {
+        notifyToast('Error: ' + err.message);
+      } finally {
+        banTargetKey = null;
+      }
+    }
+
+    async function authcloudUnbanKey(keyStr) {
+      try {
+        notifyToast('Unbanning license key...');
+        const res = await fetch('/api/authcloud/licenses/unban', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: keyStr })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          notifyToast(`🔓 License key ${keyStr} has been unbanned!`);
+          authcloudFetchLicenses();
+        } else {
+          notifyToast(`❌ Failed to unban: ${data.message || 'Error'}`);
+        }
+      } catch (err) {
+        notifyToast('Error: ' + err.message);
+      }
+    }
+
+    async function authcloudViewDetails(keyStr) {
+      const bodyEl = document.getElementById('modal-license-details-body');
+      const badgeEl = document.getElementById('modal-lic-status-badge');
+      if (bodyEl) bodyEl.innerHTML = '<div style="color:var(--ink-500);">Fetching live key details from AuthCloud...</div>';
+      if (badgeEl) badgeEl.innerHTML = '';
+      openAppModal('modal-license-details');
+
+      try {
+        const res = await fetch('/api/authcloud/licenses/' + encodeURIComponent(keyStr));
+        const data = await res.json();
+        if (res.ok && (data.license || data.key)) {
+          const lic = data.license || data;
+          const status = lic.status || 'Unused';
+          badgeEl.innerHTML = `<span class="status-badge badge-${status.toLowerCase() === 'banned' ? 'red' : 'green'}">${status}</span>`;
+          bodyEl.innerHTML = `
+            <div style="display:grid; grid-template-columns: 120px 1fr; gap:8px;">
+              <span style="color:var(--ink-500);">Key:</span><b style="color:var(--white); word-break:break-all;">${lic.key || keyStr}</b>
+              <span style="color:var(--ink-500);">Duration:</span><span style="color:var(--red); font-weight:700;">${lic.duration || '—'}</span>
+              <span style="color:var(--ink-500);">Client Note:</span><span style="color:var(--ink-100);">${lic.note || 'None'}</span>
+              <span style="color:var(--ink-500);">Status:</span><span style="color:var(--white); font-weight:600;">${lic.status || 'Unused'}</span>
+              <span style="color:var(--ink-500);">Hardware ID:</span><span style="color:var(--ink-300); word-break:break-all;">${lic.hwid || 'Not Bound'}</span>
+              <span style="color:var(--ink-500);">Created At:</span><span style="color:var(--ink-300);">${lic.created_at || '—'}</span>
+              <span style="color:var(--ink-500);">Expires At:</span><span style="color:var(--ink-300);">${lic.expires_at || lic.expiry || '—'}</span>
+            </div>
+          `;
+        } else {
+          bodyEl.innerHTML = `<div style="color:#ff8a8a;">Could not load details: ${data.message || 'License not found'}</div>`;
+        }
+      } catch (err) {
+        bodyEl.innerHTML = `<div style="color:#ff8a8a;">Error: ${err.message}</div>`;
+      }
+    }
+
+    async function authcloudLoadResellers() {
+      if (SESSION.role !== 'main_admin') return;
+      const tbody = document.getElementById('ac-tbody-resellers');
+      if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-500); padding:16px;">Loading quotas...</td></tr>`;
+
+      try {
+        const res = await fetch('/api/authcloud/resellers?admin_key=' + encodeURIComponent(SESSION.admin_key || ADMIN_KEY));
+        const data = await res.json();
+        if (res.ok && data.resellers) {
+          renderAuthcloudResellersTable(data.resellers);
+        }
+      } catch (err) {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#ff8a8a; padding:16px;">Error loading resellers: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderAuthcloudResellersTable(resellers) {
+      const tbody = document.getElementById('ac-tbody-resellers');
+      if (!tbody) return;
+      if (!resellers || resellers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-700); padding:16px;">No resellers created yet. Add one above.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = resellers.map(r => {
+        const lim = r.key_limit || 0;
+        const usd = r.keys_used || 0;
+        const pct = lim > 0 ? Math.min(100, Math.round((usd / lim) * 100)) : 0;
+        const rem = Math.max(0, lim - usd);
+        const barClass = pct >= 100 ? 'full' : (pct >= 80 ? 'warn' : '');
+
+        return `
+          <tr>
+            <td>
+              <b style="color:var(--white);">${r.username}</b>
+              ${r.note ? `<div style="font-size:10px; color:var(--ink-500);">${r.note}</div>` : ''}
+            </td>
+            <td style="min-width:130px;">
+              <div style="font-family:var(--f-mono); font-size:11px; display:flex; justify-content:space-between;">
+                <span>${usd} / ${lim}</span>
+                <span style="color:${pct >= 100 ? 'var(--red)' : 'var(--ink-500)'}; font-weight:700;">${pct}%</span>
+              </div>
+              <div class="quota-track">
+                <div class="quota-fill ${barClass}" style="width:${pct}%;"></div>
+              </div>
+            </td>
+            <td style="font-family:var(--f-mono); font-size:11.5px; font-weight:700; color:${rem === 0 ? 'var(--red)' : '#34d399'};">
+              ${rem} Keys
+            </td>
+            <td>
+              <div style="display:flex; gap:5px;">
+                <button class="app-btn btn-dark-action" style="width:auto; padding:4px 8px; font-size:10px;" onclick="authcloudOpenUpdateLimitModal('${r.username}', ${lim})">
+                  <span>Limit</span>
+                </button>
+                <button class="app-btn btn-danger-action" style="width:auto; padding:4px 8px; font-size:10px;" onclick="authcloudDeleteResellerAction('${r.username}')">
+                  <span>✕</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function authcloudCreateResellerAction() {
+      const user = document.getElementById('ac-res-user')?.value.trim();
+      const pass = document.getElementById('ac-res-pass')?.value.trim();
+      const note = document.getElementById('ac-res-note')?.value.trim();
+      const limit = parseInt(document.getElementById('ac-res-limit')?.value) || 20;
+      const msgBox = document.getElementById('msg-ac-res-create');
+
+      msgBox.className = 'inline-msg-box';
+      if (!user || !pass) {
+        msgBox.className = 'inline-msg-box err';
+        msgBox.textContent = 'Username and password required.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/authcloud/resellers/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            admin_key: SESSION.admin_key || ADMIN_KEY,
+            username: user,
+            password: pass,
+            note: note,
+            key_limit: limit
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          msgBox.className = 'inline-msg-box ok';
+          msgBox.textContent = `✅ Reseller '${user}' created with quota limit of ${limit} keys.`;
+          notifyToast(`Reseller ${user} created`);
+          document.getElementById('ac-res-user').value = '';
+          document.getElementById('ac-res-pass').value = '';
+          document.getElementById('ac-res-note').value = '';
+          authcloudLoadResellers();
+        } else {
+          msgBox.className = 'inline-msg-box err';
+          msgBox.textContent = data.message || 'Error creating reseller.';
+        }
+      } catch (err) {
+        msgBox.className = 'inline-msg-box err';
+        msgBox.textContent = 'Error: ' + err.message;
+      }
+    }
+
+    function authcloudOpenUpdateLimitModal(username, currentLimit) {
+      updateLimitTargetUser = username;
+      document.getElementById('modal-reseller-limit-user').textContent = `Setting new key quota for reseller: ${username}`;
+      document.getElementById('modal-reseller-limit-inp').value = currentLimit || 50;
+      document.getElementById('modal-reseller-reset-used').checked = false;
+      openAppModal('modal-reseller-limit');
+    }
+
+    async function authcloudExecuteUpdateLimitConfirm() {
+      if (!updateLimitTargetUser) return;
+      const newLimit = parseInt(document.getElementById('modal-reseller-limit-inp').value) || 0;
+      const resetUsed = document.getElementById('modal-reseller-reset-used').checked;
+      const msgBox = document.getElementById('msg-modal-reseller-limit');
+
+      try {
+        const res = await fetch('/api/authcloud/resellers/update-limit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            admin_key: SESSION.admin_key || ADMIN_KEY,
+            username: updateLimitTargetUser,
+            key_limit: newLimit,
+            reset_used: resetUsed
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          notifyToast(`Updated limit for ${updateLimitTargetUser} to ${newLimit}`);
+          closeAppModal('modal-reseller-limit');
+          authcloudLoadResellers();
+        } else {
+          msgBox.className = 'inline-msg-box err';
+          msgBox.textContent = data.message || 'Failed to update limit';
+        }
+      } catch (err) {
+        msgBox.className = 'inline-msg-box err';
+        msgBox.textContent = 'Error: ' + err.message;
+      }
+    }
+
+    async function authcloudDeleteResellerAction(username) {
+      if (!confirm(`Are you sure you want to delete reseller '${username}'?`)) return;
+      try {
+        const res = await fetch('/api/authcloud/resellers/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            admin_key: SESSION.admin_key || ADMIN_KEY,
+            username: username
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === 'success') {
+          notifyToast(`Reseller '${username}' removed.`);
+          authcloudLoadResellers();
+        } else {
+          notifyToast(`Error: ${data.message || 'Failed to delete'}`);
+        }
+      } catch (err) {
+        notifyToast('Error: ' + err.message);
+      }
+    }
+
+    function authcloudUpdateResellerQuotaDisplay(limit, used, remaining) {
+      const box = document.getElementById('ac-reseller-quota-box');
+      const text = document.getElementById('ac-reseller-quota-text');
+      const bar = document.getElementById('ac-reseller-quota-bar');
+      if (!box || !text || !bar) return;
+
+      box.style.display = 'block';
+      const lim = limit || 0;
+      const usd = used || 0;
+      const rem = remaining !== undefined ? remaining : Math.max(0, lim - usd);
+      const pct = lim > 0 ? Math.min(100, Math.round((usd / lim) * 100)) : 0;
+
+      text.textContent = `${usd} Used / ${lim} Limit (${rem} Remaining)`;
+      bar.style.width = pct + '%';
+      bar.className = 'quota-fill' + (pct >= 100 ? ' full' : (pct >= 80 ? ' warn' : ''));
+    }
+
     // ===== 17. APPLICATION BOOTSTRAP =====
     window.addEventListener('DOMContentLoaded', async () => {
       initChips('m-chips-container', 'm-sel-days', [1, 7, 15, 30, 60, 90, 365]);
@@ -2737,6 +3838,27 @@
 
       loadSession();
       loadLocalAuditLog();
+
+      if (SESSION.role === 'key_reseller' && SESSION.username && SESSION.password) {
+        try {
+          const res = await fetch('/unified/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: SESSION.username, password: SESSION.password })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === 'success') {
+              SESSION.key_limit = data.reseller_quota ? data.reseller_quota.key_limit : SESSION.key_limit;
+              SESSION.keys_used = data.reseller_quota ? data.reseller_quota.keys_used : SESSION.keys_used;
+              SESSION.remaining = data.reseller_quota ? data.reseller_quota.remaining : SESSION.remaining;
+              launchWorkspaceView('key_reseller');
+              return;
+            }
+          }
+        } catch (e) {}
+        clearSession();
+      }
 
       if (SESSION.role === 'main_admin' && SESSION.adminKey) {
         try {

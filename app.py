@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 import threading
@@ -15,9 +16,10 @@ load_dotenv()
 app = Flask(__name__)
 
 # CONFIG
-UID_API_BASE   = os.environ.get("UID_API_BASE", "https://uid.syntaxcorporation.online")
-ADMIN_KEY      = os.environ.get("ADMIN_KEY",    "changeme_admin_key")
-SELF_URL       = os.environ.get("SELF_URL",     "").rstrip("/")   # ← trailing slash সরানো হয়েছে
+UID_API_BASE       = os.environ.get("UID_API_BASE", "https://uid.syntaxcorporation.online")
+AUTHCLOUD_API_BASE = os.environ.get("AUTHCLOUD_API_BASE", "http://194.233.76.156:10077/lib/api").rstrip("/")
+ADMIN_KEY          = os.environ.get("ADMIN_KEY",    "changeme_admin_key")
+SELF_URL           = os.environ.get("SELF_URL",     "").rstrip("/")   # ← trailing slash সরানো হয়েছে
 
 # MONGODB SETUP
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://NAYEM:1122@cluster0.ywmyozb.mongodb.net/?appName=Cluster0")
@@ -32,17 +34,19 @@ try:
         socketTimeoutMS=10000,
     )
     mongo_client.server_info()
-    db                = mongo_client["sensix_panel"]
-    subadmins_col     = db["subadmins"]
-    fetchers_col      = db["fetchers"]
-    uid_ownership_col = db["uid_ownership"]
-    credit_log_col    = db["credit_log"]
-    trail_users_col   = db["trail_users"]
-    trail_keys_col    = db["trail_keys"]
+    db                    = mongo_client["sensix_panel"]
+    subadmins_col         = db["subadmins"]
+    fetchers_col          = db["fetchers"]
+    uid_ownership_col     = db["uid_ownership"]
+    credit_log_col        = db["credit_log"]
+    trail_users_col       = db["trail_users"]
+    trail_keys_col        = db["trail_keys"]
+    key_resellers_col     = db["key_resellers"]
+    license_keys_log_col  = db["license_keys_log"]
     print("MongoDB connected OK")
 except Exception as e:
     print(f"MongoDB FAILED: {e}")
-    mongo_client = db = subadmins_col = fetchers_col = uid_ownership_col = credit_log_col = trail_users_col = trail_keys_col = None
+    mongo_client = db = subadmins_col = fetchers_col = uid_ownership_col = credit_log_col = trail_users_col = trail_keys_col = key_resellers_col = license_keys_log_col = None
 
 
 # ===== KEEP-ALIVE SELF-PING (FIX) =====
@@ -1018,7 +1022,20 @@ def unified_login():
     if identifier == ADMIN_KEY or password == ADMIN_KEY:
         return jsonify({"status": "success", "role": "main_admin", "admin_key": ADMIN_KEY}), 200
 
-    # 2) Sub-Admin (Reseller)
+    # 2) Key Reseller or Sub-Admin (Reseller)
+    key_res = find_key_reseller(identifier)
+    if key_res and key_res.get("password") == password:
+        lim = int(key_res.get("key_limit", 0))
+        usd = int(key_res.get("keys_used", 0))
+        return jsonify({
+            "status": "success",
+            "role": "key_reseller",
+            "username": identifier,
+            "key_limit": lim,
+            "keys_used": usd,
+            "remaining": max(0, lim - usd)
+        }), 200
+
     if verify_subadmin(identifier, password):
         return jsonify({"status": "success", "role": "sub_admin", "username": identifier}), 200
 
@@ -1178,6 +1195,450 @@ def db_status():
     return jsonify({"status": "success", "message": "MongoDB connected OK"}), 200
 
 
+# ==============================================================================
+# ===== AUTHCLOUD LICENSE KEYS & RESELLER QUOTA SYSTEM ========================
+# ==============================================================================
+
+RESELLER_LOCAL_FILE = os.path.join(os.path.dirname(__file__), "resellers_quota.json")
+
+def get_all_key_resellers():
+    """Retrieve all key resellers from Mongo or local fallback"""
+    if key_resellers_col is not None:
+        try:
+            return list(key_resellers_col.find({}, {"_id": 0}))
+        except Exception as e:
+            print(f"[RESELLER DB ERR] {e}")
+    if os.path.exists(RESELLER_LOCAL_FILE):
+        try:
+            with open(RESELLER_LOCAL_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+def find_key_reseller(username):
+    """Find a specific reseller by username"""
+    if key_resellers_col is not None:
+        try:
+            doc = key_resellers_col.find_one({"username": username}, {"_id": 0})
+            if doc:
+                return doc
+        except Exception as e:
+            print(f"[RESELLER FIND ERR] {e}")
+    resellers = get_all_key_resellers()
+    for r in resellers:
+        if r.get("username") == username:
+            return r
+    return None
+
+def save_key_reseller_doc(reseller_doc):
+    """Save or update reseller record in Mongo and local backup"""
+    username = reseller_doc.get("username")
+    if key_resellers_col is not None:
+        try:
+            key_resellers_col.update_one(
+                {"username": username},
+                {"$set": reseller_doc},
+                upsert=True
+            )
+        except Exception as e:
+            print(f"[RESELLER SAVE ERR] {e}")
+    # Also sync local file for zero-downtime reliability
+    try:
+        items = []
+        if os.path.exists(RESELLER_LOCAL_FILE):
+            try:
+                with open(RESELLER_LOCAL_FILE, "r", encoding="utf-8") as f:
+                    items = json.load(f)
+            except Exception:
+                items = []
+        items = [i for i in items if i.get("username") != username]
+        items.append(reseller_doc)
+        with open(RESELLER_LOCAL_FILE, "w", encoding="utf-8") as f:
+            json.dump(items, f, indent=2)
+    except Exception as e:
+        print(f"[RESELLER LOCAL WRITE ERR] {e}")
+
+def delete_key_reseller_doc(username):
+    """Delete reseller by username"""
+    if key_resellers_col is not None:
+        try:
+            key_resellers_col.delete_one({"username": username})
+        except Exception as e:
+            print(f"[RESELLER DEL ERR] {e}")
+    if os.path.exists(RESELLER_LOCAL_FILE):
+        try:
+            with open(RESELLER_LOCAL_FILE, "r", encoding="utf-8") as f:
+                items = json.load(f)
+            items = [i for i in items if i.get("username") != username]
+            with open(RESELLER_LOCAL_FILE, "w", encoding="utf-8") as f:
+                json.dump(items, f, indent=2)
+        except Exception:
+            pass
+
+
+# 0. API Health & Status
+@app.route('/api/authcloud/status', methods=['GET'])
+def authcloud_status():
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/status"
+        resp = requests.get(url, timeout=10)
+        return jsonify(resp.json()), resp.status_code
+    except Exception as e:
+        return jsonify({"success": True, "status": "online", "message": "AuthCloud Proxy Connected", "error": str(e)}), 200
+
+
+# 1. License Directory & List
+@app.route('/api/authcloud/licenses', methods=['GET'])
+def authcloud_get_licenses():
+    status = request.args.get("status")
+    search = request.args.get("search")
+    params = {}
+    if status:
+        params["status"] = status
+    if search:
+        params["search"] = search
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/licenses"
+        resp = requests.get(url, params=params, timeout=12)
+        data = resp.json()
+        return jsonify(data), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e), "message": "Failed to connect to AuthCloud API"}), 502
+
+
+# 2. Get Single License
+@app.route('/api/authcloud/licenses/<path:key_or_id>', methods=['GET'])
+def authcloud_get_single_license(key_or_id):
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/licenses/{key_or_id}"
+        resp = requests.get(url, timeout=10)
+        return jsonify(resp.json()), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 502
+
+
+# 3. Create License Key(s) with Strict Reseller Quota Enforcement
+@app.route('/api/authcloud/licenses/create', methods=['POST'])
+def authcloud_create_licenses():
+    body = request.json or {}
+    admin_key = body.get("admin_key", "").strip()
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+
+    duration = body.get("duration", "30 Days").strip()
+    note = body.get("note", "Dashboard Order").strip()
+    try:
+        count = int(body.get("count", 1))
+    except (ValueError, TypeError):
+        count = 1
+    custom_key = body.get("key", "").strip() or None
+
+    is_admin = (admin_key == ADMIN_KEY)
+    reseller_doc = None
+
+    if not is_admin:
+        # Must be authenticated reseller
+        if not username or not password:
+            return jsonify({"success": False, "status": "error", "message": "Authentication required (Admin key or Reseller credentials)"}), 401
+        
+        reseller_doc = find_key_reseller(username)
+        # Also check existing subadmin collections
+        if not reseller_doc and subadmins_col is not None:
+            sub = subadmins_col.find_one({"username": username, "password": password})
+            if sub:
+                reseller_doc = {
+                    "username": username,
+                    "password": password,
+                    "note": sub.get("note", "Subadmin Reseller"),
+                    "key_limit": sub.get("key_limit", sub.get("credits", 20)),
+                    "keys_used": sub.get("keys_used", 0),
+                    "created_at": sub.get("created_at", datetime.utcnow()).isoformat() if hasattr(sub.get("created_at"), "isoformat") else str(sub.get("created_at"))
+                }
+                save_key_reseller_doc(reseller_doc)
+
+        if not reseller_doc or reseller_doc.get("password") != password:
+            return jsonify({"success": False, "status": "error", "message": "Invalid reseller credentials"}), 403
+
+        # Quota Verification: check remaining limit
+        key_limit = int(reseller_doc.get("key_limit", 0))
+        keys_used = int(reseller_doc.get("keys_used", 0))
+        remaining = key_limit - keys_used
+
+        if remaining <= 0:
+            return jsonify({
+                "success": False,
+                "status": "limit_reached",
+                "message": f"❌ Reseller key limit reached! (Quota: {key_limit}, Used: {keys_used}). Contact Admin to increase your limit.",
+                "key_limit": key_limit,
+                "keys_used": keys_used,
+                "remaining": 0
+            }), 403
+
+        if count > remaining:
+            return jsonify({
+                "success": False,
+                "status": "insufficient_quota",
+                "message": f"❌ Cannot create {count} keys. You only have {remaining} key(s) remaining in your limit. (Quota: {key_limit}, Used: {keys_used}).",
+                "key_limit": key_limit,
+                "keys_used": keys_used,
+                "remaining": remaining
+            }), 400
+
+    # Prepare AuthCloud API payload
+    creator_tag = f"Reseller: {username}" if reseller_doc else "Master Admin"
+    full_note = f"{note} [{creator_tag}]" if note else creator_tag
+    payload = {
+        "duration": duration,
+        "note": full_note,
+        "count": count
+    }
+    if custom_key:
+        payload["key"] = custom_key
+
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/licenses/create"
+        resp = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=20)
+        data = resp.json()
+
+        if resp.status_code in (200, 201) and data.get("success"):
+            created_list = data.get("licenses", [])
+            actual_count = len(created_list) if created_list else count
+
+            # If reseller, update used counter and log keys
+            if reseller_doc:
+                new_used = int(reseller_doc.get("keys_used", 0)) + actual_count
+                reseller_doc["keys_used"] = new_used
+                save_key_reseller_doc(reseller_doc)
+
+                # Log to mongo or local
+                if license_keys_log_col is not None:
+                    try:
+                        license_keys_log_col.insert_one({
+                            "reseller": username,
+                            "count": actual_count,
+                            "duration": duration,
+                            "keys": [k.get("key") for k in created_list if isinstance(k, dict)],
+                            "created_at": datetime.utcnow().isoformat()
+                        })
+                    except Exception as e:
+                        print(f"[KEY LOG ERR] {e}")
+
+                data["reseller_quota"] = {
+                    "key_limit": int(reseller_doc.get("key_limit", 0)),
+                    "keys_used": new_used,
+                    "remaining": max(0, int(reseller_doc.get("key_limit", 0)) - new_used)
+                }
+
+            return jsonify(data), 200
+        else:
+            return jsonify(data), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "status": "error", "message": f"AuthCloud API request failed: {str(e)}"}), 502
+
+
+# 4. Reset HWID Binding
+@app.route('/api/authcloud/licenses/reset-hwid', methods=['POST'])
+def authcloud_reset_hwid():
+    body = request.json or {}
+    key = body.get("key", "").strip()
+    if not key:
+        return jsonify({"success": False, "message": "Key is required to reset HWID"}), 400
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/licenses/reset-hwid"
+        resp = requests.post(url, json={"key": key}, headers={"Content-Type": "application/json"}, timeout=15)
+        return jsonify(resp.json()), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Failed to reset HWID: {str(e)}"}), 502
+
+
+# 5. Ban License Key
+@app.route('/api/authcloud/licenses/ban', methods=['POST'])
+def authcloud_ban_license():
+    body = request.json or {}
+    key = body.get("key", "").strip()
+    reason = body.get("reason", "Administrative action").strip()
+    if not key:
+        return jsonify({"success": False, "message": "Key is required to ban"}), 400
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/licenses/ban"
+        resp = requests.post(url, json={"key": key, "reason": reason}, headers={"Content-Type": "application/json"}, timeout=15)
+        return jsonify(resp.json()), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Failed to ban license: {str(e)}"}), 502
+
+
+# 6. Unban License Key
+@app.route('/api/authcloud/licenses/unban', methods=['POST'])
+def authcloud_unban_license():
+    body = request.json or {}
+    key = body.get("key", "").strip()
+    if not key:
+        return jsonify({"success": False, "message": "Key is required to unban"}), 400
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/licenses/unban"
+        resp = requests.post(url, json={"key": key}, headers={"Content-Type": "application/json"}, timeout=15)
+        return jsonify(resp.json()), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Failed to unban license: {str(e)}"}), 502
+
+
+# 7. Reseller Management — List All Resellers with Quota (Admin Only)
+@app.route('/api/authcloud/resellers', methods=['GET'])
+def authcloud_list_resellers():
+    admin_key = request.args.get("admin_key", "").strip()
+    if admin_key != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Unauthorized admin access"}), 403
+
+    resellers = get_all_key_resellers()
+    output = []
+    for r in resellers:
+        lim = int(r.get("key_limit", 0))
+        usd = int(r.get("keys_used", 0))
+        output.append({
+            "username": r.get("username"),
+            "note": r.get("note", ""),
+            "key_limit": lim,
+            "keys_used": usd,
+            "remaining": max(0, lim - usd),
+            "created_at": r.get("created_at", "")
+        })
+    return jsonify({"status": "success", "resellers": output, "total": len(output)}), 200
+
+
+# 8. Reseller Management — Create Reseller with Limit (Admin Only)
+@app.route('/api/authcloud/resellers/create', methods=['POST'])
+def authcloud_create_reseller():
+    body = request.json or {}
+    admin_key = body.get("admin_key", "").strip()
+    if admin_key != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Unauthorized admin access"}), 403
+
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+    note = body.get("note", "").strip()
+    try:
+        key_limit = int(body.get("key_limit", 20))
+    except (ValueError, TypeError):
+        key_limit = 20
+
+    if not username or not password:
+        return jsonify({"status": "error", "message": "Username and password required"}), 400
+
+    existing = find_key_reseller(username)
+    if existing:
+        return jsonify({"status": "error", "message": f"Reseller '{username}' already exists"}), 409
+
+    reseller_doc = {
+        "username": username,
+        "password": password,
+        "note": note,
+        "key_limit": max(0, key_limit),
+        "keys_used": 0,
+        "created_at": datetime.utcnow().isoformat()
+    }
+    save_key_reseller_doc(reseller_doc)
+
+    return jsonify({
+        "status": "success",
+        "message": f"Reseller '{username}' created with key limit of {key_limit}",
+        "reseller": {
+            "username": username,
+            "key_limit": key_limit,
+            "keys_used": 0,
+            "remaining": key_limit
+        }
+    }), 200
+
+
+# 9. Reseller Management — Update Limit / Quota (Admin Only)
+@app.route('/api/authcloud/resellers/update-limit', methods=['POST'])
+def authcloud_update_reseller_limit():
+    body = request.json or {}
+    admin_key = body.get("admin_key", "").strip()
+    if admin_key != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Unauthorized admin access"}), 403
+
+    username = body.get("username", "").strip()
+    if not username:
+        return jsonify({"status": "error", "message": "Username required"}), 400
+
+    reseller = find_key_reseller(username)
+    if not reseller:
+        return jsonify({"status": "error", "message": f"Reseller '{username}' not found"}), 404
+
+    if "key_limit" in body:
+        try:
+            reseller["key_limit"] = max(0, int(body["key_limit"]))
+        except (ValueError, TypeError):
+            pass
+
+    if body.get("reset_used", False):
+        reseller["keys_used"] = 0
+
+    if "note" in body:
+        reseller["note"] = str(body["note"]).strip()
+
+    if "password" in body and body["password"].strip():
+        reseller["password"] = str(body["password"]).strip()
+
+    save_key_reseller_doc(reseller)
+
+    lim = int(reseller.get("key_limit", 0))
+    usd = int(reseller.get("keys_used", 0))
+    return jsonify({
+        "status": "success",
+        "message": f"Reseller '{username}' quota updated successfully",
+        "reseller": {
+            "username": username,
+            "key_limit": lim,
+            "keys_used": usd,
+            "remaining": max(0, lim - usd)
+        }
+    }), 200
+
+
+# 10. Reseller Management — Delete Reseller (Admin Only)
+@app.route('/api/authcloud/resellers/delete', methods=['POST'])
+def authcloud_delete_reseller():
+    body = request.json or {}
+    admin_key = body.get("admin_key", "").strip()
+    if admin_key != ADMIN_KEY:
+        return jsonify({"status": "error", "message": "Unauthorized admin access"}), 403
+
+    username = body.get("username", "").strip()
+    if not username:
+        return jsonify({"status": "error", "message": "Username required"}), 400
+
+    delete_key_reseller_doc(username)
+    return jsonify({"status": "success", "message": f"Reseller '{username}' removed successfully"}), 200
+
+
+# 11. Reseller Profile & Quota Check
+@app.route('/api/authcloud/reseller/quota', methods=['GET'])
+def authcloud_reseller_quota():
+    username = request.args.get("username", "").strip()
+    password = request.args.get("password", "").strip()
+    if not username or not password:
+        return jsonify({"status": "error", "message": "Credentials required"}), 401
+
+    reseller = find_key_reseller(username)
+    if not reseller or reseller.get("password") != password:
+        return jsonify({"status": "error", "message": "Invalid reseller credentials"}), 403
+
+    lim = int(reseller.get("key_limit", 0))
+    usd = int(reseller.get("keys_used", 0))
+    return jsonify({
+        "status": "success",
+        "username": username,
+        "note": reseller.get("note", ""),
+        "key_limit": lim,
+        "keys_used": usd,
+        "remaining": max(0, lim - usd)
+    }), 200
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8002))
     app.run(host='0.0.0.0', port=port, debug=False)
+
