@@ -1787,6 +1787,7 @@
     let SESSION = {
       role: null,
       adminKey: null,
+      admin_key: null,
       username: null,
       password: null
     };
@@ -1809,12 +1810,16 @@
     const loadSession = () => {
       try {
         const raw = localStorage.getItem('stream_uid_session_v6');
-        if (raw) SESSION = JSON.parse(raw);
+        if (raw) {
+          SESSION = JSON.parse(raw);
+          if (SESSION.adminKey && !SESSION.admin_key) SESSION.admin_key = SESSION.adminKey;
+          if (SESSION.admin_key && !SESSION.adminKey) SESSION.adminKey = SESSION.admin_key;
+        }
       } catch (e) {}
     };
 
     const clearSession = () => {
-      SESSION = { role: null, adminKey: null, username: null, password: null };
+      SESSION = { role: null, adminKey: null, admin_key: null, username: null, password: null };
       localStorage.removeItem('stream_uid_session_v6');
     };
 
@@ -1925,7 +1930,8 @@
 
         if (res.ok && data.status === 'success') {
           if (data.role === 'main_admin') {
-            SESSION = { role: 'main_admin', adminKey: data.admin_key || identifier || password, username: null, password: null };
+            const mKey = data.admin_key || identifier || password;
+            SESSION = { role: 'main_admin', adminKey: mKey, admin_key: mKey, username: null, password: null };
             saveSession();
             notifyToast('Master Admin access granted');
             launchWorkspaceView('main_admin');
@@ -2820,6 +2826,7 @@
           notifyToast('Master key updated successfully');
           showInlineMsg('msg-set-key', '✓ Master Key changed successfully', 'ok');
           SESSION.adminKey = newKey;
+          SESSION.admin_key = newKey;
           saveSession();
           document.getElementById('set-old-key').value = '';
           document.getElementById('set-new-key').value = '';
