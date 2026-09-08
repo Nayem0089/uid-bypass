@@ -998,15 +998,18 @@
             <div class="header-title-box">
               <div class="header-icon-badge" style="border-left-color:var(--red); color:var(--red); box-shadow:0 0 15px var(--red-glow);">🔑</div>
               <div>
-                <h1 class="header-heading">AuthCloud <span>License Hub</span></h1>
-                <div class="header-subtext">Keys, Duration & Reseller Quotas Engine</div>
+                <h1 class="header-heading">License <span>Hub</span></h1>
+                <div class="header-subtext">AuthZen Key Engine & Reseller Duration Control</div>
               </div>
             </div>
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
               <span class="header-status-pill" style="border-color:var(--red-line); color:var(--white); background:var(--red-dim); box-shadow:0 0 12px var(--red-glow);">
                 <span class="status-dot-live" style="background:var(--red); box-shadow:0 0 8px var(--red);"></span>
-                <span>API: <b>http://194.233.76.156:10077</b></span>
+                <span>API: <b>https://brmodsbypass.authzen.site/api/get-key</b></span>
               </span>
+              <button class="app-btn btn-dark-action" id="btn-ac-seller-key" style="width:auto; padding:8px 16px; font-size:11px; display:none;" onclick="authcloudOpenSellerKeyModal()">
+                <span>⚙ Seller Key</span>
+              </button>
               <button class="app-btn btn-dark-action" style="width:auto; padding:8px 16px; font-size:11px;" onclick="authcloudFetchLicenses()">
                 <span>🔄 Sync Licenses</span>
               </button>
@@ -1058,18 +1061,22 @@
             <div class="dashboard-card">
               <div class="card-head-title" style="display:flex; align-items:center; justify-content:space-between;">
                 <span>⚡ License Key Generator</span>
-                <span style="font-size:10.5px; font-family:var(--f-mono); color:var(--red); font-weight:700;">PRO ENGINE</span>
+                <span style="font-size:10.5px; font-family:var(--f-mono); color:var(--red); font-weight:700;">AUTHZEN ENGINE</span>
               </div>
               <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:12px;">Create keys with exact duration validity and instant binding.</p>
 
-              <!-- Reseller Quota Banner (if applicable) -->
-              <div id="ac-reseller-quota-box" style="display:none; background:rgba(255,42,75,0.09); border:1px solid var(--red-line); border-radius:var(--r-sm); padding:12px; margin-bottom:14px;">
-                <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:600;">
+              <!-- Reseller Quota & Expiry Banner (if applicable) -->
+              <div id="ac-reseller-quota-box" style="display:none; background:rgba(255,42,75,0.09); border:1px solid var(--red-line); border-radius:var(--r-sm); padding:14px; margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; font-weight:600; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
                   <span style="color:var(--ink-300);">Your Key Limit Quota:</span>
                   <span id="ac-reseller-quota-text" style="color:var(--white); font-family:var(--f-mono);">0 / 0 Remaining</span>
                 </div>
-                <div class="quota-track">
+                <div class="quota-track" style="margin-bottom:10px;">
                   <div id="ac-reseller-quota-bar" class="quota-fill" style="width:0%;"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; flex-wrap:wrap; gap:8px; border-top:1px dashed rgba(255,255,255,0.08); padding-top:8px;">
+                  <div id="ac-reseller-validity-text" style="color:#34d399; font-weight:600;">Account Validity: Unlimited</div>
+                  <div id="ac-reseller-allowed-dur-text" style="color:var(--ink-300); font-family:var(--f-mono);">Allowed: All Durations</div>
                 </div>
               </div>
 
@@ -1151,11 +1158,11 @@
                 <span>🛡 Reseller Limits & Quotas</span>
                 <span style="font-size:10.5px; font-family:var(--f-mono); color:var(--white); background:var(--red); padding:2px 8px; border-radius:999px; font-weight:700;">ADMIN</span>
               </div>
-              <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:14px;">Set exact key limits for each reseller so they cannot generate beyond their limit.</p>
+              <p style="font-size:11.5px; color:var(--ink-500); margin-bottom:14px;">Set exact key limits, expiration dates and allowed durations for each reseller.</p>
 
               <!-- Create Reseller with Limit Form -->
               <div style="background:rgba(255,255,255,0.02); border:1px solid var(--hairline); border-radius:var(--r-md); padding:14px; margin-bottom:18px;">
-                <div style="font-size:11px; font-family:var(--f-mono); color:var(--red); font-weight:700; margin-bottom:8px;">ADD RESELLER WITH QUOTA LIMIT:</div>
+                <div style="font-size:11px; font-family:var(--f-mono); color:var(--red); font-weight:700; margin-bottom:8px;">ADD RESELLER WITH QUOTA & DATE CONTROLS:</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                   <input type="text" id="ac-res-user" class="input-field-app" placeholder="Username" style="margin:0;">
                   <input type="password" id="ac-res-pass" class="input-field-app" placeholder="Password" style="margin:0;">
@@ -1164,8 +1171,40 @@
                   <input type="text" id="ac-res-note" class="input-field-app" placeholder="Note / Store Name" style="margin:0;">
                   <input type="number" id="ac-res-limit" class="input-field-app" placeholder="Key Limit (e.g. 50)" value="50" min="1" style="margin:0;">
                 </div>
-                <button class="app-btn btn-red-action" style="margin-top:12px;" onclick="authcloudCreateResellerAction()">
-                  <span>Create Reseller with Limit</span>
+
+                <!-- Account Validity / Expiry Date -->
+                <div style="margin-top:10px;">
+                  <label style="font-size:10.5px; font-family:var(--f-mono); color:var(--ink-300); display:block; margin-bottom:4px;">
+                    📅 Account Validity Expiry Date (Optional):
+                  </label>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <input type="date" id="ac-res-expiry" class="input-field-app" style="margin:0; flex:1;">
+                    <button type="button" class="duration-chip-btn" onclick="authcloudSetExpiryDays('ac-res-expiry', 7)">+7d</button>
+                    <button type="button" class="duration-chip-btn" onclick="authcloudSetExpiryDays('ac-res-expiry', 15)">+15d</button>
+                    <button type="button" class="duration-chip-btn" onclick="authcloudSetExpiryDays('ac-res-expiry', 30)">+30d</button>
+                    <button type="button" class="duration-chip-btn" onclick="document.getElementById('ac-res-expiry').value=''">Clear</button>
+                  </div>
+                </div>
+
+                <!-- Allowed Key Durations ("Kotodin er key generate korte parbe") -->
+                <div style="margin-top:10px;">
+                  <label style="font-size:10.5px; font-family:var(--f-mono); color:var(--ink-300); display:block; margin-bottom:4px;">
+                    ⏳ Allowed Key Durations (Choose which key types this reseller can generate):
+                  </label>
+                  <div id="ac-create-dur-chips" style="display:flex; flex-wrap:wrap; gap:6px;">
+                    <span class="duration-chip-btn active" data-dur="all" onclick="authcloudToggleDurationSelect(this, 'ac-create-dur-chips')">All Durations</span>
+                    <span class="duration-chip-btn" data-dur="1 Day" onclick="authcloudToggleDurationSelect(this, 'ac-create-dur-chips')">1 Day</span>
+                    <span class="duration-chip-btn" data-dur="3 Days" onclick="authcloudToggleDurationSelect(this, 'ac-create-dur-chips')">3 Days</span>
+                    <span class="duration-chip-btn" data-dur="7 Days" onclick="authcloudToggleDurationSelect(this, 'ac-create-dur-chips')">7 Days</span>
+                    <span class="duration-chip-btn" data-dur="15 Days" onclick="authcloudToggleDurationSelect(this, 'ac-create-dur-chips')">15 Days</span>
+                    <span class="duration-chip-btn" data-dur="30 Days" onclick="authcloudToggleDurationSelect(this, 'ac-create-dur-chips')">30 Days</span>
+                    <span class="duration-chip-btn" data-dur="60 Days" onclick="authcloudToggleDurationSelect(this, 'ac-create-dur-chips')">60 Days</span>
+                    <span class="duration-chip-btn" data-dur="365 Days" onclick="authcloudToggleDurationSelect(this, 'ac-create-dur-chips')">365 Days</span>
+                  </div>
+                </div>
+
+                <button class="app-btn btn-red-action" style="margin-top:14px;" onclick="authcloudCreateResellerAction()">
+                  <span>Create Reseller with Settings</span>
                 </button>
                 <div class="inline-msg-box" id="msg-ac-res-create"></div>
               </div>
@@ -1175,13 +1214,13 @@
                 <span>ACTIVE RESELLERS & QUOTA CONSUMPTION:</span>
                 <button class="app-btn btn-dark-action" style="width:auto; padding:4px 10px; font-size:10px;" onclick="authcloudLoadResellers()"><span>Refresh</span></button>
               </div>
-              <div class="table-container-card" style="max-height:260px; overflow-y:auto;">
+              <div class="table-container-card" style="max-height:300px; overflow-y:auto;">
                 <table class="app-table">
                   <thead>
-                    <tr><th>Reseller</th><th>Quota / Used</th><th>Remaining</th><th>Actions</th></tr>
+                    <tr><th>Reseller</th><th>Quota / Used</th><th>Allowed Durations</th><th>Account Validity</th><th>Actions</th></tr>
                   </thead>
                   <tbody id="ac-tbody-resellers">
-                    <tr><td colspan="4" style="text-align:center; color:var(--ink-700); padding:20px;">Loading Reseller Quotas...</td></tr>
+                    <tr><td colspan="5" style="text-align:center; color:var(--ink-700); padding:20px;">Loading Reseller Quotas...</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1676,24 +1715,72 @@
     </div>
   </div>
 
-  <!-- MODAL: UPDATE RESELLER KEY LIMIT -->
+  <!-- MODAL: UPDATE RESELLER KEY LIMIT, EXPIRY & ALLOWED DURATIONS -->
   <div id="modal-reseller-limit" class="app-modal-overlay">
-    <div class="app-modal-box" style="border-color:var(--red-line);">
+    <div class="app-modal-box" style="max-width:520px; border-color:var(--red-line);">
       <h3 style="font-family:var(--f-display); font-size:16px; font-weight:700; color:var(--white); margin-bottom:6px;">
-        ✏ Edit Reseller Key Limit
+        ✏ Edit Reseller Quota, Dates & Durations
       </h3>
-      <div class="modal-body-text" id="modal-reseller-limit-user">Updating limit for reseller</div>
-      <label style="font-size:11px; font-family:var(--f-mono); color:var(--ink-500); display:block; margin:10px 0 4px;">New Key Generation Limit (Quota):</label>
+      <div class="modal-body-text" id="modal-reseller-limit-user">Updating settings for reseller</div>
+
+      <!-- Quota Input -->
+      <label style="font-size:11px; font-family:var(--f-mono); color:var(--ink-500); display:block; margin:10px 0 4px;">Key Generation Quota Limit:</label>
       <input type="number" id="modal-reseller-limit-inp" class="input-field-app" min="0" placeholder="e.g. 100">
+
+      <!-- Expiration Date -->
+      <label style="font-size:11px; font-family:var(--f-mono); color:var(--ink-500); display:block; margin:10px 0 4px;">📅 Account Validity Expiry Date:</label>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input type="date" id="modal-reseller-expiry-inp" class="input-field-app" style="margin:0; flex:1;">
+        <button type="button" class="duration-chip-btn" onclick="authcloudSetExpiryDays('modal-reseller-expiry-inp', 7)">+7d</button>
+        <button type="button" class="duration-chip-btn" onclick="authcloudSetExpiryDays('modal-reseller-expiry-inp', 15)">+15d</button>
+        <button type="button" class="duration-chip-btn" onclick="authcloudSetExpiryDays('modal-reseller-expiry-inp', 30)">+30d</button>
+        <button type="button" class="duration-chip-btn" onclick="document.getElementById('modal-reseller-expiry-inp').value=''">Clear</button>
+      </div>
+
+      <!-- Allowed Durations ("Kotodin er key generate korte parbe") -->
+      <label style="font-size:11px; font-family:var(--f-mono); color:var(--ink-500); display:block; margin:12px 0 4px;">⏳ Allowed Key Durations for this Reseller:</label>
+      <div id="ac-edit-dur-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+        <span class="duration-chip-btn" data-dur="all" onclick="authcloudToggleDurationSelect(this, 'ac-edit-dur-chips')">All Durations</span>
+        <span class="duration-chip-btn" data-dur="1 Day" onclick="authcloudToggleDurationSelect(this, 'ac-edit-dur-chips')">1 Day</span>
+        <span class="duration-chip-btn" data-dur="3 Days" onclick="authcloudToggleDurationSelect(this, 'ac-edit-dur-chips')">3 Days</span>
+        <span class="duration-chip-btn" data-dur="7 Days" onclick="authcloudToggleDurationSelect(this, 'ac-edit-dur-chips')">7 Days</span>
+        <span class="duration-chip-btn" data-dur="15 Days" onclick="authcloudToggleDurationSelect(this, 'ac-edit-dur-chips')">15 Days</span>
+        <span class="duration-chip-btn" data-dur="30 Days" onclick="authcloudToggleDurationSelect(this, 'ac-edit-dur-chips')">30 Days</span>
+        <span class="duration-chip-btn" data-dur="60 Days" onclick="authcloudToggleDurationSelect(this, 'ac-edit-dur-chips')">60 Days</span>
+        <span class="duration-chip-btn" data-dur="365 Days" onclick="authcloudToggleDurationSelect(this, 'ac-edit-dur-chips')">365 Days</span>
+      </div>
+
       <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
         <input type="checkbox" id="modal-reseller-reset-used" style="accent-color:var(--red); width:16px; height:16px; cursor:pointer;">
         <label for="modal-reseller-reset-used" style="font-size:11.5px; color:var(--ink-300); cursor:pointer;">Reset used keys count back to 0</label>
       </div>
+
       <div class="modal-btn-row">
-        <button class="app-btn btn-red-action" style="flex:1;" onclick="authcloudExecuteUpdateLimitConfirm()"><span>Save New Limit</span></button>
+        <button class="app-btn btn-red-action" style="flex:1;" onclick="authcloudExecuteUpdateLimitConfirm()"><span>Save Settings</span></button>
         <button class="app-btn btn-dark-action" style="flex:1;" onclick="closeAppModal('modal-reseller-limit')"><span>Cancel</span></button>
       </div>
       <div class="inline-msg-box" id="msg-modal-reseller-limit"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIGURE AUTHZEN SELLER KEY -->
+  <div id="modal-authzen-seller-key" class="app-modal-overlay">
+    <div class="app-modal-box" style="max-width:500px; border-color:var(--red-line);">
+      <h3 style="font-family:var(--f-display); font-size:16px; font-weight:700; color:var(--white); margin-bottom:6px;">
+        ⚙ Configure AuthZen Seller Key
+      </h3>
+      <div class="modal-body-text">
+        Enter your active Seller Key for <b>https://brmodsbypass.authzen.site/api/get-key</b>. This key is used to authenticate key generation requests.
+      </div>
+
+      <label style="font-size:11px; font-family:var(--f-mono); color:var(--ink-500); display:block; margin:12px 0 4px;">AuthZen Seller Key:</label>
+      <input type="text" id="modal-seller-key-inp" class="input-field-app" style="font-family:var(--f-mono); font-size:12px;" placeholder="Paste Seller Key here...">
+
+      <div class="modal-btn-row" style="margin-top:14px;">
+        <button class="app-btn btn-red-action" style="flex:1;" onclick="authcloudSaveSellerKey()"><span>Save Seller Key</span></button>
+        <button class="app-btn btn-dark-action" style="flex:1;" onclick="closeAppModal('modal-authzen-seller-key')"><span>Cancel</span></button>
+      </div>
+      <div class="inline-msg-box" id="msg-modal-seller-key"></div>
     </div>
   </div>
 
@@ -2014,6 +2101,8 @@
 
         document.getElementById('ac-admin-reseller-card').style.display = 'block';
         document.getElementById('ac-reseller-quota-box').style.display = 'none';
+        const sellerKeyBtn = document.getElementById('btn-ac-seller-key');
+        if (sellerKeyBtn) sellerKeyBtn.style.display = 'inline-flex';
 
         userDisplayName.textContent = 'ADMINISTRATOR';
         userDisplayRole.textContent = 'MASTER ADMIN';
@@ -2028,6 +2117,7 @@
         loadLocalAuditLog();
         renderCreditLogView();
         authcloudFetchLicenses();
+        authcloudLoadResellers();
       } else if (role === 'key_reseller') {
         masterPanel.classList.add('active');
         subPanel.classList.remove('active');
@@ -2042,6 +2132,8 @@
 
         document.getElementById('ac-admin-reseller-card').style.display = 'none';
         document.getElementById('ac-reseller-quota-box').style.display = 'block';
+        const sellerKeyBtn = document.getElementById('btn-ac-seller-key');
+        if (sellerKeyBtn) sellerKeyBtn.style.display = 'none';
 
         userDisplayName.textContent = SESSION.username.toUpperCase();
         userDisplayRole.textContent = 'KEY RESELLER';
@@ -2052,7 +2144,20 @@
         userCreditsTag.style.display = 'none';
 
         navigateTab('licenses');
-        authcloudUpdateResellerQuotaDisplay(SESSION.key_limit, SESSION.keys_used, SESSION.remaining);
+        authcloudUpdateResellerQuotaDisplay(
+          SESSION.key_limit,
+          SESSION.keys_used,
+          SESSION.remaining,
+          SESSION.expiry_date,
+          SESSION.is_expired,
+          SESSION.days_left,
+          SESSION.allowed_durations
+        );
+        authcloudApplyResellerDurationRestrictions(
+          SESSION.allowed_durations,
+          SESSION.is_expired,
+          SESSION.expiry_date
+        );
         authcloudFetchLicenses();
       } else if (role === 'sub_admin') {
         subPanel.classList.add('active');
@@ -3297,15 +3402,7 @@
         if (status && status !== 'all') url += '?status=' + encodeURIComponent(status);
         
         let res = await fetch(url);
-        let data;
-        if (res.ok) {
-          data = await res.json();
-        } else {
-          let directUrl = 'http://194.233.76.156:10077/lib/api/licenses';
-          if (status && status !== 'all') directUrl += '?status=' + encodeURIComponent(status);
-          res = await fetch(directUrl);
-          data = await res.json();
-        }
+        let data = await res.json();
 
         authcloudLicensesCache = data.licenses || [];
         
@@ -3664,11 +3761,115 @@
       }
     }
 
+    function authcloudSetExpiryDays(targetId, days) {
+      const inp = document.getElementById(targetId);
+      if (!inp) return;
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      inp.value = d.toISOString().split('T')[0];
+    }
+
+    function authcloudToggleDurationSelect(el, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container || !el) return;
+      const dur = el.getAttribute('data-dur');
+      if (dur === 'all') {
+        container.querySelectorAll('.duration-chip-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        return;
+      }
+      const allBtn = container.querySelector('.duration-chip-btn[data-dur="all"]');
+      if (allBtn) allBtn.classList.remove('active');
+      el.classList.toggle('active');
+      const activeChips = container.querySelectorAll('.duration-chip-btn.active');
+      if (activeChips.length === 0 && allBtn) {
+        allBtn.classList.add('active');
+      }
+    }
+
+    function authcloudGetSelectedDurations(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return ['all'];
+      const allBtn = container.querySelector('.duration-chip-btn[data-dur="all"]');
+      if (allBtn && allBtn.classList.contains('active')) return ['all'];
+      const active = [];
+      container.querySelectorAll('.duration-chip-btn.active').forEach(b => {
+        const d = b.getAttribute('data-dur');
+        if (d && d !== 'all') active.push(d);
+      });
+      return active.length > 0 ? active : ['all'];
+    }
+
+    function authcloudSetSelectedDurations(containerId, list) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.querySelectorAll('.duration-chip-btn').forEach(b => b.classList.remove('active'));
+      const arr = Array.isArray(list) ? list : (list ? String(list).split(',').map(s=>s.trim()) : ['all']);
+      if (!arr.length || arr.includes('all') || arr.includes('*')) {
+        const allBtn = container.querySelector('.duration-chip-btn[data-dur="all"]');
+        if (allBtn) allBtn.classList.add('active');
+        return;
+      }
+      arr.forEach(d => {
+        const btn = container.querySelector(`.duration-chip-btn[data-dur="${d}"]`);
+        if (btn) btn.classList.add('active');
+      });
+    }
+
+    async function authcloudOpenSellerKeyModal() {
+      const msgBox = document.getElementById('msg-modal-seller-key');
+      const inp = document.getElementById('modal-seller-key-inp');
+      if (msgBox) msgBox.className = 'inline-msg-box';
+      openAppModal('modal-authzen-seller-key');
+      try {
+        const res = await fetch('/api/authcloud/settings/seller-key?admin_key=' + encodeURIComponent(SESSION.admin_key || ADMIN_KEY));
+        const data = await res.json();
+        if (res.ok && inp) {
+          inp.value = data.seller_key || '';
+          if (data.seller_key) {
+            msgBox.className = 'inline-msg-box ok';
+            msgBox.textContent = `Current Active Seller Key: ${data.masked_key || data.seller_key}`;
+          } else {
+            msgBox.className = 'inline-msg-box err';
+            msgBox.textContent = 'No Seller Key configured yet. Please enter your AuthZen Seller Key.';
+          }
+        }
+      } catch (e) {}
+    }
+
+    async function authcloudSaveSellerKey() {
+      const keyVal = (document.getElementById('modal-seller-key-inp')?.value || '').trim();
+      const msgBox = document.getElementById('msg-modal-seller-key');
+      try {
+        const res = await fetch('/api/authcloud/settings/seller-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            admin_key: SESSION.admin_key || ADMIN_KEY,
+            seller_key: keyVal
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          notifyToast('AuthZen Seller Key saved!');
+          msgBox.className = 'inline-msg-box ok';
+          msgBox.textContent = '✅ Seller Key updated successfully!';
+          setTimeout(() => closeAppModal('modal-authzen-seller-key'), 1000);
+        } else {
+          msgBox.className = 'inline-msg-box err';
+          msgBox.textContent = data.message || 'Failed to save Seller Key';
+        }
+      } catch (err) {
+        msgBox.className = 'inline-msg-box err';
+        msgBox.textContent = 'Error: ' + err.message;
+      }
+    }
+
     function renderAuthcloudResellersTable(resellers) {
       const tbody = document.getElementById('ac-tbody-resellers');
       if (!tbody) return;
       if (!resellers || resellers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-700); padding:16px;">No resellers created yet. Add one above.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--ink-700); padding:20px;">No resellers created yet. Add one above.</td></tr>`;
         return;
       }
 
@@ -3678,6 +3879,21 @@
         const pct = lim > 0 ? Math.min(100, Math.round((usd / lim) * 100)) : 0;
         const rem = Math.max(0, lim - usd);
         const barClass = pct >= 100 ? 'full' : (pct >= 80 ? 'warn' : '');
+
+        const durs = r.allowed_durations || ['all'];
+        const isAll = durs.includes('all') || durs.includes('*');
+        const durHtml = isAll ? 
+          '<span class="status-badge badge-green" style="font-size:10px;">All Durations</span>' :
+          durs.map(d => `<span class="status-badge badge-blue" style="font-size:9.5px; margin:2px;">${d}</span>`).join('');
+
+        let validityHtml = '<span style="color:var(--ink-500); font-size:11px;">No Expiry</span>';
+        if (r.is_expired) {
+          validityHtml = `<span class="status-badge badge-red" style="font-size:10.5px;">❌ Expired (${(r.expiry_date || '').slice(0, 10)})</span>`;
+        } else if (r.expiry_date) {
+          validityHtml = `<span class="status-badge badge-green" style="font-size:10.5px;">✓ Until ${r.expiry_date.slice(0, 10)} (${r.days_left !== undefined ? r.days_left + 'd left' : ''})</span>`;
+        }
+
+        const safeDurJson = encodeURIComponent(JSON.stringify(durs));
 
         return `
           <tr>
@@ -3694,13 +3910,12 @@
                 <div class="quota-fill ${barClass}" style="width:${pct}%;"></div>
               </div>
             </td>
-            <td style="font-family:var(--f-mono); font-size:11.5px; font-weight:700; color:${rem === 0 ? 'var(--red)' : '#34d399'};">
-              ${rem} Keys
-            </td>
+            <td style="max-width:160px; line-height:1.5;">${durHtml}</td>
+            <td>${validityHtml}</td>
             <td>
               <div style="display:flex; gap:5px;">
-                <button class="app-btn btn-dark-action" style="width:auto; padding:4px 8px; font-size:10px;" onclick="authcloudOpenUpdateLimitModal('${r.username}', ${lim})">
-                  <span>Limit</span>
+                <button class="app-btn btn-dark-action" style="width:auto; padding:4px 8px; font-size:10px;" onclick="authcloudOpenUpdateLimitModal('${r.username}', ${lim}, '${r.expiry_date || ''}', '${safeDurJson}')">
+                  <span>Edit</span>
                 </button>
                 <button class="app-btn btn-danger-action" style="width:auto; padding:4px 8px; font-size:10px;" onclick="authcloudDeleteResellerAction('${r.username}')">
                   <span>✕</span>
@@ -3717,6 +3932,8 @@
       const pass = document.getElementById('ac-res-pass')?.value.trim();
       const note = document.getElementById('ac-res-note')?.value.trim();
       const limit = parseInt(document.getElementById('ac-res-limit')?.value) || 20;
+      const expiry = document.getElementById('ac-res-expiry')?.value.trim();
+      const allowedDurs = authcloudGetSelectedDurations('ac-create-dur-chips');
       const msgBox = document.getElementById('msg-ac-res-create');
 
       msgBox.className = 'inline-msg-box';
@@ -3735,7 +3952,9 @@
             username: user,
             password: pass,
             note: note,
-            key_limit: limit
+            key_limit: limit,
+            expiry_date: expiry,
+            allowed_durations: allowedDurs
           })
         });
         const data = await res.json();
@@ -3746,6 +3965,8 @@
           document.getElementById('ac-res-user').value = '';
           document.getElementById('ac-res-pass').value = '';
           document.getElementById('ac-res-note').value = '';
+          document.getElementById('ac-res-expiry').value = '';
+          authcloudSetSelectedDurations('ac-create-dur-chips', ['all']);
           authcloudLoadResellers();
         } else {
           msgBox.className = 'inline-msg-box err';
@@ -3757,17 +3978,29 @@
       }
     }
 
-    function authcloudOpenUpdateLimitModal(username, currentLimit) {
+    function authcloudOpenUpdateLimitModal(username, currentLimit, currentExpiry, safeDurJson) {
       updateLimitTargetUser = username;
-      document.getElementById('modal-reseller-limit-user').textContent = `Setting new key quota for reseller: ${username}`;
+      document.getElementById('modal-reseller-limit-user').textContent = `Editing Quota & Dates for: ${username}`;
       document.getElementById('modal-reseller-limit-inp').value = currentLimit || 50;
+      document.getElementById('modal-reseller-expiry-inp').value = (currentExpiry && currentExpiry !== 'undefined') ? currentExpiry.slice(0, 10) : '';
+      let durs = ['all'];
+      if (safeDurJson) {
+        try {
+          durs = JSON.parse(decodeURIComponent(safeDurJson));
+        } catch(e){}
+      }
+      authcloudSetSelectedDurations('ac-edit-dur-chips', durs);
       document.getElementById('modal-reseller-reset-used').checked = false;
+      const msgBox = document.getElementById('msg-modal-reseller-limit');
+      if (msgBox) msgBox.className = 'inline-msg-box';
       openAppModal('modal-reseller-limit');
     }
 
     async function authcloudExecuteUpdateLimitConfirm() {
       if (!updateLimitTargetUser) return;
       const newLimit = parseInt(document.getElementById('modal-reseller-limit-inp').value) || 0;
+      const expiry = document.getElementById('modal-reseller-expiry-inp').value.trim();
+      const allowedDurs = authcloudGetSelectedDurations('ac-edit-dur-chips');
       const resetUsed = document.getElementById('modal-reseller-reset-used').checked;
       const msgBox = document.getElementById('msg-modal-reseller-limit');
 
@@ -3779,17 +4012,19 @@
             admin_key: SESSION.admin_key || ADMIN_KEY,
             username: updateLimitTargetUser,
             key_limit: newLimit,
+            expiry_date: expiry,
+            allowed_durations: allowedDurs,
             reset_used: resetUsed
           })
         });
         const data = await res.json();
         if (res.ok && data.status === 'success') {
-          notifyToast(`Updated limit for ${updateLimitTargetUser} to ${newLimit}`);
+          notifyToast(`Settings updated for ${updateLimitTargetUser}`);
           closeAppModal('modal-reseller-limit');
           authcloudLoadResellers();
         } else {
           msgBox.className = 'inline-msg-box err';
-          msgBox.textContent = data.message || 'Failed to update limit';
+          msgBox.textContent = data.message || 'Failed to update';
         }
       } catch (err) {
         msgBox.className = 'inline-msg-box err';
@@ -3820,10 +4055,12 @@
       }
     }
 
-    function authcloudUpdateResellerQuotaDisplay(limit, used, remaining) {
+    function authcloudUpdateResellerQuotaDisplay(limit, used, remaining, expiry, isExpired, daysLeft, allowedDurations) {
       const box = document.getElementById('ac-reseller-quota-box');
       const text = document.getElementById('ac-reseller-quota-text');
       const bar = document.getElementById('ac-reseller-quota-bar');
+      const valText = document.getElementById('ac-reseller-validity-text');
+      const durText = document.getElementById('ac-reseller-allowed-dur-text');
       if (!box || !text || !bar) return;
 
       box.style.display = 'block';
@@ -3835,6 +4072,88 @@
       text.textContent = `${usd} Used / ${lim} Limit (${rem} Remaining)`;
       bar.style.width = pct + '%';
       bar.className = 'quota-fill' + (pct >= 100 ? ' full' : (pct >= 80 ? ' warn' : ''));
+
+      if (valText) {
+        if (isExpired) {
+          valText.innerHTML = `<span style="color:var(--red); font-weight:700;">❌ Account Expired (${(expiry || '').slice(0, 10)})</span>`;
+        } else if (expiry) {
+          valText.innerHTML = `<span style="color:#34d399; font-weight:600;">✓ Valid until: ${expiry.slice(0, 10)} (${daysLeft !== undefined ? daysLeft + ' days left' : ''})</span>`;
+        } else {
+          valText.innerHTML = `<span style="color:#34d399; font-weight:600;">✓ Account Validity: Unlimited</span>`;
+        }
+      }
+
+      if (durText) {
+        const durs = allowedDurations || ['all'];
+        if (durs.includes('all') || durs.includes('*')) {
+          durText.textContent = 'Allowed Keys: All Durations';
+        } else {
+          durText.textContent = `Allowed Keys: ${durs.join(', ')}`;
+        }
+      }
+    }
+
+    function authcloudApplyResellerDurationRestrictions(allowedDurations, isExpired, expiryDate) {
+      const genBtn = document.getElementById('btn-ac-generate');
+      const msgBox = document.getElementById('msg-ac-gen');
+
+      if (isExpired) {
+        if (genBtn) {
+          genBtn.disabled = true;
+          genBtn.style.opacity = '0.5';
+          genBtn.title = 'Reseller Account Expired';
+        }
+        if (msgBox) {
+          msgBox.className = 'inline-msg-box err';
+          msgBox.textContent = `❌ Your Reseller Account expired on ${(expiryDate || '').slice(0, 10)}. Key generation is locked. Contact Admin.`;
+        }
+        return;
+      }
+
+      if (!allowedDurations || allowedDurations.includes('all') || allowedDurations.includes('*')) {
+        document.querySelectorAll('#ac-duration-chips .duration-chip-btn').forEach(btn => {
+          btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1';
+          btn.style.textDecoration = 'none';
+        });
+        return;
+      }
+
+      function normD(d) {
+        return (d || '').toLowerCase().replace(/\s+/g, '').replace(/s$/g, '');
+      }
+      const allowedNorms = (allowedDurations || []).map(normD);
+
+      let firstAllowedChip = null;
+      let isCurrentSelectedAllowed = false;
+
+      document.querySelectorAll('#ac-duration-chips .duration-chip-btn').forEach(btn => {
+        const dur = btn.getAttribute('data-dur') || '';
+        if (dur === 'Custom') {
+          btn.style.display = 'none';
+          return;
+        }
+        const bNorm = normD(dur);
+        if (allowedNorms.includes(bNorm)) {
+          btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1';
+          btn.style.textDecoration = 'none';
+          if (!firstAllowedChip) firstAllowedChip = btn;
+          if (bNorm === normD(selectedLicenseDuration)) {
+            isCurrentSelectedAllowed = true;
+          }
+        } else {
+          btn.style.pointerEvents = 'none';
+          btn.style.opacity = '0.25';
+          btn.style.textDecoration = 'line-through';
+          btn.classList.remove('active');
+        }
+      });
+
+      if (!isCurrentSelectedAllowed && firstAllowedChip) {
+        const newDur = firstAllowedChip.getAttribute('data-dur');
+        authcloudSelectDuration(newDur, firstAllowedChip);
+      }
     }
 
     // ===== 17. APPLICATION BOOTSTRAP =====
