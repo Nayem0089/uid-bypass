@@ -19,7 +19,7 @@ app = Flask(__name__)
 UID_API_BASE        = os.environ.get("UID_API_BASE", "https://uid.syntaxcorporation.online")
 AUTHCLOUD_API_BASE  = os.environ.get("AUTHCLOUD_API_BASE", "https://brmodsbypass.authzen.site/api").rstrip("/")
 AUTHZEN_GET_KEY_URL = os.environ.get("AUTHZEN_GET_KEY_URL", "https://brmodsbypass.authzen.site/api/get-key")
-AUTHZEN_SELLER_KEY  = os.environ.get("AUTHZEN_SELLER_KEY", os.environ.get("SELLER_KEY", "")).strip()
+AUTHZEN_SELLER_KEY  = os.environ.get("AUTHZEN_SELLER_KEY", os.environ.get("SELLER_KEY", "RES-E961EF9C")).strip()
 ADMIN_KEY           = os.environ.get("ADMIN_KEY",    "changeme_admin_key")
 SELF_URL            = os.environ.get("SELF_URL",     "").rstrip("/")   # ← trailing slash সরানো হয়েছে
 
@@ -1243,7 +1243,7 @@ def get_authzen_seller_key():
                     return val
         except Exception:
             pass
-    return ""
+    return AUTHZEN_SELLER_KEY or "RES-E961EF9C"
 
 
 def set_authzen_seller_key(seller_key):
@@ -1415,24 +1415,50 @@ def authcloud_get_licenses():
         except Exception:
             pass
 
-    # Also fetch remote keys from AuthZen
+    # Also fetch remote keys from AuthZen API (/api/key/list?seller_key=...)
     remote_keys = []
+    seller_k = get_authzen_seller_key()
     try:
-        keys_url = f"{AUTHCLOUD_API_BASE}/keys"
-        resp = requests.get(keys_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=6)
+        keys_url = f"{AUTHCLOUD_API_BASE}/key/list?seller_key={seller_k}"
+        resp = requests.get(keys_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         if resp.status_code == 200:
             data = resp.json()
             raw_list = data.get("keys", [])
             for k in raw_list:
-                k_str = k if isinstance(k, str) else k.get("key")
-                remote_keys.append({
-                    "key": k_str,
-                    "duration": k.get("duration", "30 Days") if isinstance(k, dict) else "30 Days",
-                    "note": "AuthZen Cloud Key",
-                    "status": "Unused",
-                    "hwid": "None",
-                    "created_at": k.get("created_at", "") if isinstance(k, dict) else ""
-                })
+                if isinstance(k, dict):
+                    k_code = k.get("key_code") or k.get("key")
+                    days = k.get("days", 30)
+                    plan = k.get("plan", f"{days}day")
+                    raw_status = (k.get("status") or "unused").strip().lower()
+                    if raw_status == "banned":
+                        status_str = "Banned"
+                    elif raw_status == "used":
+                        status_str = "Used"
+                    else:
+                        status_str = "Unused"
+                    hwid_val = k.get("hwid_status") or "None"
+                    remote_keys.append({
+                        "id": k.get("id"),
+                        "key": k_code,
+                        "duration": f"{days} Days" if days else plan,
+                        "plan": plan,
+                        "note": f"AuthZen ({k.get('assigned_seller', seller_k)})",
+                        "status": status_str,
+                        "hwid": hwid_val,
+                        "hwid_status": hwid_val,
+                        "used_by_ip": k.get("used_by_ip", ""),
+                        "used_at": k.get("used_at", ""),
+                        "created_at": k.get("created_at", "")
+                    })
+                elif isinstance(k, str):
+                    remote_keys.append({
+                        "key": k,
+                        "duration": "30 Days",
+                        "note": f"AuthZen ({seller_k})",
+                        "status": "Unused",
+                        "hwid": "None",
+                        "created_at": ""
+                    })
     except Exception as e:
         print(f"[AUTHZEN KEYS FETCH NOTE] {e}")
 
@@ -1611,108 +1637,78 @@ def authcloud_create_licenses():
     creator_tag = f"Reseller: {username}" if reseller_doc else "Master Admin"
     full_note = f"{note} [{creator_tag}]" if note else creator_tag
 
-    # Map duration to standard format or AuthZen gen plan
+    # Map duration to standard AuthZen plan code (e.g. 1day, 3day, 7day, 15day, 30day, 60day, 90day, 365day)
+    dur_clean = duration.lower().strip()
     plan_map = {
-        "1 day": "gen_1",
-        "7 days": "gen_7",
-        "15 days": "gen_15",
-        "30 days": "gen_30"
+        "1 hour": "1hour",
+        "2 hours": "2hour",
+        "12 hours": "12hour",
+        "1 day": "1day",
+        "3 days": "3day",
+        "7 days": "7day",
+        "15 days": "15day",
+        "30 days": "30day",
+        "60 days": "60day",
+        "90 days": "90day",
+        "365 days": "365day",
+        "lifetime": "365day"
     }
-    plan_code = plan_map.get(duration.lower().strip(), "gen_30")
-
-    payload = {
-        "seller_key": active_seller_key,
-        "duration": duration,
-        "plan": plan_code,
-        "count": count,
-        "note": full_note
-    }
-    if custom_key:
-        payload["key"] = custom_key
-
-    headers = {
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0",
-        "X-Seller-Key": active_seller_key
-    }
+    plan_code = plan_map.get(dur_clean)
+    if not plan_code:
+        import re
+        nums = re.findall(r'\d+', dur_clean)
+        if nums:
+            if "hour" in dur_clean:
+                plan_code = f"{nums[0]}hour"
+            else:
+                plan_code = f"{nums[0]}day"
+        else:
+            plan_code = "30day"
 
     generated_keys = []
-    api_url = AUTHZEN_GET_KEY_URL
     api_err = None
 
-    # Step A: POST to https://brmodsbypass.authzen.site/api/get-key
-    try:
-        resp = requests.post(
-            f"{api_url}?seller_key={active_seller_key}&duration={duration}&count={count}",
-            json=payload,
-            headers=headers,
-            timeout=20
-        )
-        if resp.status_code in (200, 201):
-            try:
-                res_data = resp.json()
-                if isinstance(res_data, dict):
-                    if "licenses" in res_data and isinstance(res_data["licenses"], list):
-                        generated_keys = res_data["licenses"]
-                    elif "keys" in res_data and isinstance(res_data["keys"], list):
-                        generated_keys = [{"key": k, "duration": duration, "note": full_note} for k in res_data["keys"]]
-                    elif "key" in res_data:
-                        generated_keys = [{"key": res_data["key"], "duration": res_data.get("duration", duration), "note": full_note}]
-            except Exception:
-                pass
-        else:
-            try:
-                err_data = resp.json()
-                api_err = err_data.get("message") or err_data.get("error")
-            except Exception:
-                api_err = f"HTTP {resp.status_code}"
-    except Exception as e:
-        api_err = str(e)
-
-    # Step B: GET to https://brmodsbypass.authzen.site/api/get-key (AuthZen accepts both GET and POST)
-    if not generated_keys:
+    # Step A: Call GET https://brmodsbypass.authzen.site/api/get-key?seller_key=...&plan=...
+    for _ in range(count):
         try:
-            resp_get = requests.get(
-                f"{api_url}?seller_key={active_seller_key}&duration={duration}&count={count}",
-                headers=headers,
+            resp = requests.get(
+                f"{AUTHCLOUD_API_BASE}/get-key?seller_key={active_seller_key}&plan={plan_code}",
+                headers={"User-Agent": "Mozilla/5.0"},
                 timeout=20
             )
-            if resp_get.status_code in (200, 201):
+            if resp.status_code in (200, 201):
                 try:
-                    res_data = resp_get.json()
+                    res_data = resp.json()
                     if isinstance(res_data, dict):
-                        if "licenses" in res_data and isinstance(res_data["licenses"], list):
-                            generated_keys = res_data["licenses"]
+                        k_str = res_data.get("key")
+                        if k_str:
+                            generated_keys.append({
+                                "key": k_str,
+                                "duration": f"{res_data.get('days', duration)} Days" if res_data.get('days') else duration,
+                                "plan": res_data.get("plan", plan_code),
+                                "note": full_note,
+                                "status": "Unused",
+                                "hwid": "None",
+                                "created_at": res_data.get("issued_at", datetime.utcnow().isoformat())
+                            })
+                        elif "licenses" in res_data and isinstance(res_data["licenses"], list):
+                            generated_keys.extend(res_data["licenses"])
                         elif "keys" in res_data and isinstance(res_data["keys"], list):
-                            generated_keys = [{"key": k, "duration": duration, "note": full_note} for k in res_data["keys"]]
-                        elif "key" in res_data:
-                            generated_keys = [{"key": res_data["key"], "duration": res_data.get("duration", duration), "note": full_note}]
-                except Exception:
-                    pass
-            elif not api_err:
+                            generated_keys.extend([{"key": k, "duration": duration, "note": full_note} for k in res_data["keys"]])
+                        else:
+                            api_err = res_data.get("message") or "No key returned in API response"
+                except Exception as ex:
+                    api_err = f"JSON parse error: {ex}"
+            else:
                 try:
-                    err_data = resp_get.json()
+                    err_data = resp.json()
                     api_err = err_data.get("message") or err_data.get("error")
                 except Exception:
-                    api_err = f"HTTP {resp_get.status_code}"
+                    api_err = f"HTTP {resp.status_code}"
+                break
         except Exception as e:
-            if not api_err:
-                api_err = str(e)
-
-    # Step C: Fallback to AuthZen /api/key endpoint if available
-    if not generated_keys:
-        try:
-            resp_key = requests.get(
-                f"{AUTHCLOUD_API_BASE}/key?duration={duration}",
-                headers={"User-Agent": "Mozilla/5.0"},
-                timeout=10
-            )
-            if resp_key.status_code == 200:
-                k_data = resp_key.json()
-                if k_data.get("key"):
-                    generated_keys = [{"key": k_data["key"], "duration": k_data.get("duration", duration), "note": full_note}]
-        except Exception:
-            pass
+            api_err = str(e)
+            break
 
     if not generated_keys:
         msg = f"Failed to generate key from AuthZen API ({AUTHZEN_GET_KEY_URL}): {api_err or 'No key returned'}"
@@ -1763,50 +1759,142 @@ def authcloud_create_licenses():
     return jsonify(response_data), 200
 
 
-# 4. Reset HWID Binding
+# 1. Create License Key Direct Route (AuthZen Engine)
+# curl -X GET "https://brmodsbypass.authzen.site/api/get-key?seller_key=RES-E961EF9C&plan=30day"
+@app.route('/api/get-key', methods=['GET'])
+def authcloud_direct_get_key():
+    seller_key = request.args.get("seller_key", "").strip() or get_authzen_seller_key()
+    plan = request.args.get("plan", "30day").strip()
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/get-key?seller_key={seller_key}&plan={plan}"
+        resp = requests.get(url, timeout=15)
+        try:
+            return jsonify(resp.json()), resp.status_code
+        except Exception:
+            return jsonify({"success": resp.status_code == 200, "message": resp.text}), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"AuthZen API error: {e}"}), 500
+
+
+# 2. Reset HWID
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/reset?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+@app.route('/api/key/reset', methods=['POST', 'GET'])
 @app.route('/api/authcloud/licenses/reset-hwid', methods=['POST'])
 def authcloud_reset_hwid():
-    body = request.json or {}
-    key = body.get("key", "").strip()
+    body = request.get_json(silent=True) or {}
+    key = (request.args.get("key") or body.get("key") or "").strip()
+    seller_key = (request.args.get("seller_key") or body.get("seller_key") or "").strip() or get_authzen_seller_key()
     if not key:
         return jsonify({"success": False, "message": "Key is required to reset HWID"}), 400
     try:
-        url = f"{AUTHCLOUD_API_BASE}/licenses/reset-hwid"
-        resp = requests.post(url, json={"key": key}, headers={"Content-Type": "application/json"}, timeout=15)
-        return jsonify(resp.json()), resp.status_code
-    except Exception:
-        return jsonify({"success": True, "message": f"HWID reset request processed for key: {key}"}), 200
+        url = f"{AUTHCLOUD_API_BASE}/key/reset?seller_key={seller_key}&key={key}"
+        resp = requests.post(url, timeout=15)
+        try:
+            return jsonify(resp.json()), resp.status_code
+        except Exception:
+            return jsonify({"success": resp.status_code == 200, "message": resp.text}), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"AuthZen API error: {e}"}), 500
 
 
-# 5. Ban License Key
+# 3. Unlock HWID
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/unlock?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+@app.route('/api/key/unlock', methods=['POST', 'GET'])
+@app.route('/api/authcloud/licenses/unlock-hwid', methods=['POST'])
+def authcloud_unlock_hwid():
+    body = request.get_json(silent=True) or {}
+    key = (request.args.get("key") or body.get("key") or "").strip()
+    seller_key = (request.args.get("seller_key") or body.get("seller_key") or "").strip() or get_authzen_seller_key()
+    if not key:
+        return jsonify({"success": False, "message": "Key is required to unlock HWID"}), 400
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/key/unlock?seller_key={seller_key}&key={key}"
+        resp = requests.post(url, timeout=15)
+        try:
+            return jsonify(resp.json()), resp.status_code
+        except Exception:
+            return jsonify({"success": resp.status_code == 200, "message": resp.text}), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"AuthZen API error: {e}"}), 500
+
+
+# 4. Ban Key
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/ban?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+@app.route('/api/key/ban', methods=['POST', 'GET'])
 @app.route('/api/authcloud/licenses/ban', methods=['POST'])
 def authcloud_ban_license():
-    body = request.json or {}
-    key = body.get("key", "").strip()
-    reason = body.get("reason", "Administrative action").strip()
+    body = request.get_json(silent=True) or {}
+    key = (request.args.get("key") or body.get("key") or "").strip()
+    seller_key = (request.args.get("seller_key") or body.get("seller_key") or "").strip() or get_authzen_seller_key()
     if not key:
         return jsonify({"success": False, "message": "Key is required to ban"}), 400
     try:
-        url = f"{AUTHCLOUD_API_BASE}/licenses/ban"
-        resp = requests.post(url, json={"key": key, "reason": reason}, headers={"Content-Type": "application/json"}, timeout=15)
-        return jsonify(resp.json()), resp.status_code
-    except Exception:
-        return jsonify({"success": True, "message": f"Key {key} marked as banned."}), 200
+        url = f"{AUTHCLOUD_API_BASE}/key/ban?seller_key={seller_key}&key={key}"
+        resp = requests.post(url, timeout=15)
+        try:
+            return jsonify(resp.json()), resp.status_code
+        except Exception:
+            return jsonify({"success": resp.status_code == 200, "message": resp.text}), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"AuthZen API error: {e}"}), 500
 
 
-# 6. Unban License Key
+# 5. Unban Key
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/unban?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+@app.route('/api/key/unban', methods=['POST', 'GET'])
 @app.route('/api/authcloud/licenses/unban', methods=['POST'])
 def authcloud_unban_license():
-    body = request.json or {}
-    key = body.get("key", "").strip()
+    body = request.get_json(silent=True) or {}
+    key = (request.args.get("key") or body.get("key") or "").strip()
+    seller_key = (request.args.get("seller_key") or body.get("seller_key") or "").strip() or get_authzen_seller_key()
     if not key:
         return jsonify({"success": False, "message": "Key is required to unban"}), 400
     try:
-        url = f"{AUTHCLOUD_API_BASE}/licenses/unban"
-        resp = requests.post(url, json={"key": key}, headers={"Content-Type": "application/json"}, timeout=15)
-        return jsonify(resp.json()), resp.status_code
-    except Exception:
-        return jsonify({"success": True, "message": f"Key {key} unbanned."}), 200
+        url = f"{AUTHCLOUD_API_BASE}/key/unban?seller_key={seller_key}&key={key}"
+        resp = requests.post(url, timeout=15)
+        try:
+            return jsonify(resp.json()), resp.status_code
+        except Exception:
+            return jsonify({"success": resp.status_code == 200, "message": resp.text}), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"AuthZen API error: {e}"}), 500
+
+
+# 6. Delete Key
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/delete?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+@app.route('/api/key/delete', methods=['POST', 'GET'])
+@app.route('/api/authcloud/licenses/delete', methods=['POST'])
+def authcloud_delete_license():
+    body = request.get_json(silent=True) or {}
+    key = (request.args.get("key") or body.get("key") or "").strip()
+    seller_key = (request.args.get("seller_key") or body.get("seller_key") or "").strip() or get_authzen_seller_key()
+    if not key:
+        return jsonify({"success": False, "message": "Key is required to delete"}), 400
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/key/delete?seller_key={seller_key}&key={key}"
+        resp = requests.post(url, timeout=15)
+        try:
+            return jsonify(resp.json()), resp.status_code
+        except Exception:
+            return jsonify({"success": resp.status_code == 200, "message": resp.text}), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"AuthZen API error: {e}"}), 500
+
+
+# 7. List Your Keys
+# curl -X GET "https://brmodsbypass.authzen.site/api/key/list?seller_key=RES-E961EF9C"
+@app.route('/api/key/list', methods=['GET'])
+def authcloud_direct_list_keys():
+    seller_key = request.args.get("seller_key", "").strip() or get_authzen_seller_key()
+    try:
+        url = f"{AUTHCLOUD_API_BASE}/key/list?seller_key={seller_key}"
+        resp = requests.get(url, timeout=15)
+        try:
+            return jsonify(resp.json()), resp.status_code
+        except Exception:
+            return jsonify({"success": resp.status_code == 200, "message": resp.text}), resp.status_code
+    except Exception as e:
+        return jsonify({"success": False, "message": f"AuthZen API error: {e}"}), 500
 
 
 # 7. Reseller Management — List All Resellers with Quota, Expiry Date & Allowed Durations (Admin Only)

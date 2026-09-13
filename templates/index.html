@@ -1041,14 +1041,17 @@
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
               <div>
                 <div style="font-family:var(--f-display); font-size:14px; font-weight:700; color:var(--white); display:flex; align-items:center; gap:8px;">
-                  <span style="color:var(--red);">🔄</span> Instant Hardware ID (HWID) Reset
+                  <span style="color:var(--red);">🔄</span> Instant Hardware ID (HWID) Control
                 </div>
-                <div style="font-size:11.5px; color:var(--ink-500); margin-top:2px;">Reset device binding for any customer license in 1 click.</div>
+                <div style="font-size:11.5px; color:var(--ink-500); margin-top:2px;">Reset device binding or unlock HWID for any license in 1 click.</div>
               </div>
-              <div style="display:flex; gap:10px; flex:1; max-width:540px; min-width:280px;">
-                <input type="text" id="ac-inp-quick-reset" class="input-field-app" style="margin:0; font-family:var(--f-mono); font-size:12.5px;" placeholder="Paste License Key (e.g. KEY-XXXX-YYYY)...">
-                <button class="app-btn btn-red-action" style="width:auto; padding:10px 22px; white-space:nowrap;" onclick="authcloudQuickResetHwid()">
-                  <span>Reset HWID</span>
+              <div style="display:flex; gap:8px; flex:1; max-width:580px; min-width:280px; flex-wrap:wrap;">
+                <input type="text" id="ac-inp-quick-reset" class="input-field-app" style="margin:0; font-family:var(--f-mono); font-size:12.5px; flex:1; min-width:180px;" placeholder="Paste License Key (e.g. BYP-XXXX-XXXX)...">
+                <button class="app-btn btn-red-action" style="width:auto; padding:10px 18px; white-space:nowrap;" onclick="authcloudQuickResetHwid()">
+                  <span>🔄 Reset HWID</span>
+                </button>
+                <button class="app-btn btn-blue-action" style="width:auto; padding:10px 18px; white-space:nowrap;" onclick="authcloudQuickUnlockHwid()">
+                  <span>🔓 Unlock HWID</span>
                 </button>
               </div>
             </div>
@@ -1695,6 +1698,19 @@
       <div class="modal-btn-row">
         <button class="app-btn btn-danger-action" style="flex:1;" onclick="authcloudExecuteBanConfirm()"><span>Ban License Key</span></button>
         <button class="app-btn btn-dark-action" style="flex:1;" onclick="closeAppModal('modal-ban-license')"><span>Cancel</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DELETE LICENSE -->
+  <div id="modal-delete-license" class="app-modal-overlay">
+    <div class="app-modal-box" style="border-color:var(--red-line); box-shadow:0 0 35px var(--red-glow);">
+      <h3 class="modal-title-red">🗑 Delete License Key</h3>
+      <div class="modal-body-text">Are you sure you want to permanently delete this license key from AuthZen? This action cannot be reversed:</div>
+      <div id="modal-delete-key-text" style="font-family:var(--f-mono); font-size:13px; font-weight:700; color:var(--white); background:rgba(255,42,75,0.12); padding:8px 12px; border-radius:var(--r-sm); border:1px dashed var(--red-line); margin:10px 0; word-break:break-all;">KEY-XXXX</div>
+      <div class="modal-btn-row">
+        <button class="app-btn btn-danger-action" style="flex:1;" onclick="authcloudExecuteDeleteConfirm()"><span>Delete Permanently</span></button>
+        <button class="app-btn btn-dark-action" style="flex:1;" onclick="closeAppModal('modal-delete-license')"><span>Cancel</span></button>
       </div>
     </div>
   </div>
@@ -3370,6 +3386,7 @@
     let selectedLicenseDuration = '30 Days';
     let generatedKeysCache = [];
     let banTargetKey = null;
+    let deleteTargetKey = null;
     let updateLimitTargetUser = null;
 
     function authcloudSelectDuration(durationStr, el) {
@@ -3465,9 +3482,15 @@
           statusBadge = '<span class="status-badge badge-red" style="background:rgba(255,42,75,0.18); color:#ff6b81; border-color:var(--red-line);">Banned</span>';
         }
 
-        const hwidDisplay = hwid === 'Not Bound' || !hwid ? 
-          '<span style="color:var(--ink-700); font-family:var(--f-mono); font-size:11px;">None</span>' : 
-          `<span style="color:var(--ink-300); font-family:var(--f-mono); font-size:11px;" title="${hwid}">${hwid.slice(0, 12)}...</span>`;
+        const hwidStatus = item.hwid_status || item.hwid || 'None';
+        let hwidDisplay = '<span style="color:var(--ink-700); font-family:var(--f-mono); font-size:11px;">None</span>';
+        if (hwidStatus.toLowerCase() === 'unlock' || hwidStatus.toLowerCase() === 'unlocked') {
+          hwidDisplay = '<span class="status-badge badge-blue" style="background:rgba(59,130,246,0.15); color:#60a5fa; border-color:rgba(59,130,246,0.3); font-size:10px;">🔓 Unlocked</span>';
+        } else if (hwidStatus.toLowerCase() === 'reset') {
+          hwidDisplay = '<span class="status-badge badge-amber" style="background:rgba(245,158,11,0.15); color:#fbbf24; border-color:rgba(245,158,11,0.3); font-size:10px;">🔄 Reset</span>';
+        } else if (hwidStatus !== 'None' && hwidStatus !== 'Not Bound' && hwidStatus) {
+          hwidDisplay = `<span style="color:var(--ink-300); font-family:var(--f-mono); font-size:11px;" title="${hwidStatus}">${hwidStatus.slice(0, 12)}...</span>`;
+        }
 
         return `
           <tr>
@@ -3481,15 +3504,21 @@
             <td>${hwidDisplay}</td>
             <td style="font-family:var(--f-mono); font-size:11px; color:var(--ink-500);">${expires}</td>
             <td>
-              <div style="display:flex; gap:6px; flex-wrap:nowrap;">
-                <button class="app-btn btn-dark-action" style="width:auto; padding:5px 10px; font-size:11px;" title="Reset HWID" onclick="authcloudResetHwidForKey('${key}')">
+              <div style="display:flex; gap:5px; flex-wrap:nowrap;">
+                <button class="app-btn btn-dark-action" style="width:auto; padding:5px 9px; font-size:11px;" title="Reset HWID" onclick="authcloudResetHwidForKey('${key}')">
                   <span>🔄 Reset</span>
                 </button>
+                <button class="app-btn btn-dark-action" style="width:auto; padding:5px 9px; font-size:11px; border-color:rgba(59,130,246,0.4);" title="Unlock HWID" onclick="authcloudUnlockHwidForKey('${key}')">
+                  <span>🔓 Unlock</span>
+                </button>
                 ${isBanned ? 
-                  `<button class="app-btn btn-amber-action" style="width:auto; padding:5px 10px; font-size:11px;" onclick="authcloudUnbanKey('${key}')"><span>🔓 Unban</span></button>` :
-                  `<button class="app-btn btn-danger-action" style="width:auto; padding:5px 10px; font-size:11px;" onclick="authcloudPromptBan('${key}')"><span>🚫 Ban</span></button>`
+                  `<button class="app-btn btn-amber-action" style="width:auto; padding:5px 9px; font-size:11px;" title="Unban Key" onclick="authcloudUnbanKey('${key}')"><span>Unban</span></button>` :
+                  `<button class="app-btn btn-danger-action" style="width:auto; padding:5px 9px; font-size:11px;" title="Ban Key" onclick="authcloudPromptBan('${key}')"><span>🚫 Ban</span></button>`
                 }
-                <button class="app-btn btn-dark-action" style="width:auto; padding:5px 10px; font-size:11px;" title="Details" onclick="authcloudViewDetails('${key}')">
+                <button class="app-btn btn-danger-action" style="width:auto; padding:5px 9px; font-size:11px; background:rgba(255,42,75,0.1); border-color:rgba(255,42,75,0.3);" title="Delete Key" onclick="authcloudPromptDelete('${key}')">
+                  <span>🗑</span>
+                </button>
+                <button class="app-btn btn-dark-action" style="width:auto; padding:5px 9px; font-size:11px;" title="Details" onclick="authcloudViewDetails('${key}')">
                   <span>ℹ</span>
                 </button>
               </div>
@@ -3640,6 +3669,17 @@
       if (inp) inp.value = '';
     }
 
+    async function authcloudQuickUnlockHwid() {
+      const inp = document.getElementById('ac-inp-quick-reset');
+      const key = (inp?.value || '').trim();
+      if (!key) {
+        notifyToast('Please paste or enter a license key');
+        return;
+      }
+      await authcloudUnlockHwidForKey(key);
+      if (inp) inp.value = '';
+    }
+
     async function authcloudResetHwidForKey(keyStr) {
       try {
         notifyToast('Resetting HWID binding...');
@@ -3649,7 +3689,7 @@
           body: JSON.stringify({ key: keyStr })
         });
         const data = await res.json();
-        if (res.ok && data.success) {
+        if (res.ok && (data.success || data.action === 'reset')) {
           notifyToast(`✅ HWID successfully reset for key: ${keyStr}`);
           authcloudFetchLicenses();
         } else {
@@ -3657,6 +3697,58 @@
         }
       } catch (err) {
         notifyToast('Error connecting to API: ' + err.message);
+      }
+    }
+
+    async function authcloudUnlockHwidForKey(keyStr) {
+      try {
+        notifyToast('Unlocking HWID binding...');
+        const res = await fetch('/api/authcloud/licenses/unlock-hwid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: keyStr })
+        });
+        const data = await res.json();
+        if (res.ok && (data.success || data.action === 'unlock')) {
+          notifyToast(`🔓 HWID successfully unlocked for key: ${keyStr}`);
+          authcloudFetchLicenses();
+        } else {
+          notifyToast(`❌ Unlock HWID failed: ${data.message || 'Unknown error'}`);
+        }
+      } catch (err) {
+        notifyToast('Error connecting to API: ' + err.message);
+      }
+    }
+
+    function authcloudPromptDelete(keyStr) {
+      deleteTargetKey = keyStr;
+      const keyTextEl = document.getElementById('modal-delete-key-text');
+      if (keyTextEl) keyTextEl.textContent = keyStr;
+      openAppModal('modal-delete-license');
+    }
+
+    async function authcloudExecuteDeleteConfirm() {
+      if (!deleteTargetKey) return;
+      const keyToDelete = deleteTargetKey;
+      closeAppModal('modal-delete-license');
+      try {
+        notifyToast('Deleting license key...');
+        const res = await fetch('/api/authcloud/licenses/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: keyToDelete })
+        });
+        const data = await res.json();
+        if (res.ok && (data.success || data.action === 'delete')) {
+          notifyToast(`🗑 Key ${keyToDelete} deleted successfully!`);
+          authcloudFetchLicenses();
+        } else {
+          notifyToast(`❌ Failed to delete key: ${data.message || 'Error'}`);
+        }
+      } catch (err) {
+        notifyToast('Error: ' + err.message);
+      } finally {
+        deleteTargetKey = null;
       }
     }
 
@@ -3679,7 +3771,7 @@
           body: JSON.stringify({ key: banTargetKey, reason: reason })
         });
         const data = await res.json();
-        if (res.ok && data.success) {
+        if (res.ok && (data.success || data.action === 'ban')) {
           notifyToast(`🚫 License key ${banTargetKey} has been banned.`);
           authcloudFetchLicenses();
         } else {
@@ -3701,7 +3793,7 @@
           body: JSON.stringify({ key: keyStr })
         });
         const data = await res.json();
-        if (res.ok && data.success) {
+        if (res.ok && (data.success || data.action === 'unban')) {
           notifyToast(`🔓 License key ${keyStr} has been unbanned!`);
           authcloudFetchLicenses();
         } else {
