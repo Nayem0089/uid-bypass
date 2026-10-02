@@ -19,7 +19,7 @@ app = Flask(__name__)
 UID_API_BASE        = os.environ.get("UID_API_BASE", "https://uid.syntaxcorporation.online")
 AUTHCLOUD_API_BASE  = os.environ.get("AUTHCLOUD_API_BASE", "https://brmodsbypass.authzen.site/api").rstrip("/")
 AUTHZEN_GET_KEY_URL = os.environ.get("AUTHZEN_GET_KEY_URL", "https://brmodsbypass.authzen.site/api/get-key")
-AUTHZEN_SELLER_KEY  = os.environ.get("AUTHZEN_SELLER_KEY", os.environ.get("SELLER_KEY", "RES-E961EF9C")).strip()
+AUTHZEN_SELLER_KEY  = os.environ.get("AUTHZEN_SELLER_KEY", os.environ.get("SELLER_KEY", "libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0")).strip()
 ADMIN_KEY           = os.environ.get("ADMIN_KEY",    "changeme_admin_key")
 SELF_URL            = os.environ.get("SELF_URL",     "").rstrip("/")   # ← trailing slash সরানো হয়েছে
 
@@ -1243,7 +1243,7 @@ def get_authzen_seller_key():
                     return val
         except Exception:
             pass
-    return AUTHZEN_SELLER_KEY or "RES-E961EF9C"
+    return AUTHZEN_SELLER_KEY or "libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0"
 
 
 def set_authzen_seller_key(seller_key):
@@ -1760,7 +1760,7 @@ def authcloud_create_licenses():
 
 
 # 1. Create License Key Direct Route (AuthZen Engine)
-# curl -X GET "https://brmodsbypass.authzen.site/api/get-key?seller_key=RES-E961EF9C&plan=30day"
+# curl -X GET "https://brmodsbypass.authzen.site/api/get-key?seller_key=libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0&plan=30day"
 @app.route('/api/get-key', methods=['GET'])
 def authcloud_direct_get_key():
     seller_key = request.args.get("seller_key", "").strip() or get_authzen_seller_key()
@@ -1777,7 +1777,7 @@ def authcloud_direct_get_key():
 
 
 # 2. Reset HWID
-# curl -X POST "https://brmodsbypass.authzen.site/api/key/reset?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/reset?seller_key=libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0&key=BYP-XXXX-XXXX"
 @app.route('/api/key/reset', methods=['POST', 'GET'])
 @app.route('/api/authcloud/licenses/reset-hwid', methods=['POST'])
 def authcloud_reset_hwid():
@@ -1798,7 +1798,7 @@ def authcloud_reset_hwid():
 
 
 # 3. Unlock HWID
-# curl -X POST "https://brmodsbypass.authzen.site/api/key/unlock?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/unlock?seller_key=libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0&key=BYP-XXXX-XXXX"
 @app.route('/api/key/unlock', methods=['POST', 'GET'])
 @app.route('/api/authcloud/licenses/unlock-hwid', methods=['POST'])
 def authcloud_unlock_hwid():
@@ -1819,7 +1819,7 @@ def authcloud_unlock_hwid():
 
 
 # 4. Ban Key
-# curl -X POST "https://brmodsbypass.authzen.site/api/key/ban?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/ban?seller_key=libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0&key=BYP-XXXX-XXXX"
 @app.route('/api/key/ban', methods=['POST', 'GET'])
 @app.route('/api/authcloud/licenses/ban', methods=['POST'])
 def authcloud_ban_license():
@@ -1840,7 +1840,7 @@ def authcloud_ban_license():
 
 
 # 5. Unban Key
-# curl -X POST "https://brmodsbypass.authzen.site/api/key/unban?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/unban?seller_key=libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0&key=BYP-XXXX-XXXX"
 @app.route('/api/key/unban', methods=['POST', 'GET'])
 @app.route('/api/authcloud/licenses/unban', methods=['POST'])
 def authcloud_unban_license():
@@ -1861,7 +1861,7 @@ def authcloud_unban_license():
 
 
 # 6. Delete Key
-# curl -X POST "https://brmodsbypass.authzen.site/api/key/delete?seller_key=RES-E961EF9C&key=BYP-XXXX-XXXX"
+# curl -X POST "https://brmodsbypass.authzen.site/api/key/delete?seller_key=libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0&key=BYP-XXXX-XXXX"
 @app.route('/api/key/delete', methods=['POST', 'GET'])
 @app.route('/api/authcloud/licenses/delete', methods=['POST'])
 def authcloud_delete_license():
@@ -1882,7 +1882,7 @@ def authcloud_delete_license():
 
 
 # 7. List Your Keys
-# curl -X GET "https://brmodsbypass.authzen.site/api/key/list?seller_key=RES-E961EF9C"
+# curl -X GET "https://brmodsbypass.authzen.site/api/key/list?seller_key=libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0"
 @app.route('/api/key/list', methods=['GET'])
 def authcloud_direct_list_keys():
     seller_key = request.args.get("seller_key", "").strip() or get_authzen_seller_key()

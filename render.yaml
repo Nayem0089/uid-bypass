@@ -11,3 +11,6 @@ services:
         sync: false
       - key: ADMIN_KEY
         sync: false
+      - key: AUTHZEN_SELLER_KEY
+        value: libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0
+

@@ -861,14 +861,9 @@
 
       <div class="sidebar-nav-list">
 
-        <button class="nav-btn active" id="nav-btn-uids" onclick="navigateTab('uids')">
-          <div class="nav-icon-box">▣</div>
-          <span class="sidebar-text">UID Vault</span>
-        </button>
-
-        <button class="nav-btn" id="nav-btn-licenses" onclick="navigateTab('licenses')">
+        <button class="nav-btn active" id="nav-btn-licenses" onclick="navigateTab('licenses')">
           <div class="nav-icon-box" style="color:var(--red);">🔑</div>
-          <span class="sidebar-text">License & Keys</span>
+          <span class="sidebar-text">License Hub</span>
           <span style="font-size:9px; background:var(--red); color:#fff; border-radius:999px; padding:2px 7px; margin-left:auto; font-weight:700; box-shadow:0 0 8px var(--red-glow);">API</span>
         </button>
 
@@ -917,82 +912,8 @@
       <!-- PANEL A: MASTER ADMIN -->
       <div id="master-admin-panel" class="workspace-page">
 
-        <div id="view-tab-uids" class="panel-view-tab active">
-
-          <div class="dashboard-header">
-            <div class="header-title-box">
-              <div class="header-icon-badge">▣</div>
-              <div>
-                <h1 class="header-heading">UID <span>Vault</span></h1>
-                <div class="header-subtext">Manage & monitor active stream licenses</div>
-              </div>
-            </div>
-            <div class="header-status-pill"><span class="status-dot-live"></span><span>Master Admin Active</span></div>
-          </div>
-
-          <div class="metrics-grid">
-            <div class="metric-card"><div class="metric-value white" id="m-stat-total">—</div><div class="metric-label">Total UIDs</div></div>
-            <div class="metric-card"><div class="metric-value green" id="m-stat-active">—</div><div class="metric-label">Active Licenses</div></div>
-            <div class="metric-card"><div class="metric-value red" id="m-stat-expired">—</div><div class="metric-label">Expired Licenses</div></div>
-            <div class="metric-card"><div class="metric-value amber" id="m-stat-expiring">—</div><div class="metric-label">Expiring ≤ 7 Days</div></div>
-          </div>
-
-          <div class="dashboard-grid-2">
-
-            <div class="dashboard-card">
-              <div class="card-head-title">Create & Activate UID</div>
-              <input type="text" id="m-inp-uid" class="input-field-app" placeholder="User ID (e.g. 102938475)">
-              <input type="text" id="m-inp-name" class="input-field-app" placeholder="Player Name (e.g. Shadow Assassin)">
-              <select id="m-sel-days" class="input-field-app">
-                <option value="1">1 Day Validity</option>
-                <option value="7">7 Days Validity</option>
-                <option value="15">15 Days Validity</option>
-                <option value="30" selected>30 Days Validity</option>
-                <option value="60">60 Days Validity</option>
-                <option value="90">90 Days Validity</option>
-                <option value="365">1 Year Validity</option>
-              </select>
-              <div class="duration-chips-wrap" id="m-chips-container"></div>
-              <button class="app-btn btn-red-action" onclick="mainCreateUID()"><span>Save & Activate UID</span></button>
-              <button class="app-btn btn-amber-action" style="margin-top: 10px;" onclick="mainCreateUID24()"><span>Instant 24-Hour Activation</span></button>
-              <div class="inline-msg-box" id="msg-m-create"></div>
-            </div>
-
-            <div class="dashboard-card">
-              <div class="card-head-title">Manage & Renew UID</div>
-              <input type="text" id="m-inp-rm-uid" class="input-field-app" placeholder="UID to Revoke / Remove">
-              <button class="app-btn btn-danger-action" style="margin-bottom: 16px;" onclick="mainTriggerRemove()"><span>Revoke UID</span></button>
-              <hr class="section-divider">
-              <input type="text" id="m-inp-renew-uid" class="input-field-app" placeholder="UID to Renew / Extend">
-              <select id="m-sel-renew-days" class="input-field-app">
-                <option value="7">+7 Days Extension</option>
-                <option value="15">+15 Days Extension</option>
-                <option value="30" selected>+30 Days Extension</option>
-                <option value="60">+60 Days Extension</option>
-              </select>
-              <div class="duration-chips-wrap" id="m-renew-chips-container"></div>
-              <button class="app-btn btn-amber-action" onclick="mainRenewUID()"><span>Renew / Extend UID</span></button>
-              <div class="inline-msg-box" id="msg-m-manage"></div>
-            </div>
-
-          </div>
-
-          <div class="table-toolbar">
-            <button class="app-btn btn-dark-action" style="width:auto; padding:10px 22px;" onclick="mainFetchUIDs()"><span>Refresh Vault</span></button>
-            <div class="search-input-box"><input type="text" id="m-search-box" placeholder="Filter by UID, Name or Status..."></div>
-          </div>
-
-          <div class="table-container-card">
-            <table class="app-table">
-              <thead><tr><th>UID</th><th>Player Name</th><th>Duration</th><th>Status</th><th>Expires At</th><th>Time Left</th><th>Actions</th></tr></thead>
-              <tbody id="m-tbody-uids"><tr><td colspan="7" style="text-align:center; color:var(--ink-700); padding:40px;">Loading UID Vault...</td></tr></tbody>
-            </table>
-          </div>
-
-        </div>
-
         <!-- TAB: AUTHCLOUD LICENSE KEYS & GENERATOR HUB -->
-        <div id="view-tab-licenses" class="panel-view-tab">
+        <div id="view-tab-licenses" class="panel-view-tab active">
 
           <div class="dashboard-header">
             <div class="header-title-box">
@@ -1007,7 +928,11 @@
                 <span class="status-dot-live" style="background:var(--red); box-shadow:0 0 8px var(--red);"></span>
                 <span>API: <b>https://brmodsbypass.authzen.site/api/get-key</b></span>
               </span>
-              <button class="app-btn btn-dark-action" id="btn-ac-seller-key" style="width:auto; padding:8px 16px; font-size:11px; display:none;" onclick="authcloudOpenSellerKeyModal()">
+              <span class="header-status-pill" id="ac-active-key-pill" style="border-color:rgba(255,42,75,0.35); color:var(--white); background:rgba(255,42,75,0.08); box-shadow:0 0 10px rgba(255,42,75,0.15);">
+                <span class="status-dot-live" style="background:#2dd4bf; box-shadow:0 0 8px #2dd4bf;"></span>
+                <span>API Key: <b style="font-family:var(--f-mono); color:#2dd4bf;" id="ac-active-key-text">libapi_e68f8fdf...</b></span>
+              </span>
+              <button class="app-btn btn-dark-action" id="btn-ac-seller-key" style="width:auto; padding:8px 16px; font-size:11px;" onclick="authcloudOpenSellerKeyModal()">
                 <span>⚙ Seller Key</span>
               </button>
               <button class="app-btn btn-dark-action" style="width:auto; padding:8px 16px; font-size:11px;" onclick="authcloudFetchLicenses()">
@@ -1790,7 +1715,7 @@
       </div>
 
       <label style="font-size:11px; font-family:var(--f-mono); color:var(--ink-500); display:block; margin:12px 0 4px;">AuthZen Seller Key:</label>
-      <input type="text" id="modal-seller-key-inp" class="input-field-app" style="font-family:var(--f-mono); font-size:12px;" placeholder="Paste Seller Key here...">
+      <input type="text" id="modal-seller-key-inp" class="input-field-app" style="font-family:var(--f-mono); font-size:12px;" value="libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0" placeholder="Paste Seller Key here...">
 
       <div class="modal-btn-row" style="margin-top:14px;">
         <button class="app-btn btn-red-action" style="flex:1;" onclick="authcloudSaveSellerKey()"><span>Save Seller Key</span></button>
@@ -2108,7 +2033,7 @@
         subPanel.classList.remove('active');
         trailPanel?.classList.remove('active');
 
-        if (navUids) navUids.style.display = 'flex';
+        if (navUids) navUids.style.display = 'none';
         if (navLicenses) navLicenses.style.display = 'flex';
         navResellers.style.display = 'flex';
         navFetchers.style.display = 'flex';
@@ -2125,8 +2050,7 @@
         userAvatarIcon.textContent = 'A';
         userCreditsTag.style.display = 'none';
 
-        navigateTab('uids');
-        mainFetchUIDs();
+        navigateTab('licenses');
         loadResellersAction();
         adminLoadTrailKeysAction();
         adminLoadTrailUsersAction();
@@ -2242,6 +2166,7 @@
     }
 
     function navigateTab(tabName) {
+      if (tabName === 'uids') tabName = 'licenses';
       document.querySelectorAll('.nav-btn[id^="nav-btn-"]').forEach(btn => btn.classList.remove('active'));
       const activeNav = document.getElementById('nav-btn-' + tabName);
       if (activeNav) activeNav.classList.add('active');
@@ -2334,7 +2259,8 @@
     // ===== 7. MASTER ADMIN LOGIC =====
     async function mainFetchUIDs() {
       const tbody = document.getElementById('m-tbody-uids');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--ink-500); padding:36px;">Refreshing UID Vault...</td></tr>';
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--ink-500); padding:36px;">Refreshing...</td></tr>';
 
       try {
         const res = await fetch('/admin/list?admin_key=' + encodeURIComponent(SESSION.adminKey));
@@ -2354,6 +2280,7 @@
 
     function renderMainUIDsTable(uids) {
       const tbody = document.getElementById('m-tbody-uids');
+      if (!tbody) return;
       if (!uids.length) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--ink-700); padding:40px;">No UIDs found</td></tr>';
         return;
@@ -3434,6 +3361,17 @@
         if (bannedEl) bannedEl.textContent = authcloudLicensesCache.filter(k => (k.status || '').toLowerCase() === 'banned').length;
 
         renderAuthcloudLicensesTable(authcloudLicensesCache);
+
+        if (SESSION.role === 'main_admin' && (SESSION.admin_key || SESSION.adminKey)) {
+          fetch('/api/authcloud/settings/seller-key?admin_key=' + encodeURIComponent(SESSION.admin_key || SESSION.adminKey || ADMIN_KEY))
+            .then(r => r.json())
+            .then(kData => {
+              if (kData.seller_key) {
+                const keyLabel = document.getElementById('ac-active-key-text');
+                if (keyLabel) keyLabel.textContent = kData.masked_key || (kData.seller_key.length > 14 ? (kData.seller_key.slice(0, 10) + '...' + kData.seller_key.slice(-4)) : kData.seller_key);
+              }
+            }).catch(() => {});
+        }
       } catch (err) {
         console.error('Error fetching AuthCloud licenses:', err);
         const tbody = document.getElementById('ac-tbody-licenses');
@@ -3917,16 +3855,18 @@
         const res = await fetch('/api/authcloud/settings/seller-key?admin_key=' + encodeURIComponent(SESSION.admin_key || ADMIN_KEY));
         const data = await res.json();
         if (res.ok && inp) {
-          inp.value = data.seller_key || '';
-          if (data.seller_key) {
-            msgBox.className = 'inline-msg-box ok';
-            msgBox.textContent = `Current Active Seller Key: ${data.masked_key || data.seller_key}`;
-          } else {
-            msgBox.className = 'inline-msg-box err';
-            msgBox.textContent = 'No Seller Key configured yet. Please enter your AuthZen Seller Key.';
-          }
+          const activeK = data.seller_key || 'libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0';
+          inp.value = activeK;
+          const displayMasked = data.masked_key || (activeK.length > 14 ? (activeK.slice(0, 10) + '...' + activeK.slice(-4)) : activeK);
+          const keyLabel = document.getElementById('ac-active-key-text');
+          if (keyLabel) keyLabel.textContent = displayMasked;
+
+          msgBox.className = 'inline-msg-box ok';
+          msgBox.textContent = `Current Active Seller Key: ${displayMasked}`;
         }
-      } catch (e) {}
+      } catch (e) {
+        if (inp && !inp.value) inp.value = 'libapi_e68f8fdfa38a081b6f174fda9300e1ce968bdfe0';
+      }
     }
 
     async function authcloudSaveSellerKey() {
@@ -3946,6 +3886,10 @@
           notifyToast('AuthZen Seller Key saved!');
           msgBox.className = 'inline-msg-box ok';
           msgBox.textContent = '✅ Seller Key updated successfully!';
+          const keyLabel = document.getElementById('ac-active-key-text');
+          if (keyLabel && keyVal) {
+            keyLabel.textContent = keyVal.length > 14 ? (keyVal.slice(0, 10) + '...' + keyVal.slice(-4)) : keyVal;
+          }
           setTimeout(() => closeAppModal('modal-authzen-seller-key'), 1000);
         } else {
           msgBox.className = 'inline-msg-box err';
